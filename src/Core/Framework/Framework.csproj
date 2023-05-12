@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 		<PropertyGroup>
-				<OutputType>Exe</OutputType>
-				<AssemblyName>Benchmarker</AssemblyName>
+				<AssemblyName>Benchmarker.Framework</AssemblyName>
+				<RootNamespace>Benchmarker.Framework</RootNamespace>
 				<TargetFramework>net7.0</TargetFramework>
 				<ImplicitUsings>enable</ImplicitUsings>
 				<Nullable>enable</Nullable>
 		</PropertyGroup>
 
 		<ItemGroup>
-				<ProjectReference Include="..\Framework\Framework.csproj" />
+				<PackageReference Include="BenchmarkDotnet" Version="*" />
+				<PackageReference Include="Sodiware.Core" Version="*-*" />
 		</ItemGroup>
 
 </Project>

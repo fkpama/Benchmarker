@@ -1,16 +1,10 @@
-﻿using System.Collections.Immutable;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Runtime.Loader;
+﻿using System.Reflection;
 using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -19,106 +13,13 @@ using BenchmarkDotNet.Validators;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Sodiware;
 using Sodiware.Benchmarker;
 
 namespace TestAdapter
 {
-    [FileExtension(".dll")]
-    [Category("managed")]
-    [DefaultExecutorUri(BenchmarkerConstants.ExecutorUri)]
-    public class BenchmarkerDiscovery : ITestDiscoverer
-    {
-        static AssemblyLoadContext? s_context;
-        internal static IEnumerable<BenchmarkTestCase> GetTestCases(string item)
-            => GetTestCases(item, null);
-        internal static IEnumerable<BenchmarkTestCase>
-            GetTestCases(string item, Func<Type, IConfig>? configFactory = null)
-        {
-            string? suffix;
-            Assembly asm;
-            AssemblyLoadContext ctx;
-            try
-            {
-                ctx = s_context ??= new AssemblyLoadContext("x", true);
-                asm = ctx.LoadFromAssemblyPath(item);
-                var attr = asm.GetCustomAttribute<AssemblyConfigurationAttribute>();
-                suffix = attr?.Configuration;
-            }
-            catch
-            {
-                // TODO: Log exception
-                yield break;
-            }
-
-            foreach (var type in loadTypes(asm))
-            {
-                var methods = loadMethods(type);
-                var config = configFactory?.Invoke(type);
-                var run = BenchmarkConverter
-                        .MethodsToBenchmarks(type, methods, config!);
-
-                foreach (var btestCase in run.BenchmarksCases)
-                {
-                    var m = btestCase.Descriptor.WorkloadMethod;
-                    var attr = m.GetCustomAttribute<BenchmarkAttribute>();
-                    var fullyQualifiedName = $"{type.FullName}.{m.Name}";
-                    var testCase = new TestCase(fullyQualifiedName,
-                            new(BenchmarkerConstants.ExecutorUri),
-                            item)
-                    {
-                        DisplayName = btestCase.Descriptor.WorkloadMethodDisplayInfo,
-                        FullyQualifiedName = fullyQualifiedName,
-                        CodeFilePath = attr?.SourceCodeFile,
-                        LineNumber = attr?.SourceCodeLineNumber ?? default,
-                    };
-                    yield return new(run, config, btestCase, testCase, ctx);
-                }
-            }
-        }
-
-        private static MethodInfo[] loadMethods(Type type)
-        {
-            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
-                .Where(x => x.GetCustomAttribute<BenchmarkAttribute>() is not null)
-                .ToArray();
-
-            return methods;
-        }
-
-        private static IEnumerable<Type> loadTypes(Assembly asm)
-        {
-            Type[] types;
-            try
-            {
-                types = asm.GetExportedTypes();
-            }
-            catch(ReflectionTypeLoadException ex)
-            {
-                if (ex.Types is null)
-                {
-                    throw;
-                }
-                types = ex.Types
-                    .Where(x => x is not null)
-                    .ToArray()!;
-            }
-
-            return types;
-        }
-
-        public void DiscoverTests(IEnumerable<string> sources,
-            IDiscoveryContext discoveryContext,
-            IMessageLogger logger,
-            ITestCaseDiscoverySink discoverySink)
-        {
-            foreach(var item in sources.SelectMany(GetTestCases))
-            {
-                discoverySink.SendTestCase(item.TestCase);
-            }
-        }
-    }
     [ExtensionUri(BenchmarkerConstants.ExecutorUri)]
-    class Class1 : ITestExecutor
+    internal sealed class BenchmarkerExecutor : ITestExecutor
     {
         private readonly CancellationTokenSource CancellationTokenSource = new();
         public void Cancel()
@@ -141,20 +42,23 @@ namespace TestAdapter
             IRunContext? runContext,
             IFrameworkHandle? frameworkHandle)
         {
-            Console.WriteLine("Runtest 2");
+            var settings = Helpers.Load(runContext);
             if (sources is null || frameworkHandle is null) return;
             var cases = new List<BenchmarkTestCase>();
-            var lst = new List<BenchmarkRunInfo>(CreateRunInfos(frameworkHandle, sources, cases));
+            var lst = new List<BenchmarkRunInfo>(CreateRunInfos(frameworkHandle,
+                                                                sources,
+                                                                cases,
+                                                                settings));
             BenchmarkRunner.Run(lst.ToArray());
         }
 
-        private IEnumerable<BenchmarkRunInfo> CreateRunInfos(IFrameworkHandle handle, IEnumerable<string> sources, List<BenchmarkTestCase> cases)
+        private IEnumerable<BenchmarkRunInfo> CreateRunInfos(IFrameworkHandle handle, IEnumerable<string> sources, List<BenchmarkTestCase> cases, Benchmarker.Engine.Settings.BenchmarkerSettings settings)
         {
             foreach (var group in sources
-                .SelectMany(x => BenchmarkerDiscovery.GetTestCases(x,
-                x => createBenchmarkConfig(handle, x, cases))
+                .SelectMany(x => BenchmarkerDiscoverer.GetTestCases(x,
+                x => createBenchmarkConfig(handle, x, cases, settings))
                 .GroupBy(x => x.RunInfo)
-                .Where(x => x.Count() > 0)))
+                .Where(x => x.Any())))
             {
                 cases.AddRange(group);
                 foreach (var tc in group)
@@ -167,7 +71,8 @@ namespace TestAdapter
 
         private IConfig createBenchmarkConfig(IFrameworkHandle handle,
                                               Type type,
-                                              List<BenchmarkTestCase> cases)
+                                              List<BenchmarkTestCase> cases,
+                                              Benchmarker.Engine.Settings.BenchmarkerSettings settings)
         {
             var config = ManualConfig
                 .CreateEmpty()
@@ -191,9 +96,17 @@ namespace TestAdapter
                 config.AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)));
             }
 
-            if (!config.GetExporters().Any(x => x is BenchmarkerExporter))
+            var exporter = config.GetExporters()
+                .OfType<BenchmarkerExporter>()
+                .FirstOrDefault();
+            if (exporter is null)
             {
-                config.AddExporter(new BenchmarkerExporter());
+                config.AddExporter(exporter = new());
+            }
+            if (settings is not null
+                && settings.History.IsPresent())
+            {
+                exporter.FilePath = settings.History;
             }
             return config;
         }
@@ -309,10 +222,5 @@ namespace TestAdapter
                     this.handle.SendMessage(convert(logKind), text);
             }
         }
-    }
-
-    public interface IDiagnoserListener
-    {
-        void OnTestFinished(BenchmarkCase benchmarkCase);
     }
 }

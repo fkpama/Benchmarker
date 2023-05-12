@@ -8,8 +8,11 @@
 		</PropertyGroup>
 
 		<ItemGroup>
-		  <ProjectReference Include="..\..\src\Sodiware.Benchmarker\Sodiware.Benchmarker.csproj" />
-				<ProjectReference Include="..\..\src\TestAdapter\TestAdapter.csproj">
+
+				<ProjectReference Include="..\..\src\Core\Framework\Framework.csproj" />
+				<AdapterLibraries Include="..\..\src\Core\Engine\Engine.csproj" />
+				<AdapterLibraries Include="..\..\src\MsTests\TestAdapter\TestAdapter.csproj"/>
+				<ProjectReference Include="@(AdapterLibraries)">
 						<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 						<OutputItemType>None</OutputItemType>
 						<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -17,8 +20,7 @@
 		</ItemGroup>
 
 		<ItemGroup>
-				<None Include="BenchmarkDotNet.Artifacts/" Visible="false">
-				</None>
+			<None Include="BenchmarkDotNet.Artifacts/**/*" Visible="false" />
 		</ItemGroup>
 
 </Project>
