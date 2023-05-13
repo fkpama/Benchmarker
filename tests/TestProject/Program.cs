@@ -6,7 +6,7 @@ namespace TestProject
     {
         public static void Main()
         {
-            //BenchmarkRunner.Run<Class1>();
+            BenchmarkRunner.Run<Class1>();
         }
     }
 }

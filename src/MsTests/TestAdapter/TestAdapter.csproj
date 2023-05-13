@@ -8,14 +8,16 @@
 		</PropertyGroup>
 
 		<ItemGroup>
-				<PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
-				<PackageReference Include="BenchmarkDotNet.Annotations" Version="0.13.5" />
 				<PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.5.0" />
 		</ItemGroup>
 
 		<ItemGroup>
 				<ProjectReference Include="..\..\Core\Engine\Engine.csproj" />
 				<ProjectReference Include="..\..\Core\Framework\Framework.csproj" />
+		</ItemGroup>
+
+		<ItemGroup>
+				<InternalsVisibleTo Include="FrameworkTests" />
 		</ItemGroup>
 
 </Project>

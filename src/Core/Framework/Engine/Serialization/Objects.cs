@@ -1,9 +1,8 @@
 ﻿#nullable disable
-using System.Text.Json.Serialization;
+using Benchmarker;
 
-namespace Sodiware.Benchmarker.Serialization.BenchmarkDotnet
+namespace Benchmarker.Engine.Serialization
 {
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
     public class Benchmark
     {
         public string DisplayInfo { get; set; }
@@ -88,7 +87,7 @@ namespace Sodiware.Benchmarker.Serialization.BenchmarkDotnet
 
     public class Metric
     {
-        public int Value { get; set; }
+        public double Value { get; set; }
         public Descriptor Descriptor { get; set; }
     }
 
@@ -131,12 +130,10 @@ namespace Sodiware.Benchmarker.Serialization.BenchmarkDotnet
         public double StandardError { get; set; }
         public double Variance { get; set; }
         public double StandardDeviation { get; set; }
-        public double Skewness { get; set; }
+        public double? Skewness { get; set; }
         public double Kurtosis { get; set; }
         public ConfidenceInterval ConfidenceInterval { get; set; }
         public Percentiles Percentiles { get; set; }
     }
-
-
 }
 #nullable restore

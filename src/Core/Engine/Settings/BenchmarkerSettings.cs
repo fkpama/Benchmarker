@@ -28,7 +28,9 @@ namespace Benchmarker.Engine.Settings
         }
 
         public string? History { get; set; }
-        public double Threshold { get; set; } = -1;
+        public string? MeanThreshold { get; set; }
+        public string? MemoryThreshold { get; set; }
+        public bool Indented { get; set; }
 
     }
 }

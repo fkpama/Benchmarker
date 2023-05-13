@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 		<PropertyGroup>
 				<AssemblyName>Benchmarker.Engine</AssemblyName>
@@ -7,5 +7,14 @@
 				<ImplicitUsings>enable</ImplicitUsings>
 				<Nullable>enable</Nullable>
 		</PropertyGroup>
+
+		<ItemGroup>
+		  <PackageReference Include="BenchmarkDotNet" Version="*" />
+		</ItemGroup>
+
+		<ItemGroup>
+		  <ProjectReference Include="..\Framework\Framework.csproj" />
+		  <ProjectReference Include="..\Models\Models.csproj" />
+		</ItemGroup>
 
 </Project>

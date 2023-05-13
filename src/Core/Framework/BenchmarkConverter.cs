@@ -1,9 +1,13 @@
 ﻿using System.Diagnostics;
 using Sodiware;
-using Sodiware.Benchmarker.Serialization;
-using Sodiware.Benchmarker.Serialization.BenchmarkDotnet;
+using Benchmarker.Serialization;
+using Benchmarker.Engine.Serialization;
+using Benchmarker.Framework.Engine;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Exporters.Json;
+using Sodiware.IO;
 
-namespace Sodiware.Benchmarker
+namespace Benchmarker
 {
     public interface IBenchmarkConverter
     {
@@ -44,6 +48,48 @@ namespace Sodiware.Benchmarker
                 Id = id
             };
             return new(detail);
+        }
+    }
+
+    static class Helper
+    {
+        public static double ToDouble(this string? value)
+        {
+            if (value.IsMissing()
+                || (value = value.Trim()).EqualsOrd("-"))
+                return 0;
+            return double.Parse(value);
+        }
+        public static int ToInt(this string? value)
+        {
+            if (value.IsMissing()
+                || (value = value.Trim()).EqualsOrd("-"))
+                return 0;
+            return int.Parse(value);
+        }
+
+        internal static void Delete(string path)
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch (IOException ex)
+            {
+                Platform.Log.WriteError($"Unable to delte file ({ex.Message}) from '{path}'");
+            }
+        }
+
+        internal static void SecureCopy(string path, string backup)
+        {
+            try
+            {
+                File.Copy(path, backup);
+            }
+            catch (IOException ex)
+            {
+                Platform.Log.WriteError($"Unable to copy backup file ({ex.Message}) '{backup}' from '{path}'");
+            }
         }
     }
 }

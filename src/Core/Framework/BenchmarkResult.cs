@@ -1,6 +1,6 @@
-﻿using Sodiware.Benchmarker.Serialization.BenchmarkDotnet;
+﻿using Benchmarker.Engine.Serialization;
 
-namespace Sodiware.Benchmarker.Serialization
+namespace Benchmarker.Serialization
 {
     public class BenchmarkResult
     {

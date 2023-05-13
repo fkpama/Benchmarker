@@ -2,105 +2,57 @@
 using System.Reflection;
 using System.Runtime.Loader;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Benchmarker.Engine;
+using Benchmarker.Framework.Engine;
+using Benchmarker.Running;
+using Benchmarker.Serialization;
+using TestAdapter;
 
-namespace TestAdapter
+namespace Benchmarker.MsTests.TestAdapter
 {
     [FileExtension(".dll")]
+    [FileExtension(".exe")]
     [Category("managed")]
-    [DefaultExecutorUri(BenchmarkerConstants.ExecutorUri)]
+    [DefaultExecutorUri(Constants.ExecutorUri)]
     public sealed class BenchmarkerDiscoverer : ITestDiscoverer
     {
-        static AssemblyLoadContext? s_context;
-        internal static IEnumerable<BenchmarkTestCase> GetTestCases(string item)
-            => GetTestCases(item, null);
-        internal static IEnumerable<BenchmarkTestCase>
-            GetTestCases(string item, Func<Type, IConfig>? configFactory = null)
+        internal static readonly TestProperty BenchmarkIdProperty = TestProperty
+            .Register(PropertyNames.BenchmarkId,
+            label: "Benchmark Id",
+            valueType: typeof(Guid),
+            owner: typeof(BenchmarkerDiscoverer));
+        internal static TestCase ConvertTestCase(string item, BenchmarkTestCase bcase)
         {
-            string? suffix;
-            Assembly asm;
-            AssemblyLoadContext ctx;
-            try
-            {
-                ctx = s_context ??= new AssemblyLoadContext("x", true);
-                asm = ctx.LoadFromAssemblyPath(item);
-                var attr = asm.GetCustomAttribute<AssemblyConfigurationAttribute>();
-                suffix = attr?.Configuration;
-            }
-            catch
-            {
-                // TODO: Log exception
-                yield break;
-            }
-
-            foreach (var type in loadTypes(asm))
-            {
-                var methods = loadMethods(type);
-                var config = configFactory?.Invoke(type);
-                var run = BenchmarkConverter
-                        .MethodsToBenchmarks(type, methods, config!);
-
-                foreach (var btestCase in run.BenchmarksCases)
-                {
-                    var m = btestCase.Descriptor.WorkloadMethod;
-                    var attr = m.GetCustomAttribute<BenchmarkAttribute>();
-                    var fullyQualifiedName = $"{type.FullName}.{m.Name}";
-                    var testCase = new TestCase(fullyQualifiedName,
-                            new(BenchmarkerConstants.ExecutorUri),
+            var btestCase = bcase.BenchmarkCase;
+            var fullyQualifiedName = bcase.FullyQualifiedName;
+            var sourceCodeFile = bcase.SourceCodeFile;
+            var  sourceCodeLineNumber = bcase.SourceCodeLineNumber;
+            var testCase = new TestCase(fullyQualifiedName,
+                            new(Constants.ExecutorUri),
                             item)
-                    {
-                        DisplayName = btestCase.Descriptor.WorkloadMethodDisplayInfo,
-                        FullyQualifiedName = fullyQualifiedName,
-                        CodeFilePath = attr?.SourceCodeFile,
-                        LineNumber = attr?.SourceCodeLineNumber ?? default,
-                    };
-                    yield return new(run, config, btestCase, testCase, ctx);
-                }
-            }
-        }
-
-        private static MethodInfo[] loadMethods(Type type)
-        {
-            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
-                .Where(x => x.GetCustomAttribute<BenchmarkAttribute>() is not null)
-                .ToArray();
-
-            return methods;
-        }
-
-        private static IEnumerable<Type> loadTypes(Assembly asm)
-        {
-            Type[] types;
-            try
             {
-                types = asm.GetExportedTypes();
-            }
-            catch(ReflectionTypeLoadException ex)
-            {
-                if (ex.Types is null)
-                {
-                    throw;
-                }
-                types = ex.Types
-                    .Where(x => x is not null)
-                    .ToArray()!;
-            }
-
-            return types;
+                DisplayName = btestCase.Descriptor.WorkloadMethodDisplayInfo,
+                FullyQualifiedName = fullyQualifiedName,
+                CodeFilePath = sourceCodeFile,
+                LineNumber = sourceCodeLineNumber ?? default,
+            };
+            testCase.SetPropertyValue(BenchmarkIdProperty, bcase.Id.ToString());
+            return testCase;
         }
+        internal static IEnumerable<BenchmarkTestCase<TestCase>> GetTestCases(string item,
+            IBenchmarkIdGenerator idGenerator)
+            => TestCaseCollection<TestCase>
+            .GetTestCases(item, idGenerator, Platform.History, null, ConvertTestCase, null);
 
         public void DiscoverTests(IEnumerable<string> sources,
             IDiscoveryContext discoveryContext,
             IMessageLogger logger,
             ITestCaseDiscoverySink discoverySink)
         {
-            foreach(var item in sources.SelectMany(GetTestCases))
+            var generator = Helpers.DefaultIdGenerator;
+            foreach (var item in sources.SelectMany(x => GetTestCases(x, generator)))
             {
-                discoverySink.SendTestCase(item.TestCase);
+                discoverySink.SendTestCase(item.TestCase!);
             }
         }
     }

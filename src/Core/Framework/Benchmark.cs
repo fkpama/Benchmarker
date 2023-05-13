@@ -1,12 +1,13 @@
-﻿using Sodiware.Benchmarker.Serialization.BenchmarkDotnet;
+﻿using BenchmarkDotNet.Exporters.Json;
+using Benchmarker.Engine.Serialization;
 
-namespace Sodiware.Benchmarker
+namespace Benchmarker
 {
     public class Benchmark1
     {
         public string FullName { get; set; }
-        public double Mean { get; set; }
-        public int BytesAllocated { get; }
+        public double? Mean { get; set; }
+        public double BytesAllocated { get; }
 
         internal Benchmark1(Benchmark benchmark)
         {

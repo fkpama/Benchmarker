@@ -1,12 +1,15 @@
 ﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Sodiware.Benchmarker.Serialization;
-using Sodiware.Benchmarker.Storage;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using Benchmarker.Engine.Serialization;
+using Benchmarker.Framework.Engine;
+using Benchmarker.Serialization;
+using Benchmarker.Storage;
+using Sodiware;
 
-namespace Sodiware.Benchmarker
+namespace Benchmarker
 {
     public class RunBench
     {
@@ -58,35 +61,65 @@ namespace Sodiware.Benchmarker
             this.store = store;
         }
     }
-    public class ExportParser
+    public sealed class ExportParser : IExportParser
     {
         private readonly IBenchmarkConverter converter;
         private readonly IBenchmarkIdGenerator idGenerator;
-        private readonly IBenchmarkStore store;
 
-        public IBenchmarkStore Store { get => this.store; }
-        public ExportParser(IBenchmarkStore store)
+        public ExportParser()
             : this(BenchmarkConverter.Instance,
-                  BenchmarkIdGenerator.Instance,
-                  store) { }
+                  BenchmarkIdGenerator.Instance)
+        { }
         public ExportParser(IBenchmarkConverter converter,
-            IBenchmarkIdGenerator idGenerator,
-            IBenchmarkStore store)
+            IBenchmarkIdGenerator idGenerator)
         {
             this.converter = converter;
             this.idGenerator = idGenerator;
-            this.store = store;
         }
 
         public Encoding Encoding { get; } = Encoding.UTF8;
 
-        public ValueTask<Run?> ParseAsync(string path, CancellationToken cancellationToken)
-            => ParseAsync(File.OpenRead(path), cancellationToken);
-        public async ValueTask<Run?> ParseAsync(Stream stream, CancellationToken cancellationToken)
+        public async ValueTask<Run?> ParseAsync(string path, IBenchmarkStore store, CancellationToken cancellationToken)
         {
+            using var file = File.OpenRead(path);
+            return await ParseAsync(file, store, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        class SafeConverter : JsonConverter<double>
+        {
+            public override double Read(ref Utf8JsonReader reader,
+                                        Type typeToConvert,
+                                        JsonSerializerOptions options)
+            {
+
+                double value;
+                if (reader.TokenType == JsonTokenType.String)
+                {
+                    value = -1;
+                }
+                else if (!reader.TryGetDouble(out value))
+                {
+                    value = -1;
+                }
+                return value;
+            }
+
+            public override void Write(Utf8JsonWriter writer, double value, JsonSerializerOptions options)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        public async ValueTask<Run?> ParseAsync(Stream stream, IBenchmarkStore store, CancellationToken cancellationToken)
+        {
+
+
+            var converter = new SafeConverter();
+            var options = new JsonSerializerOptions();
+            options.Converters.Insert(0, converter);
             var root = await JsonSerializer
-                .DeserializeAsync<Serialization.BenchmarkDotnet.Root>(stream,
-                                                           cancellationToken: cancellationToken);
+                .DeserializeAsync<Root>(stream,
+                options,
+                                        cancellationToken: cancellationToken);
 
             Debug.Assert(root is not null);
             Run? run = null;
@@ -96,10 +129,8 @@ namespace Sodiware.Benchmarker
                 var lst = new List<RunBench>();
                 foreach (var bm in root.Benchmarks)
                 {
-                    var id = await this.idGenerator
-                        .GetIdAsync(bm, cancellationToken)
-                        .ConfigureAwait(false);
-                    var detail = await this.store
+                    var id = this.idGenerator.GetId(bm);
+                    var detail = await store
                     .GetDetailAsync(id, cancellationToken)
                     .ConfigureAwait(false);
                     if (detail is null)
@@ -108,14 +139,14 @@ namespace Sodiware.Benchmarker
                             .ConvertDetailAsync(bm, id, cancellationToken)
                             .ConfigureAwait(false);
 
-                        detail = this.store.Add(detail);
+                        detail = store.Add(detail);
 
                         //await this.store
                         //    .SaveAsync(cancellationToken)
                         //    .ConfigureAwait(false);
 
                     }
-                    var runBench = new Bench(detail, this.store);
+                    var runBench = new Bench(detail, store);
                     var record = await this.converter
                         .ConvertRecordAsync(bm, detail, cancellationToken)
                         .ConfigureAwait(false);
@@ -125,8 +156,8 @@ namespace Sodiware.Benchmarker
                     model.Add(record);
                 }
 
-                run = new(lst, this.store);
-                this.store.Add(model);
+                run = new(lst, store);
+                store.Add(model);
                 //await this.store.SaveAsync(cancellationToken);
             }
 

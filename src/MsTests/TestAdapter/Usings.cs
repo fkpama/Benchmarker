@@ -1,0 +1,15 @@
+﻿global using BenchmarkDotNet.Analysers;
+global using BenchmarkDotNet.Columns;
+global using BenchmarkDotNet.Configs;
+global using BenchmarkDotNet.Diagnosers;
+global using BenchmarkDotNet.Engines;
+global using BenchmarkDotNet.Exporters;
+global using BenchmarkDotNet.Jobs;
+global using BenchmarkDotNet.Loggers;
+global using BenchmarkDotNet.Reports;
+global using BenchmarkDotNet.Running;
+global using BenchmarkDotNet.Validators;
+global using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+global using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+global using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+global using Sodiware;

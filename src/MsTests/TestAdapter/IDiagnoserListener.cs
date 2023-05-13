@@ -1,9 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
-using BenchmarkDotNet.Exporters.Json;
-using BenchmarkDotNet.Running;
-
-namespace TestAdapter
+﻿namespace Benchmarker.MsTests.TestAdapter
 {
     public interface IDiagnoserListener
     {

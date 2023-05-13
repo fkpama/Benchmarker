@@ -1,6 +1,6 @@
-﻿namespace TestAdapter
+﻿namespace Benchmarker.MsTests.TestAdapter
 {
-    internal static class BenchmarkerConstants
+    internal static class Constants
     {
         internal const string ExecutorUri = "executor://swbenmarker";
     }
