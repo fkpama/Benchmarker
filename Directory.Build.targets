@@ -14,6 +14,9 @@
 		</ItemGroup>
 
 		<PropertyGroup>
+		</PropertyGroup>
+
+		<PropertyGroup>
 				<_CodeAnalisisVersion>4.3.*</_CodeAnalisisVersion>
 		</PropertyGroup>
 
