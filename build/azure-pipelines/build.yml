@@ -30,3 +30,11 @@ steps:
     command: 'pack'
     packagesToPack: '$(FrameworkProjectPath);$(TestAdapterProjectPath)'
     versioningScheme: 'off'
+
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Write your commands here
+      
+      ls $(Build.ArtifactStagingDirectory)
