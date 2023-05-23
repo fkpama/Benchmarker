@@ -25,18 +25,15 @@
 		</ItemGroup>
 
 		<ItemGroup>
-				<ProjectReference Include="..\..\Core\Engine\Engine.csproj" PrivateAssets="all" />
-				<ProjectReference Include="..\..\Core\Framework\Framework.csproj"
+				<ProjectReference Include="..\..\Core\Engine\Engine.csproj"
 													PrivateAssets="all"
-													ExcludeFromPackage="true"
 													/>
+				<ProjectReference Include="..\..\Core\Framework\Framework.csproj" />
 				<ProjectReference Include="..\MsTests.Common\MsTests.Common.csproj" PrivateAssets="all" />
 		</ItemGroup>
 
 		<ItemGroup Condition="'$(Configuration)'=='Debug'">
 				<InternalsVisibleTo Include="FrameworkTests" />
 		</ItemGroup>
-
-		<Import Project="PackageBuild.targets"/>
 
 </Project>

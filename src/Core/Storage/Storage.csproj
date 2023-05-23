@@ -9,11 +9,15 @@
 		</PropertyGroup>
 
 		<PropertyGroup>
+				<IsPackable>true</IsPackable>
 				<PackageId>Benchmarker.Storage</PackageId>
 		</PropertyGroup>
 
 		<ItemGroup>
-				<ProjectReference Include="..\Models\Models.csproj" />
+				<ProjectReference Include="..\Models\Models.csproj"
+													PrivateAssets="all"
+													Pack="true"
+													/>
 		</ItemGroup>
 
 </Project>

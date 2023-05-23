@@ -175,6 +175,5 @@ namespace Benchmarker.MsTests.TestAdapter
             }
             return settings;
         }
-
     }
 }

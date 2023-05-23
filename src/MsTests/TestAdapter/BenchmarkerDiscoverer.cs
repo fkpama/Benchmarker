@@ -51,9 +51,9 @@ namespace Benchmarker.MsTests.TestAdapter
                           filter);
 
         public void DiscoverTests(IEnumerable<string> sources,
-            IDiscoveryContext discoveryContext,
-            IMessageLogger logger,
-            ITestCaseDiscoverySink discoverySink)
+                                  IDiscoveryContext discoveryContext,
+                                  IMessageLogger logger,
+                                  ITestCaseDiscoverySink discoverySink)
         {
             var generator = Helpers.DefaultIdGenerator;
             var filter = Helpers.GetFilter(discoveryContext);

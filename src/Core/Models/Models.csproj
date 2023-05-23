@@ -14,9 +14,4 @@
 				<PackageReference Include="StronglyTypedId" Version="*-*" />
 				<PackageReference Include="System.Text.Json" Version="*" />
 		</ItemGroup>
-
-		<ItemGroup>
-		  <Folder Include="Serialization\" />
-		</ItemGroup>
-
 </Project>

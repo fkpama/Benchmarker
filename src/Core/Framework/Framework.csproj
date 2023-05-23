@@ -13,10 +13,7 @@
 				<PackageId>Benchmarker</PackageId>
 		</PropertyGroup>
 		<ItemGroup>
-				<Content Include="Assets/Directory.Build.targets"  
-								 IncludeInPackage="true"
-								 PackagePath="build/$(TargetFramework)/$(PackageId).targets"
-								 />
+				<Content Include="Assets/Directory.Build.targets" IncludeInPackage="true" PackagePath="build/$(TargetFramework)/$(PackageId).targets" />
 		</ItemGroup>
 
 		<ItemGroup>
@@ -24,6 +21,9 @@
 		</ItemGroup>
 
 		<ItemGroup>
+		  <ProjectReference Include="..\Models\Models.csproj"
+												PrivateAssets="all"
+												/>
 		  <ProjectReference Include="..\Storage\Storage.csproj" />
 		</ItemGroup>
 

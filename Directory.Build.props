@@ -2,14 +2,17 @@
 <Project>
 		<PropertyGroup>
 				<LangVersion>latest</LangVersion>
+				<AssemblyName Condition="'$(AssemblyName)'==''">Benchmarker.$(MSBuildProjectName)</AssemblyName>
 		</PropertyGroup>
 
 		<PropertyGroup>
 				<Authors>Sodiware</Authors>
 				<PackageProjectUrl>https://github.com/fkpama/Benchmarker</PackageProjectUrl>
+
+				<AllowedOutputExtensionsInPackageBuildOutputFolder Condition="'$(Configuration)'=='Debug'">$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 		</PropertyGroup>
 
-		<ItemGroup>
-
-		</ItemGroup>
+		<PropertyGroup>
+			<PackageOutputPath Condition="'$(PackageOutputPath)'==''">$(MSBuildThisFileDirectory)tests/PkgRepository</PackageOutputPath>
+		</PropertyGroup>
 </Project>

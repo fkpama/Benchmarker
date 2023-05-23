@@ -40,5 +40,9 @@
 				<PackageReference Update="Microsoft.VisualStudio.SDK"
 													Version="17.0.*" />
 		</ItemGroup>
+
+		<Import Condition="'$(IsPackable)'=='true' AND '$(PackProjectReference)'!='false'"
+						Project="$(MSBuildThisFileDirectory)/build/PackProjectReference.targets"
+						/>
 </Project>
 

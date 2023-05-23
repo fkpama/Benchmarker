@@ -1,3 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
+		<PropertyGroup>
+				<_BenchmarkerDir Condition="$(TargetFrameworkMonitor.StartsWith('.NETFramework'))">net461</_BenchmarkerDir>
+				<_BenchmarkerDir Condition="'$(_BenchmarkerDir)'==''">netstandard2.1</_BenchmarkerDir>
+		</PropertyGroup>
 </Project>
