@@ -44,6 +44,7 @@ steps:
     command: 'pack'
     packagesToPack: '$(FrameworkProjectPath);$(TestAdapterProjectPath)'
     versioningScheme: 'off'
+    buildProperties: 'PackageVersion=$(PackageVersion)'
 
 - task: Bash@3
   inputs:
@@ -53,8 +54,10 @@ steps:
       ls $(Build.ArtifactStagingDirectory)
 
 - task: Bash@3
+  condition: ne(variables.PackageVersion, '*')
+  displayName: Tag Version
   inputs:
     targetType: 'inline'
     script: |
-      git tag test-tag HEAD & \
-      git push origin test-tag
+      git tag $(PackageVersion) HEAD & \
+      git push origin $(PackageVersion)
