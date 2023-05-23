@@ -21,7 +21,7 @@ variables:
     Build.PackageVersion: ${{ parameters.PackageVersion }}
     Git.TagPrefix: 'dev/'
     ${{ if ne(parameters.PackageVersion, '*') }}:
-      Build.PackageGitTag: $(Git.TagPrefix)$[[ parameters.PackageVersion ]]
+      Build.PackageGitTag: $(Git.TagPrefix)${{ parameters.PackageVersion }}
 
 
 steps:
