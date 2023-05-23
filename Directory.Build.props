@@ -7,7 +7,12 @@
 
 		<PropertyGroup>
 				<Authors>Sodiware</Authors>
-				<PackageProjectUrl>https://github.com/fkpama/Benchmarker</PackageProjectUrl>
+				<!--<PackageProjectUrl>https://github.com/fkpama/Benchmarker</PackageProjectUrl>-->
+
+				<EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+				<!-- Deterministic dll. See https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#continuousintegrationbuild -->
+				<ContinuousIntegrationBuild Condition="'$(BUILD_BUILDID)'!=''">true</ContinuousIntegrationBuild>
 
 				<IncludeSymbols>true</IncludeSymbols>
 				<SymbolPackageFormat>snupkg</SymbolPackageFormat>

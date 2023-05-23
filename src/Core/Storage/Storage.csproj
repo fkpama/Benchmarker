@@ -14,6 +14,10 @@
 		</PropertyGroup>
 
 		<ItemGroup>
+				<PackageReference Include="Sodiware.Core" />
+		</ItemGroup>
+
+		<ItemGroup>
 				<ProjectReference Include="..\Models\Models.csproj"
 													PrivateAssets="all"
 													Pack="true"
