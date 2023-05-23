@@ -8,6 +8,7 @@ parameters:
     - name: PackageVersion
       type: string
       displayName: Package Version
+      default: 0.0.0.0
 
 variables:
     BuildConfiguration: Debug
