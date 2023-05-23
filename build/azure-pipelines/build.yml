@@ -52,16 +52,10 @@ steps:
     versioningScheme: 'off'
     buildProperties: 'PackageVersion=$(Build.PackageVersion)'
 
-- task: Bash@3
-  displayName: Update tag
-  inputs:
-    targetType: 'inline'
-    script: |
-      # Write your commands here
-      ls $(Build.ArtifactStagingDirectory)
 
 - task: NuGetCommand@2
-  condition: and(succeeded(), eq(parameters.PublishPackage, 'true'))
+  condition: and(succeeded(), eq(parameters.PublishPackage, true))
+  displayName: Publish Package
   inputs:
     command: 'push'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg;$(Build.ArtifactStagingDirectory)/**/*.snupkg'
