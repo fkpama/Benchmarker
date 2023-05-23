@@ -19,6 +19,9 @@ variables:
     FrameworkProjectPath: src/Core/Framework/Framework.csproj
     TestAdapterProjectPath: src/MsTests/TestAdapter/TestAdapter.csproj
     Build.PackageVersion: ${{ parameters.PackageVersion }}
+    Git.TagPrefix: 'dev/'
+    ${{ if ne(parameters.PackageVersion, '*') }}:
+      Build.PackageGitTag: $(Git.TagPrefix)$[[ parameters.PackageVersion ]]
 
 
 steps:
@@ -34,7 +37,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        &build/scripts/AutoVer.ps1 -TagPrefix dev/ -VersionVariable 'Build.PackageVersion' -TagVariable 'Build.PackageGitTag'
+        &build/scripts/AutoVer.ps1 -TagPrefix $(Git.TagPrefix) -VersionVariable 'Build.PackageVersion' -TagVariable 'Build.PackageGitTag'
 
 - task: DotNetCoreCLI@2
   displayName: Restore Projects
@@ -62,14 +65,25 @@ steps:
       nuGetFeedType: 'internal'
       publishVstsFeed: '71da89f7-cd98-452b-aa60-432a3d3bfa89/eee4749a-0ff7-4dc1-87ff-e3f038a85d1c'
 
-- task: Bash@3
-  condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
-  displayName: Tag Version
-  inputs:
-    targetType: 'inline'
-    script: |
-      git tag $(Build.PackageGitTag) && \
-      git push origin $(Build.PackageGitTag)
+- ${{ if eq(parameters.PackageVersion, '*') }}:
+  - task: Bash@3
+    condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
+    displayName: Tag Version
+    inputs:
+      targetType: 'inline'
+      script: |
+        git tag $(Build.PackageGitTag) && \
+        git push origin $(Build.PackageGitTag)
+
+- ${{ if ne(parameters.PackageVersion, '*') }}:
+  - task: Bash@3
+    condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
+    displayName: Tag Version
+    inputs:
+      targetType: 'inline'
+      script: |
+        git tag $(Build.PackageGitTag) && \
+        git push origin $(Build.PackageGitTag)
 
 - task: PowerShell@2
   condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
