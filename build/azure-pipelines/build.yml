@@ -18,9 +18,12 @@ variables:
 
 steps:
 - task: DotNetCoreCLI@2
+  displayName: Restore Projects
   inputs:
     command: 'restore'
-    projects: '$(FrameworkProjectPath);$(TestAdapterProjectPath)'
+    projects: |
+      $(FrameworkProjectPath)
+      $(TestAdapterProjectPath)
     feedsToUse: 'select'
 - task: DotNetCoreCLI@2
   inputs:
