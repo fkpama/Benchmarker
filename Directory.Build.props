@@ -9,6 +9,8 @@
 				<Authors>Sodiware</Authors>
 				<PackageProjectUrl>https://github.com/fkpama/Benchmarker</PackageProjectUrl>
 
+				<IncludeSymbols>true</IncludeSymbols>
+				<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 				<AllowedOutputExtensionsInPackageBuildOutputFolder Condition="'$(Configuration)'=='Debug'">$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 		</PropertyGroup>
 

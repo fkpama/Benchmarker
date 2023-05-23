@@ -9,6 +9,10 @@
 															 AND '$(SignAssembly)'=='true'">$(MSBuildThisFileDirectory)build/assets/Key.snk</AssemblyOriginatorKeyFile>
 		</PropertyGroup>
 
+		<ItemGroup Condition="'$(BUILD_BUILDID)'!=''">
+				<PackageReference Include="Microsoft.SourceLink.GitHub" Version="*" PrivateAssets="All"/>
+		</ItemGroup>
+
 		<PropertyGroup>
 				<_CodeAnalisisVersion>4.3.*</_CodeAnalisisVersion>
 		</PropertyGroup>
