@@ -24,16 +24,12 @@ steps:
   fetchDepth: 0
   persistCredentials: true
 
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: &dotnet tool restore
-
 - ${{ if eq(parameters.PackageVersion, '*') }}:
   - task: PowerShell@2
     inputs:
       targetType: 'inline'
-      script: &build/scripts/AutoVer.ps1 -TagPrefix dev
+      script: |
+        &build/scripts/AutoVer.ps1 -TagPrefix dev
 
 - task: DotNetCoreCLI@2
   displayName: Restore Projects
