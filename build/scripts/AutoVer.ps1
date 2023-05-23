@@ -2,7 +2,9 @@
     [Parameter(Position=1)][string]$TagPrefix = 'pre-release/v',
     [Parameter()][string]$PreRelease = 'preview',
     [Parameter()][switch]$NoToolRestore,
-    [Parameter()][switch]$NoTagFetch
+    [Parameter()][switch]$NoTagFetch,
+    [Parameter()][string]$VersionVariable = 'Build.PackageVersion',
+    [Parameter()][string]$TagVariable = 'PackageGitTag'
 )
 
 $ErrorActionPreference='Stop'
@@ -31,8 +33,8 @@ if ($current -ne $next)
         $next="$base.$(1+ [int]$height)"
     }
     Write-Output "NEXT: $current => $next"
-    Write-Output "##vso[task.setvariable variable=PackageVersion;]$next"
-    Write-Output "##vso[task.setvariable variable=PackageGitTag;]$TagPrefix$next"
+    Write-Output "##vso[task.setvariable variable=$VersionVariable;]$next"
+    Write-Output "##vso[task.setvariable variable=$TagVariable;]$TagPrefix$next"
 }
 else
 {
