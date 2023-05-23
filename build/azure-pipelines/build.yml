@@ -71,7 +71,7 @@ steps:
     targetType: 'inline'
     script: |
       $datePart=Get-Date -Format yyyyMMdd
-      
-      $buildName="(Build.PackageGitTag)-$(Build.SourceBranchName)-${datePart}.$(Build.BuildId)"
-      
+
+      $buildName="$(Build.PackageGitTag)-$(Build.SourceBranchName)-${datePart}.$(Build.BuildId)"
+
       Write-Host "##vso[build.updatebuildnumber]$buildName" 
