@@ -26,6 +26,7 @@ steps:
 
 - ${{ if eq(parameters.PackageVersion, '*') }}:
   - task: PowerShell@2
+    displayName: Compute Package Version
     inputs:
       targetType: 'inline'
       script: |
@@ -40,6 +41,7 @@ steps:
       $(TestAdapterProjectPath)
     feedsToUse: 'select'
 - task: DotNetCoreCLI@2
+  displayName: Build Packages
   inputs:
     command: 'pack'
     packagesToPack: '$(FrameworkProjectPath);$(TestAdapterProjectPath)'
@@ -47,6 +49,7 @@ steps:
     buildProperties: 'PackageVersion=$(Build.PackageVersion)'
 
 - task: Bash@3
+  displayName: Update tag
   inputs:
     targetType: 'inline'
     script: |
@@ -59,5 +62,5 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      git tag $(Build.PackageGitTag) HEAD & \
+      git tag $(Build.PackageGitTag) & \
       git push origin $(Build.PackageGitTag)
