@@ -13,7 +13,7 @@ parameters:
 variables:
     BuildConfiguration: Debug
     FrameworkProjectPath: src/Core/Framework/Framework.csproj
-    TestAdapterProjectPath: src/MsTests/TestAdapter/TestAdapter.csproj"
+    TestAdapterProjectPath: src/MsTests/TestAdapter/TestAdapter.csproj
 
 
 steps:
