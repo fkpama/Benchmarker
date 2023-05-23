@@ -60,6 +60,7 @@ steps:
       command: 'push'
       packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg;$(Build.ArtifactStagingDirectory)/**/*.snupkg'
       nuGetFeedType: 'internal'
+      publishVstsFeed: '3c402c17-56d6-4971-8a53-fb51ce29ff2e'
 
 - task: Bash@3
   condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
