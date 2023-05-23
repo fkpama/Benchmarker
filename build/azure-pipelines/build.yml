@@ -57,7 +57,7 @@ steps:
       ls $(Build.ArtifactStagingDirectory)
 
 - task: Bash@3
-  condition: ne(variables['Build.PackageGitTag'], '*')
+  condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
   displayName: Tag Version
   inputs:
     targetType: 'inline'
@@ -66,7 +66,7 @@ steps:
       git push origin $(Build.PackageGitTag)
 
 - task: PowerShell@2
-  condition: ne(variables['Build.PackageGitTag'], '*')
+  condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
   inputs:
     targetType: 'inline'
     script: |
