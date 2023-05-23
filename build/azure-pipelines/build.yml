@@ -18,6 +18,7 @@ variables:
     BuildConfiguration: Debug
     FrameworkProjectPath: src/Core/Framework/Framework.csproj
     TestAdapterProjectPath: src/MsTests/TestAdapter/TestAdapter.csproj
+    StorageProjectPath: src/Core/Storage/Storage.csproj
     Build.PackageVersion: ${{ parameters.PackageVersion }}
     Git.TagPrefix: 'dev/'
     ${{ if ne(parameters.PackageVersion, '*') }}:
@@ -40,18 +41,10 @@ steps:
         &build/scripts/AutoVer.ps1 -TagPrefix $(Git.TagPrefix) -VersionVariable 'Build.PackageVersion' -TagVariable 'Build.PackageGitTag'
 
 - task: DotNetCoreCLI@2
-  displayName: Restore Projects
-  inputs:
-    command: 'restore'
-    projects: |
-      $(FrameworkProjectPath)
-      $(TestAdapterProjectPath)
-    feedsToUse: 'select'
-- task: DotNetCoreCLI@2
   displayName: Build Packages
   inputs:
     command: 'pack'
-    packagesToPack: '$(FrameworkProjectPath);$(TestAdapterProjectPath)'
+    packagesToPack: '$(FrameworkProjectPath);$(TestAdapterProjectPath);$(StorageProjectPath)'
     versioningScheme: 'off'
     buildProperties: 'PackageVersion=$(Build.PackageVersion)'
 
@@ -61,7 +54,7 @@ steps:
     displayName: Publish Package
     inputs:
       command: 'push'
-      packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg;$(Build.ArtifactStagingDirectory)/**/*.snupkg'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;$(Build.ArtifactStagingDirectory)/**/*.snupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
       nuGetFeedType: 'internal'
       publishVstsFeed: '71da89f7-cd98-452b-aa60-432a3d3bfa89/eee4749a-0ff7-4dc1-87ff-e3f038a85d1c'
 
