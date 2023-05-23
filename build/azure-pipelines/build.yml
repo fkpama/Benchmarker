@@ -14,7 +14,7 @@ variables:
     BuildConfiguration: Debug
     FrameworkProjectPath: src/Core/Framework/Framework.csproj
     TestAdapterProjectPath: src/MsTests/TestAdapter/TestAdapter.csproj
-    PackageVersion: ${{ parameters.PackageVersion }}
+    Build.PackageVersion: ${{ parameters.PackageVersion }}
 
 
 steps:
@@ -29,7 +29,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        &build/scripts/AutoVer.ps1 -TagPrefix dev
+        &build/scripts/AutoVer.ps1 -TagPrefix dev -VersionVariable 'Build.PackageVersion'
 
 - task: DotNetCoreCLI@2
   displayName: Restore Projects
@@ -44,7 +44,7 @@ steps:
     command: 'pack'
     packagesToPack: '$(FrameworkProjectPath);$(TestAdapterProjectPath)'
     versioningScheme: 'off'
-    buildProperties: 'PackageVersion=$(PackageVersion)'
+    buildProperties: 'PackageVersion=$(Build.PackageVersion)'
 
 - task: Bash@3
   inputs:
@@ -54,10 +54,10 @@ steps:
       ls $(Build.ArtifactStagingDirectory)
 
 - task: Bash@3
-  condition: ne(variables.PackageVersion, '*')
+  condition: ne(variables['Build.PackageVersion'], '*')
   displayName: Tag Version
   inputs:
     targetType: 'inline'
     script: |
-      git tag $(PackageVersion) HEAD & \
-      git push origin $(PackageVersion)
+      git tag $(Build.PackageVersion) HEAD & \
+      git push origin $(Build.PackageVersion)
