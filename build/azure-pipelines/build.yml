@@ -9,6 +9,10 @@ parameters:
       type: string
       displayName: Package Version
       default: '*'
+    - name: PublishPackage
+      type: boolean
+      default: true
+      displayName: Publish Package
 
 variables:
     BuildConfiguration: Debug
@@ -55,6 +59,13 @@ steps:
     script: |
       # Write your commands here
       ls $(Build.ArtifactStagingDirectory)
+
+- task: NuGetCommand@2
+  condition: and(succeeded(), eq(parameters.PublishPackage, 'true'))
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg;$(Build.ArtifactStagingDirectory)/**/*.snupkg'
+    nuGetFeedType: 'internal'
 
 - task: Bash@3
   condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
