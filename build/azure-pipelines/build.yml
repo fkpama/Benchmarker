@@ -18,6 +18,11 @@ variables:
 
 steps:
 
+- checkout: 
+  clean: true
+  fetchDepth: 0
+  persistCredentials: true
+
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
