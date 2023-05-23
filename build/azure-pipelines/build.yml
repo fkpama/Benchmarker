@@ -17,6 +17,14 @@ variables:
 
 
 steps:
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      &dotnet tool restore
+      &build/AutoVer.ps1
+
 - task: DotNetCoreCLI@2
   displayName: Restore Projects
   inputs:
