@@ -14,6 +14,7 @@
 		<ItemGroup>
 				<ProjectReference Include="..\..\Core\Engine\Engine.csproj" />
 				<ProjectReference Include="..\..\Core\Framework\Framework.csproj" />
+				<ProjectReference Include="..\MsTests.Common\MsTests.Common.csproj" />
 		</ItemGroup>
 
 		<ItemGroup>

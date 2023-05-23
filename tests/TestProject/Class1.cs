@@ -2,23 +2,12 @@
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Configs;
 using Benchmarker;
 using Benchmarker.Framework;
-
 namespace TestProject
 {
-    public class DebugAttribute : Attribute, IConfigSource
-    {
-        public IConfig Config { get; }
-        public DebugAttribute()
-        {
-            this.Config = new ManualConfig()
-                .WithOption(ConfigOptions.DisableOptimizationsValidator, true);
-        }
-    }
     //[BenchmarkerExporter, MemoryDiagnoser, ShortRunJob]
-    [DryJob, MeanDelta, Debug, MemoryDiagnoser(false)]
+    [DryJob, MeanDelta, MemoryDiagnoser(false)]
     public class Class1
     {
         const int count = 10000;
@@ -39,19 +28,24 @@ namespace TestProject
         }
 
         [MethodImpl(MethodImplOptions.NoOptimization)]
-        [Benchmark, MaxMem("101 KB")]
+        [Benchmark, MaxMem("105 KB"), MemThreshold("1KB")]
         public void Benchmark__1()
         {
             var attr = new byte[101 * SizeUnit.KB.ByteAmount];
             //BusySleep(sleep.Add(TimeSpan.FromMilliseconds(Random.Shared.Next(0, 15))));
         }
 
+
+
+
         [Benchmark, MaxTime("55ms")]
         public void Benchmark__2()
         {
+
             //var attr = new byte[8199];
+
             //Random.Shared.NextBytes(attr);
-            BusySleep(TimeSpan.FromMilliseconds(50));
+            BusySleep(TimeSpan.FromMilliseconds(55));
         }
     }
 }

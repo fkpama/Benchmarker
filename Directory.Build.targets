@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+		<ItemGroup>
+				<Using Remove="System.Net.Http" />
+		</ItemGroup>
+		
+		<PropertyGroup>
+				<AssemblyOriginatorKeyFile Condition="'$(AssemblyOriginatorKeyFile)'==''
+															 AND '$(SignAssembly)'=='true'">$(MSBuildThisFileDirectory)build/assets/Key.snk</AssemblyOriginatorKeyFile>
+		</PropertyGroup>
+
+		<PropertyGroup>
+				<_CodeAnalisisVersion>4.3.*</_CodeAnalisisVersion>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<PackageReference Update="Microsoft.CodeAnalysis*"
+													Version="$(_CodeAnalisisVersion)"
+													/>
+				<PackageReference Update="Microsoft.VisualStudio.LanguageServices"
+													Version="$(_CodeAnalisisVersion)"
+													/>
+				<PackageReference Update="Microsoft.VisualStudio.SDK"
+													Version="17.0.*" />
+		</ItemGroup>
+</Project>
+

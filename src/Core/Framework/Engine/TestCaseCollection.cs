@@ -194,7 +194,7 @@ namespace Benchmarker.Engine
                     var caseConclusions = conclusions
                         .Where(x => x.Report?.BenchmarkCase ==  tcase);
                     var failed = caseConclusions.Any(x => x.Kind == ConclusionKind.Error);
-                    bcase.NotifyResult(caseConclusions);
+                    bcase.NotifyResult(summary, caseConclusions);
                 }
             }
         }

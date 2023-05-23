@@ -1,11 +1,7 @@
-﻿using System.Diagnostics;
-using Sodiware;
-using Benchmarker.Serialization;
+﻿using Benchmarker.Serialization;
 using Benchmarker.Engine.Serialization;
 using Benchmarker.Framework.Engine;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Exporters.Json;
-using Sodiware.IO;
 
 namespace Benchmarker
 {

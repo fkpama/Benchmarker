@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel;
-using System.Reflection;
-using System.Runtime.Loader;
-using BenchmarkDotNet.Attributes;
+using System.Diagnostics;
 using Benchmarker.Engine;
 using Benchmarker.Framework.Engine;
 using Benchmarker.Running;
-using Benchmarker.Serialization;
+using MsTests.Common.Serialization;
 using TestAdapter;
 
 namespace Benchmarker.MsTests.TestAdapter
@@ -13,7 +11,7 @@ namespace Benchmarker.MsTests.TestAdapter
     [FileExtension(".dll")]
     [FileExtension(".exe")]
     [Category("managed")]
-    [DefaultExecutorUri(Constants.ExecutorUri)]
+    [DefaultExecutorUri(BenchmarkerConstants.ExecutorUri)]
     public sealed class BenchmarkerDiscoverer : ITestDiscoverer
     {
         internal static readonly TestProperty BenchmarkIdProperty = TestProperty
@@ -28,7 +26,7 @@ namespace Benchmarker.MsTests.TestAdapter
             var sourceCodeFile = bcase.SourceCodeFile;
             var  sourceCodeLineNumber = bcase.SourceCodeLineNumber;
             var testCase = new TestCase(fullyQualifiedName,
-                            new(Constants.ExecutorUri),
+                            new(BenchmarkerConstants.ExecutorUri),
                             item)
             {
                 DisplayName = btestCase.Descriptor.WorkloadMethodDisplayInfo,
@@ -40,9 +38,17 @@ namespace Benchmarker.MsTests.TestAdapter
             return testCase;
         }
         internal static IEnumerable<BenchmarkTestCase<TestCase>> GetTestCases(string item,
-            IBenchmarkIdGenerator idGenerator)
+            IBenchmarkIdGenerator idGenerator,
+            TestCaseCollection<TestCase>.TestFilter? filter)
             => TestCaseCollection<TestCase>
-            .GetTestCases(item, idGenerator, Platform.History, null, ConvertTestCase, null);
+            .GetTestCases(item,
+                          idGenerator,
+                          Platform.History,
+                          null,
+                          ConvertTestCase,
+                          null,
+                          null,
+                          filter);
 
         public void DiscoverTests(IEnumerable<string> sources,
             IDiscoveryContext discoveryContext,
@@ -50,9 +56,26 @@ namespace Benchmarker.MsTests.TestAdapter
             ITestCaseDiscoverySink discoverySink)
         {
             var generator = Helpers.DefaultIdGenerator;
-            foreach (var item in sources.SelectMany(x => GetTestCases(x, generator)))
+            var filter = Helpers.GetFilter(discoveryContext);
+            var settings = Helpers
+                .LoadAdapterSettings(discoveryContext.RunSettings?.SettingsXml,
+                out _);
+            foreach (var item in sources)
+                //.SelectMany(x => GetTestCases(x, generator)))
             {
-                discoverySink.SendTestCase(item.TestCase!);
+                var methodFilter = Helpers.GetFilter(settings, item);
+                foreach (var testCase in GetTestCases(item, generator, methodFilter))
+                {
+                    Debug.Assert(testCase.TestCase is not null);
+                    var send = true;
+                    if (filter is not null)
+                    {
+                        send = filter.MatchTestCase(testCase.TestCase,
+                            (p) => FilterLayer.PropertyProvider(testCase.TestCase, p) == null);
+                    }
+                    if (send)
+                        discoverySink.SendTestCase(testCase.TestCase!);
+                }
             }
         }
     }

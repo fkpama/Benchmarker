@@ -14,11 +14,11 @@
 		</ItemGroup>
 
 		<ItemGroup>
-		  <ProjectReference Include="..\Models\Models.csproj" />
+				<InternalsVisibleTo Include="Benchmarker.Engine" />
 		</ItemGroup>
 
 		<ItemGroup>
-				<InternalsVisibleTo Include="Benchmarker.Engine" />
+		  <ProjectReference Include="..\Storage\Storage.csproj" />
 		</ItemGroup>
 
 </Project>

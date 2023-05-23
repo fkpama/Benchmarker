@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFramework>net472</TargetFramework>
+				<RootNamespace>Benchmarker.VisualStudio.CodeLens</RootNamespace>
+				<ImplicitUsings>enable</ImplicitUsings>
+				<Nullable>enable</Nullable>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<PackageReference Include="Microsoft.VisualStudio.Language" Version="17.0.487" />
+				<PackageReference Include="Sodiware.Core" Version="*-*" />
+		</ItemGroup>
+
+		<ItemGroup>
+		  <ProjectReference Include="..\Common\CodeLens.Common.csproj" />
+		</ItemGroup>
+
+		<ItemGroup>
+		  <Compile Update="Resources.Designer.cs">
+		    <DesignTime>True</DesignTime>
+		    <AutoGen>True</AutoGen>
+		    <DependentUpon>Resources.resx</DependentUpon>
+		  </Compile>
+		</ItemGroup>
+
+		<ItemGroup>
+		  <EmbeddedResource Update="Resources.resx">
+		    <Generator>PublicResXFileCodeGenerator</Generator>
+		    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		  </EmbeddedResource>
+		</ItemGroup>
+
+</Project>

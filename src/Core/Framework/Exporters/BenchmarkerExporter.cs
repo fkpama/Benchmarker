@@ -20,7 +20,7 @@ namespace Benchmarker.Framework.Exporters
         }
     }
 
-    public class BenchmarkerExporter : ExporterBase
+    public sealed class BenchmarkerExporter : ExporterBase
     {
         private readonly IBenchmarkStoreFactory storeFactory;
 

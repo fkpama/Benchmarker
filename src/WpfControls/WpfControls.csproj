@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFrameworks>net7.0-windows;net472</TargetFrameworks>
+				<AssemblyName>Benchmarker.Wpf.Controls</AssemblyName>
+				<RootNamespace>Benchmarker.Wpf.Controls</RootNamespace>
+				<Nullable>enable</Nullable>
+				<UseWPF>true</UseWPF>
+				<SignAssembly>true</SignAssembly>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<PackageReference Include="System.Windows.Controls.DataVisualization.Toolkit"
+													Version="*"
+													/>
+		</ItemGroup>
+
+</Project>

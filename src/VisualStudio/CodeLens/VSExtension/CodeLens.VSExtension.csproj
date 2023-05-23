@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFramework>net472</TargetFramework>
+				<RootNamespace>Benchmarker.VisualStudio.CodeLens</RootNamespace>
+				<ImplicitUsings>enable</ImplicitUsings>
+				<Nullable>enable</Nullable>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<!--<PackageReference Include="Microsoft.VisualStudio.LanguageServices" />-->
+			<PackageReference Include="Microsoft.VisualStudio.SDK" />
+		  <!--<PackageReference Include="Microsoft.VisualStudio.LanguageServices" Version="4.5.0" />-->
+		</ItemGroup>
+
+		<ItemGroup>
+				<ProjectReference Include="..\..\..\WpfControls\WpfControls.csproj" />
+				<ProjectReference Include="..\Common\CodeLens.Common.csproj" />
+		</ItemGroup>
+
+		<ItemGroup>
+		  <Reference Include="PresentationFramework" />
+		</ItemGroup>
+
+</Project>

@@ -10,7 +10,7 @@ using TestAdapter;
 
 namespace Benchmarker.MsTests.TestAdapter
 {
-    [ExtensionUri(Constants.ExecutorUri)]
+    [ExtensionUri(BenchmarkerConstants.ExecutorUri)]
     internal sealed partial class BenchmarkerExecutor : ITestExecutor
     {
         private readonly CancellationTokenSource CancellationTokenSource = new();
@@ -52,7 +52,11 @@ namespace Benchmarker.MsTests.TestAdapter
                                        settings,
                                        testFactory,
                                        logger,
-                                       filter)
+                                       (id, tc) =>
+                                       {
+
+                                           return filter?.Invoke(id, tc) ?? true;
+                                       })
                 .ToArray();
             prepareForRun(cases, frameworkHandle, logger);
             try
@@ -77,7 +81,6 @@ namespace Benchmarker.MsTests.TestAdapter
             cases.Initialize();
             cases.Result += (o, e) =>
             {
-                var testCase = e.TestCase;
                 var result = createResult(e.TestCase, e);
                 frameworkHandle.RecordResult(result);
             };
@@ -99,14 +102,63 @@ namespace Benchmarker.MsTests.TestAdapter
                 var errors = eventArgs.Conclusions
                     .Where(x => x.Kind == ConclusionKind.Error)
                     .Select(x => x.Message);
+
+                var columns = formatColumns(eventArgs.Summary, eventArgs.TestCase);
                 var result = new TestResult(testCase.TestCase)
                 {
                     Outcome = outcome,
                     ErrorMessage = string.Join(Environment.NewLine, errors),
                 };
-                result.AddOutput(output);
+
+                var duration = eventArgs
+                    .Summary
+                    .GetMean(testCase)
+                    .ToTimeSpan();
+
+                result.Duration = duration;
+
+
+                var sb = new StringBuilder();
+                if (columns.IsPresent())
+                {
+
+                    sb.AppendLine();
+
+                    sb.AppendLine(columns);
+
+                    sb.AppendLine();
+                    sb.AppendLine();
+                }
+
+                sb.AppendLine(output);
+                result.AddOutput(sb.ToString());
                 return result;
             }
+        }
+
+        private static string? formatColumns(
+            Summary summary,
+            BenchmarkTestCase testCase)
+        {
+            if (testCase.Config is null)
+                return null;
+            //var rules = testCase.Config.GetColumnHidingRules().ToArray();
+            //var columns = testCase.Config.GetColumnProviders()
+            //    .SelectMany(x => x.GetColumns(summary))
+            //    .Where(x => !x.IsDefault(summary, testCase.BenchmarkCase))
+            //    .Where(x => x.IsAvailable(summary))
+            //    .Where(col => !rules.Any(x => x.NeedToHide(col)))
+            //    .ToArray();
+            var columns = summary.GetColumns()
+                .Where(x => x.IsAvailable(summary))
+                .Where(x => x.AlwaysShow)
+                .Where(x => !x.IsDefault(summary, testCase.BenchmarkCase));
+            columns = columns.Where(x => !x.ColumnName.EqualsOrd("Method"));
+            using var sw = new StringWriter();
+            var formatter = new SummaryFormatter(testCase, summary, columns);
+            formatter.Format(sw);
+
+            return sw.ToString();
         }
 
         public void RunTests(IEnumerable<TestCase>? tests,
@@ -215,7 +267,7 @@ namespace Benchmarker.MsTests.TestAdapter
                                               BenchmarkerSettings settings,
                                               IBenchmarkIdGenerator idGenerator)
         {
-            return BenchEngine.InitConfig(current, cases);
+            return BenchEngine.InitConfig(current, cases, settings);
         }
     }
 }
