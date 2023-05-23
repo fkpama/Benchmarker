@@ -23,7 +23,7 @@ steps:
     targetType: 'inline'
     script: |
       &dotnet tool restore
-      &build/AutoVer.ps1
+      &build/scripts/AutoVer.ps1
 
 - task: DotNetCoreCLI@2
   displayName: Restore Projects
