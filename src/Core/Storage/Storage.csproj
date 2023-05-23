@@ -14,7 +14,7 @@
 		</PropertyGroup>
 
 		<ItemGroup>
-				<PackageReference Include="Sodiware.Core" />
+				<PackageReference Include="Sodiware.Core" Version="0.0.0.1" />
 		</ItemGroup>
 
 		<ItemGroup>
