@@ -65,3 +65,13 @@ steps:
       git tag $(Build.PackageGitTag) & \
       git push origin $(Build.PackageGitTag)
 
+- task: PowerShell@2
+  condition: ne(variables['Build.PackageGitTag'], '*')
+  inputs:
+    targetType: 'inline'
+    script: |
+      $datePart=Get-Date -Format yyyyMMdd
+      
+      $buildName="(Build.PackageGitTag)-$(Build.SourceBranchName)-${datePart}.$(Build.BuildId)"
+      
+      Write-Host "##vso[build.updatebuildnumber]$buildName" 
