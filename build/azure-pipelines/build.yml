@@ -18,7 +18,7 @@ variables:
 
 steps:
 
-- checkout: 
+- checkout: self
   clean: true
   fetchDepth: 0
   persistCredentials: true
