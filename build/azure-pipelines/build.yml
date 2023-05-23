@@ -64,3 +64,4 @@ steps:
     script: |
       git tag $(Build.PackageGitTag) & \
       git push origin $(Build.PackageGitTag)
+
