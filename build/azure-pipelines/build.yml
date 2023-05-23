@@ -72,6 +72,6 @@ steps:
     script: |
       $datePart=Get-Date -Format yyyyMMdd
 
-      $buildName="$(Build.PackageGitTag)-$(Build.SourceBranchName)-${datePart}.$(Build.BuildId)"
+      $buildName="$(Build.PackageVersion)-$(Build.SourceBranchName) ${datePart}.$(Rev:r)"
 
       Write-Host "##vso[build.updatebuildnumber]$buildName" 
