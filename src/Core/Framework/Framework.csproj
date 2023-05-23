@@ -3,22 +3,32 @@
 		<PropertyGroup>
 				<AssemblyName>Benchmarker.Framework</AssemblyName>
 				<RootNamespace>Benchmarker.Framework</RootNamespace>
-				<TargetFramework>netstandard2.1</TargetFramework>
+				<TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
 				<ImplicitUsings>enable</ImplicitUsings>
 				<Nullable>enable</Nullable>
 				<LangVersion>latest</LangVersion>
 		</PropertyGroup>
+
+		<PropertyGroup>
+				<PackageId>Benchmarker</PackageId>
+		</PropertyGroup>
+		<ItemGroup>
+				<Content Include="Assets/Directory.Build.targets"  
+								 IncludeInPackage="true"
+								 PackagePath="build/$(TargetFramework)/$(PackageId).targets"
+								 />
+		</ItemGroup>
 
 		<ItemGroup>
 				<PackageReference Include="BenchmarkDotnet" Version="*" />
 		</ItemGroup>
 
 		<ItemGroup>
-				<InternalsVisibleTo Include="Benchmarker.Engine" />
+		  <ProjectReference Include="..\Storage\Storage.csproj" />
 		</ItemGroup>
 
 		<ItemGroup>
-		  <ProjectReference Include="..\Storage\Storage.csproj" />
+				<InternalsVisibleTo Include="Benchmarker.Engine" />
 		</ItemGroup>
 
 </Project>

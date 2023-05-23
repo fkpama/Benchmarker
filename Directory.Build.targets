@@ -13,6 +13,23 @@
 				<_CodeAnalisisVersion>4.3.*</_CodeAnalisisVersion>
 		</PropertyGroup>
 
+		<Target Name="_PrepareForPackageGen"
+						BeforeTargets="_GetPackageFiles"
+						Condition="'$(IsPackable)'=='true'">
+				<PropertyGroup>
+						<!-- see: https://learn.microsoft.com/en-us/nuget/reference/msbuild-targets -->
+						<PackageReadmeFile Condition="'$(PackageReadmeFile)'==''">README.md</PackageReadmeFile>
+						<!--<PackageLicenseExpression>MIT</PackageLicenseExpression>-->
+						<!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>-->
+				</PropertyGroup>
+				<ItemGroup>
+						<Content Include="$(MSBuildThisFileDirectory)/README.md"
+										 Pack="true"
+										 PackagePath="/"
+									/>
+				</ItemGroup>
+		</Target>
+
 		<ItemGroup>
 				<PackageReference Update="Microsoft.CodeAnalysis*"
 													Version="$(_CodeAnalisisVersion)"

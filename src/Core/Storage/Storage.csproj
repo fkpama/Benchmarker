@@ -1,11 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 		<PropertyGroup>
-				<TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
+				<TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
 				<ImplicitUsings>enable</ImplicitUsings>
 				<Nullable>enable</Nullable>
 
 				<SignAssembly>true</SignAssembly>
+		</PropertyGroup>
+
+		<PropertyGroup>
+				<PackageId>Benchmarker.Storage</PackageId>
 		</PropertyGroup>
 
 		<ItemGroup>

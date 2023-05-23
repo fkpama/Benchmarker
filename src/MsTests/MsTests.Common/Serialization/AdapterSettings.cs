@@ -71,7 +71,7 @@ namespace MsTests.Common.Serialization
 
     public class BenchmarkIdCollection
     {
-        public const string Separator = ";";
+        public const char Separator = ';';
         [XmlAttribute]
         public required string Source { get; init; }
 
