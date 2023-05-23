@@ -13,16 +13,17 @@ parameters:
 variables:
     BuildConfiguration: Debug
     FrameworkProjectPath: src/Core/Framework/Framework.csproj
+    TestAdapterProjectPath: src/MsTests/TestAdapter/TestAdapter.csproj"
 
 
 steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    projects: '$(FrameworkProjectPath)'
+    projects: '$(FrameworkProjectPath);$(TestAdapterProjectPath)'
     feedsToUse: 'select'
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'build'
-    projects: '$(FrameworkProjectPath)'
-    arguments: '-o $(Build.BinariesDirectory)'
+    command: 'pack'
+    packagesToPack: '$(FrameworkProjectPath);$(TestAdapterProjectPath)'
+    versioningScheme: 'off'
