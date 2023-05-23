@@ -18,6 +18,11 @@ variables:
 steps:
 - task: DotNetCoreCLI@2
   inputs:
+    command: 'restore'
+    projects: '$(FrameworkProjectPath)'
+    feedsToUse: 'select'
+- task: DotNetCoreCLI@2
+  inputs:
     command: 'build'
     projects: '$(FrameworkProjectPath)'
     arguments: '-o $(Build.BinariesDirectory)'
