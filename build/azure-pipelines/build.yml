@@ -62,7 +62,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      git tag $(Build.PackageGitTag) & \
+      git tag $(Build.PackageGitTag) && \
       git push origin $(Build.PackageGitTag)
 
 - task: PowerShell@2
