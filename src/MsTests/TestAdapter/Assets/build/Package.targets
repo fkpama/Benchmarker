@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+		<ItemGroup Condition="'$(_BenchmarkerDir)'!=''">
+				<None Include="$(MSBuildThisFileDirectory)/$(_BenchmarkerDir)/**/*.dll"
+							Visible="false"
+							CopyToOutputDirectory="PreserveNewest" />
+				<None Include="$(MSBuildThisFileDirectory)/$(_BenchmarkerDir)/**/*.pdb"
+							Visible="false"
+							CopyToOutputDirectory="PreserveNewest" />
+		</ItemGroup>
+</Project>

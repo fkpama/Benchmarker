@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
@@ -10,8 +12,15 @@ using Perfolizer.Horology;
 
 namespace Benchmarker
 {
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static class Extensions
     {
+        internal static string GetFullName(this MethodInfo method)
+        {
+            return $"{method.DeclaringType}.{method.Name}";
+        }
+        public static TimeSpan ToTimeSpan(this TimeInterval interval)
+            => TimeSpan.FromMilliseconds(interval.ToMilliseconds());
         public static TimeInterval GetMean(this Summary summary, BenchmarkTestCase testCase)
             => GetMean(summary, testCase.BenchmarkCase);
         public static TimeInterval GetMean(this Summary summary, BenchmarkCase testCase)
@@ -24,7 +33,8 @@ namespace Benchmarker
         {
             var avg = reports
                     .Where(x => x.ResultStatistics is not null)
-                    .Average(x => x.ResultStatistics!.Mean);
+                    .DefaultIfEmpty()
+                    .Average(x => x.ResultStatistics?.Mean ?? 0);
             var ti = TimeInterval.FromNanoseconds(avg);
             return ti;
         }
@@ -136,6 +146,19 @@ namespace Benchmarker
                           format,
                           presentation);
             return val;
+        }
+
+        internal static TimeInterval GetMeanDelta(this BenchmarkRecord record,
+                                                  TimeInterval currentVal)
+        {
+            if (!record.Mean.HasValue || record.Mean < 0)
+            {
+                throw new InvalidOperationException();
+            }
+            var old = record.Mean.Value;
+            var to = TimeInterval.FromNanoseconds(old);
+            var res = TimeInterval.FromNanoseconds(to.Nanoseconds - currentVal.Nanoseconds);
+            return res;
         }
     }
 }

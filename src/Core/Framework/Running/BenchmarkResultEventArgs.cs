@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Reports;
 
 namespace Benchmarker.Running
 {
@@ -20,17 +21,31 @@ namespace Benchmarker.Running
 
         public BenchmarkTestCase TestCase { get; }
     }
+    public class BenchmarkConclusionEventArgs : BenchmarkEventArgs
+    {
+        public Conclusion Conclusion { get; }
+        public BenchmarkConclusionEventArgs(BenchmarkTestCase testCase,
+            Conclusion conclusion)
+            : base(testCase)
+        {
+            this.Conclusion = conclusion;
+        }
+
+    }
     public class BenchmarkResultEventArgs : BenchmarkEventArgs
     {
         public BenchmarkResultEventArgs(BenchmarkTestCase testCase,
-            IEnumerable<Conclusion> conclusions,
+                                        Summary summary,
+                                        IEnumerable<Conclusion> conclusions,
                                         bool failed)
             : base(testCase)
         {
+            this.Summary = summary;
             this.Conclusions = conclusions.ToArray();
             this.Failed = failed;
         }
 
+        public Summary Summary { get; }
         public IReadOnlyList<Conclusion> Conclusions { get; }
         public bool Failed { get; }
     }

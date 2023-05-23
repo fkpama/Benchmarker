@@ -1,0 +1,103 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+    - name: PackageVersion
+      type: string
+      displayName: Package Version
+      default: '*'
+    - name: PublishPackage
+      type: boolean
+      default: true
+      displayName: Publish Package
+
+variables:
+    BuildConfiguration: Debug
+    FrameworkProjectPath: src/Core/Framework/Framework.csproj
+    TestAdapterProjectPath: src/MsTests/TestAdapter/TestAdapter.csproj
+    Build.PackageVersion: ${{ parameters.PackageVersion }}
+    Git.TagPrefix: 'dev/'
+    ${{ if ne(parameters.PackageVersion, '*') }}:
+      Build.PackageGitTag: $(Git.TagPrefix)${{ parameters.PackageVersion }}
+
+
+steps:
+
+- checkout: self
+  clean: true
+  fetchDepth: 0
+  persistCredentials: true
+
+- ${{ if eq(parameters.PackageVersion, '*') }}:
+  - task: PowerShell@2
+    displayName: Compute Package Version
+    inputs:
+      targetType: 'inline'
+      script: |
+        &build/scripts/AutoVer.ps1 -TagPrefix $(Git.TagPrefix) -VersionVariable 'Build.PackageVersion' -TagVariable 'Build.PackageGitTag'
+
+- task: DotNetCoreCLI@2
+  displayName: Restore Projects
+  inputs:
+    command: 'restore'
+    projects: |
+      $(FrameworkProjectPath)
+      $(TestAdapterProjectPath)
+    feedsToUse: 'select'
+- task: DotNetCoreCLI@2
+  displayName: Build Packages
+  inputs:
+    command: 'pack'
+    packagesToPack: '$(FrameworkProjectPath);$(TestAdapterProjectPath)'
+    versioningScheme: 'off'
+    buildProperties: 'PackageVersion=$(Build.PackageVersion)'
+
+- ${{ if eq(parameters.PublishPackage, true) }}:
+  - task: NuGetCommand@2
+    condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
+    displayName: Publish Package
+    inputs:
+      command: 'push'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg;$(Build.ArtifactStagingDirectory)/**/*.snupkg'
+      nuGetFeedType: 'internal'
+      publishVstsFeed: '71da89f7-cd98-452b-aa60-432a3d3bfa89/eee4749a-0ff7-4dc1-87ff-e3f038a85d1c'
+
+- ${{ if eq(parameters.PackageVersion, '*') }}:
+  - task: Bash@3
+    condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
+    displayName: Tag Version
+    inputs:
+      targetType: 'inline'
+      script: |
+        git tag $(Build.PackageGitTag) && \
+        git push origin $(Build.PackageGitTag)
+
+- ${{ if ne(parameters.PackageVersion, '*') }}:
+  - task: Bash@3
+    condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
+    displayName: Tag Version
+    inputs:
+      targetType: 'inline'
+      script: |
+        git tag $(Build.PackageGitTag) && \
+        git tag $(Build.PackageVersion) && \
+        git push origin $(Build.PackageGitTag) && \
+        git push origin $(Build.PackageVersion)
+
+- task: PowerShell@2
+  condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
+  inputs:
+    targetType: 'inline'
+    script: |
+      $idx='$(Build.BuildNumber)'.LastIndexOf('.')
+
+      $rev='$(Build.BuildNumber)'.Substring($idx + 1)
+
+      $datePart=Get-Date -Format yyyyMMdd
+
+      $buildName="$(Build.PackageVersion)-$(Build.SourceBranchName) ${datePart}.$rev"
+
+      Write-Host "##vso[build.updatebuildnumber]$buildName" 

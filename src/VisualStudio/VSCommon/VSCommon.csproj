@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFramework>net472</TargetFramework>
+				<AssemblyName>Benchmarker.VisualStudio.Common</AssemblyName>
+				<RootNamespace>Benchmarker.VisualStudio</RootNamespace>
+				<ImplicitUsings>enable</ImplicitUsings>
+				<Nullable>enable</Nullable>
+		</PropertyGroup>
+
+		<ItemGroup>
+		  <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.0.0" />
+		</ItemGroup>
+
+		<ItemGroup>
+		  <ProjectReference Include="..\..\Core\Models\Models.csproj" />
+		</ItemGroup>
+
+</Project>

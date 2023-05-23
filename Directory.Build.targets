@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+		<ItemGroup>
+				<Using Remove="System.Net.Http" />
+		</ItemGroup>
+		
+		<PropertyGroup>
+				<AssemblyOriginatorKeyFile Condition="'$(AssemblyOriginatorKeyFile)'==''
+															 AND '$(SignAssembly)'=='true'">$(MSBuildThisFileDirectory)build/assets/Key.snk</AssemblyOriginatorKeyFile>
+		</PropertyGroup>
+
+		<ItemGroup Condition="'$(BUILD_BUILDID)'!=''">
+				<PackageReference Include="Microsoft.SourceLink.GitHub" Version="*" PrivateAssets="All"/>
+		</ItemGroup>
+
+		<PropertyGroup>
+				<_CodeAnalisisVersion>4.3.*</_CodeAnalisisVersion>
+		</PropertyGroup>
+
+		<Target Name="_PrepareForPackageGen"
+						BeforeTargets="_GetPackageFiles"
+						Condition="'$(IsPackable)'=='true'">
+				<PropertyGroup>
+						<!-- see: https://learn.microsoft.com/en-us/nuget/reference/msbuild-targets -->
+						<PackageReadmeFile Condition="'$(PackageReadmeFile)'==''">README.md</PackageReadmeFile>
+						<!--<PackageLicenseExpression>MIT</PackageLicenseExpression>-->
+						<!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>-->
+				</PropertyGroup>
+				<ItemGroup>
+						<Content Include="$(MSBuildThisFileDirectory)/README.md"
+										 Pack="true"
+										 PackagePath="/"
+									/>
+				</ItemGroup>
+		</Target>
+
+		<ItemGroup>
+				<PackageReference Update="Microsoft.CodeAnalysis*"
+													Version="$(_CodeAnalisisVersion)"
+													/>
+				<PackageReference Update="Microsoft.VisualStudio.LanguageServices"
+													Version="$(_CodeAnalisisVersion)"
+													/>
+				<PackageReference Update="Microsoft.VisualStudio.SDK"
+													Version="17.0.*" />
+		</ItemGroup>
+
+		<Import Condition="'$(IsPackable)'=='true' AND '$(PackProjectReference)'!='false'"
+						Project="$(MSBuildThisFileDirectory)/build/PackProjectReference.targets"
+						/>
+</Project>
+

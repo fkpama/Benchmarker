@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
+				<ImplicitUsings>enable</ImplicitUsings>
+				<Nullable>enable</Nullable>
+
+				<SignAssembly>true</SignAssembly>
+				<IsPackable>false</IsPackable>
+		</PropertyGroup>
+
+		<PropertyGroup>
+				<PackageId>Benchmarker.MsTests.Common</PackageId>
+		</PropertyGroup>
+
+</Project>

@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Reports;
 
 namespace Benchmarker.Running
 {
@@ -6,10 +7,11 @@ namespace Benchmarker.Running
         where T: class
     {
         public BenchmarkResultEventArgs(
+            Summary summary,
             BenchmarkTestCase<T> testCase,
             IEnumerable<Conclusion> conclusions,
             bool failed)
-            : base(testCase, conclusions, failed)
+            : base(testCase, summary, conclusions, failed)
         {
             this.TestCase = testCase;
         }

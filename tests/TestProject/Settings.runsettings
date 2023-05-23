@@ -3,5 +3,6 @@
 		<Benchmarks>
 				<History>C:\Temp\MyHistory.hist.json</History>
 				<MemoryThreshold>0B</MemoryThreshold>
+				<Persistent>true</Persistent>
 		</Benchmarks>
 </RunSettings>

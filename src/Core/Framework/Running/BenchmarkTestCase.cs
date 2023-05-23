@@ -16,6 +16,7 @@ namespace Benchmarker.Running
         public event EventHandler<BenchmarkResultEventArgs>? Failed;
         public event EventHandler<BenchmarkResultEventArgs>? Succeeded;
         public event EventHandler<BenchmarkResultEventArgs>? Result;
+        public event EventHandler<BenchmarkConclusionEventArgs>? Conclusion;
         public event EventHandler? ProcessStart
             , ProcessExit
             , Enter
@@ -138,11 +139,11 @@ namespace Benchmarker.Running
             return report.GetAllocated(this.BenchmarkCase);
         }
 
-        internal void NotifyResult(IEnumerable<Conclusion> conclusions)
+        internal void NotifyResult(Summary summary, IEnumerable<Conclusion> conclusions)
         {
             var failed = conclusions.Any(x => x.Kind == ConclusionKind.Error);
             //BenchmarkResultEventArgs? args = new(this, conclusions, failed);
-            var args = this.CreateResult(conclusions, failed);
+            var args = this.CreateResult(summary, conclusions, failed);
             if (failed)
                 this.Failed?.Invoke(this, args);
             else
@@ -151,8 +152,8 @@ namespace Benchmarker.Running
             this.Result?.Invoke(this, args);
         }
 
-        private protected virtual BenchmarkResultEventArgs CreateResult(IEnumerable<Conclusion> conclusions, bool failed)
-            => new(this, conclusions, failed);
+        private protected virtual BenchmarkResultEventArgs CreateResult(Summary summary, IEnumerable<Conclusion> conclusions, bool failed)
+            => new(this, summary, conclusions, failed);
 
         internal void OnProcessStart()
         {
@@ -182,6 +183,11 @@ namespace Benchmarker.Running
         internal void OnStart()
         {
             this.Enter?.Invoke(this);
+        }
+
+        internal void OnConclusion(Conclusion conclusion)
+        {
+            this.Conclusion?.Invoke(this, new(this, conclusion));
         }
     }
 }

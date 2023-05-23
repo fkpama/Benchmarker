@@ -11,6 +11,19 @@ namespace Benchmarker.MsTests.TestAdapter
     {
         sealed class FrameworkLogger : ILogger
         {
+            readonly struct MessageItem
+            {
+                public readonly TestMessageLevel Level;
+
+                public MessageItem(TestMessageLevel level, string message)
+                {
+                    this.Level = level;
+                    this.Message = message;
+                }
+
+                public readonly string Message;
+
+            }
             private readonly IFrameworkHandle handle;
             private readonly TestCaseCollection collection;
             private readonly StringBuilder output = new();
@@ -59,7 +72,15 @@ namespace Benchmarker.MsTests.TestAdapter
                 }
             }
 
-            public void Flush() { }
+            public void Flush()
+            {
+                lock (this.output)
+                {
+                    if (this.output.Length > 0)
+                    {
+                    }
+                }
+            }
 
             private bool isOutput(LogKind kind)
             {
@@ -70,13 +91,6 @@ namespace Benchmarker.MsTests.TestAdapter
                 if (!string.IsNullOrEmpty(text))
                 {
                     var str = text;
-                    if (isOutput(logKind))
-                    {
-                        lock (this.output)
-                        {
-                            output.Append(str);
-                        }
-                    }
                     if (!str.Trim().StartsWith("// AfterAll"))
                         this.currentOutputs?.Add(str);
 
@@ -85,6 +99,8 @@ namespace Benchmarker.MsTests.TestAdapter
                         lock(this.error)
                             this.error.Append(text);
                     }
+                    lock(this.output)
+                        this.output.Append(text);
                     this.handle
                         .SendMessage(convert(logKind), $"{logKind}: {str}");
                 }
@@ -99,6 +115,7 @@ namespace Benchmarker.MsTests.TestAdapter
 
             public void WriteLine()
             {
+                this.Flush();
             }
 
             public void WriteLine(LogKind logKind, string text)
@@ -106,11 +123,12 @@ namespace Benchmarker.MsTests.TestAdapter
                 if (isOutput(logKind))
                     text += Environment.NewLine;
                 this.Write(logKind, text);
+                this.Flush();
             }
 
             internal string GetOutput(BenchmarkTestCase<TestCase> testCase)
             {
-                lock (this.output)
+                lock (this.outputs)
                 {
                     if(!this.outputs.TryGetValue(testCase, out var val))
                     {

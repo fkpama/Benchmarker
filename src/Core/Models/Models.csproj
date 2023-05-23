@@ -1,19 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 		<PropertyGroup>
+				<TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
 				<AssemblyName>Benchmarker.Models</AssemblyName>
 				<RootNamespace>Benchmarker</RootNamespace>
-				<TargetFramework>netstandard2.1</TargetFramework>
 				<ImplicitUsings>enable</ImplicitUsings>
 				<Nullable>enable</Nullable>
+				<SignAssembly>true</SignAssembly>
 		</PropertyGroup>
 
 		<ItemGroup>
 				<PackageReference Include="Sodiware.Core" Version="*-*" />
 				<PackageReference Include="StronglyTypedId" Version="*-*" />
-				<PackageReference Include="System.Text.Json" Version="*-*" />
-				<PackageReference Include="BenchmarkDotNet" Version="*" />
-				<PackageReference Include="BenchmarkDotNet.Annotations" Version="*" />
+				<PackageReference Include="System.Text.Json" Version="*" />
 		</ItemGroup>
-
 </Project>

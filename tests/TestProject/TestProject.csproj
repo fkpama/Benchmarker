@@ -7,6 +7,7 @@
 				<Nullable>enable</Nullable>
 				<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
 
+				<IsTestProject>true</IsTestProject>
 				<IsPackable>false</IsPackable>
 		</PropertyGroup>
 
@@ -16,6 +17,7 @@
 				<ProjectReference Include="..\..\src\Core\Framework\Framework.csproj" />
 				<AdapterLibraries Include="..\..\src\Core\Engine\Engine.csproj" />
 				<AdapterLibraries Include="..\..\src\MsTests\TestAdapter\TestAdapter.csproj" />
+				<ProjectReference Include="..\..\src\MsTests\MsTests.Common\MsTests.Common.csproj" />
 				<ProjectReference Include="@(AdapterLibraries)">
 						<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 						<OutputItemType>None</OutputItemType>

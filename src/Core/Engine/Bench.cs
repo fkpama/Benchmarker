@@ -9,7 +9,9 @@ namespace Benchmarker
 {
     public static class BenchEngine
     {
-        public static IConfig InitConfig(IConfig config, TestCaseCollection collection)
+        public static IConfig InitConfig(IConfig config,
+                                         TestCaseCollection collection,
+                                         Engine.Settings.BenchmarkerSettings settings)
         {
             //config.AddValidator(new EventValidatorHook(collection));
             Apply(config, collection);

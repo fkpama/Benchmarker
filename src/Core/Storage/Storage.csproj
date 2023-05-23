@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
+				<ImplicitUsings>enable</ImplicitUsings>
+				<Nullable>enable</Nullable>
+
+				<SignAssembly>true</SignAssembly>
+		</PropertyGroup>
+
+		<PropertyGroup>
+				<IsPackable>true</IsPackable>
+				<PackageId>Benchmarker.Storage</PackageId>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<ProjectReference Include="..\Models\Models.csproj"
+													PrivateAssets="all"
+													Pack="true"
+													/>
+		</ItemGroup>
+
+</Project>

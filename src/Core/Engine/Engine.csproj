@@ -3,7 +3,7 @@
 		<PropertyGroup>
 				<AssemblyName>Benchmarker.Engine</AssemblyName>
 				<RootNamespace>Benchmarker</RootNamespace>
-				<TargetFramework>net7.0</TargetFramework>
+				<TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
 				<ImplicitUsings>enable</ImplicitUsings>
 				<Nullable>enable</Nullable>
 		</PropertyGroup>

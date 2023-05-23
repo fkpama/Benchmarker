@@ -188,7 +188,8 @@ namespace Benchmarker.Engine
             static MethodInfo[] loadMethods(Type type)
             {
                 var methods = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
-                .Where(x => x.GetCustomAttribute<BenchmarkAttribute>() is not null)
+                .Where(x => x.GetCustomAttribute<BenchmarkAttribute>() is not null
+                && IsAccessible(method: x))
                 .ToArray();
 
                 return methods;
@@ -213,6 +214,16 @@ namespace Benchmarker.Engine
 
                 return types;
             }
+        }
+
+        private static bool IsAccessible(MethodInfo method)
+        {
+            if (!method.IsPublic || !method.DeclaringType.IsPublic)
+            {
+                Platform.Log.WriteLine($"Skipping non public method {method.GetFullName()}");
+                return false;
+            }
+            return true;
         }
 
         private static void setConfig(object btestCase, IConfig config)

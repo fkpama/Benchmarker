@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Exporters;
+﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -9,7 +7,6 @@ using Benchmarker.Framework.Exporters;
 using Benchmarker.Running;
 using Benchmarker.Serialization;
 using Benchmarker.Storage;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Benchmarker.Framework.Engine
 {

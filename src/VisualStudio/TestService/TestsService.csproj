@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFramework>net472</TargetFramework>
+				<ImplicitUsings>enable</ImplicitUsings>
+				<Nullable>enable</Nullable>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.5.0" />
+				<PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.5.*" />
+				<PackageReference Include="Microsoft.VisualStudio.LanguageServices" Version="*" />
+				<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="*" />
+				<PackageReference Include="Microsoft.Extensions.ObjectPool" Version="*" />
+				<PackageReference Include="Microsoft.VisualStudio.ProjectSystem" Version="17.*-*" />
+				<!--<PackageReference Include="System.Collections.Immutable" Version="6.*" />-->
+				<!--<PackageReference Include="Microsoft.VisualStudio.TestWindow.Interfaces" Version="11.0.61030" />-->
+				<Reference Include="Microsoft.VisualStudio.TestWindow.Interfaces">
+						<HintPath>C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\VBCSharp\SourceBasedTestDiscovery\Microsoft.VisualStudio.TestWindow.Interfaces.dll</HintPath>
+				</Reference>
+		</ItemGroup>
+
+		<ItemGroup>
+		  <ProjectReference Include="..\..\Core\Storage\Storage.csproj" />
+		  <ProjectReference Include="..\..\MsTests\MsTests.Common\MsTests.Common.csproj" />
+		  <ProjectReference Include="..\VSCommon\VSCommon.csproj" />
+		</ItemGroup>
+
+</Project>

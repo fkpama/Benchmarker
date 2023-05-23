@@ -73,7 +73,7 @@ namespace Benchmarker.Framework.Validators
         public IEnumerable<Conclusion> Analyse(Summary summary)
         {
             var lst = new List<Conclusion>();
-            var current = new List<Conclusion>();
+            //var current = new List<Conclusion>();
             foreach (var bdnTc in summary.BenchmarksCases)
             {
                 if (!summary.HasReport(bdnTc))
