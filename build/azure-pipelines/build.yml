@@ -52,14 +52,14 @@ steps:
     versioningScheme: 'off'
     buildProperties: 'PackageVersion=$(Build.PackageVersion)'
 
-
-- task: NuGetCommand@2
-  condition: and(succeeded(), eq(parameters.PublishPackage, true))
-  displayName: Publish Package
-  inputs:
-    command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg;$(Build.ArtifactStagingDirectory)/**/*.snupkg'
-    nuGetFeedType: 'internal'
+- ${{ if eq(parameters.PublishPackage, true) }}:
+  - task: NuGetCommand@2
+    condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
+    displayName: Publish Package
+    inputs:
+      command: 'push'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg;$(Build.ArtifactStagingDirectory)/**/*.snupkg'
+      nuGetFeedType: 'internal'
 
 - task: Bash@3
   condition: and(succeeded(), ne(variables['Build.PackageGitTag'], '*'))
