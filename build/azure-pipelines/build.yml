@@ -54,7 +54,7 @@ steps:
       ls $(Build.ArtifactStagingDirectory)
 
 - task: Bash@3
-  condition: ne(variables['Build.PackageVersion'], '*')
+  condition: ne(variables['Build.PackageGitTag'], '*')
   displayName: Tag Version
   inputs:
     targetType: 'inline'
