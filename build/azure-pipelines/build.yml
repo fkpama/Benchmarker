@@ -29,7 +29,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        &build/scripts/AutoVer.ps1 -TagPrefix dev -VersionVariable 'Build.PackageVersion' -TagVariable 'Build.PackageGitTag'
+        &build/scripts/AutoVer.ps1 -TagPrefix dev/ -VersionVariable 'Build.PackageVersion' -TagVariable 'Build.PackageGitTag'
 
 - task: DotNetCoreCLI@2
   displayName: Restore Projects
