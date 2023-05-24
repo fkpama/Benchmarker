@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+
+			<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+			<EnableDefaultContentItems>false</EnableDefaultContentItems>
+			<EnableDefaultItems>false</EnableDefaultItems>
+			<EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+
+			<Title>Benchmarker project template</Title>
+			<PackageType>Template</PackageType>
+			<PackageId>Benchmarker.Template</PackageId>
+			<Description>Benchmark test project template</Description>
+			<PackageTags>dotnet-new;templates</PackageTags>
+
+			<IncludeContentInPack>true</IncludeContentInPack>
+			<IncludeBuildOutput>false</IncludeBuildOutput>
+			<ContentTargetFolders>content</ContentTargetFolders>
+	</PropertyGroup>
+
+		<ItemGroup>
+				<Content Include="TestProject\**\*"
+								 Exclude="TestProject\**\bin\**;TestProject\**\obj\**"
+								 PackagePath="content/%(RecursiveDir)%(Filename)%(Extension)"
+								 Pack="true"
+								 />
+				<Compile Remove="**\*" />
+		</ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFramework>{TargetFramework}</TargetFramework>
+				<!--#if (TargetFramework == "net7.0") -->
+				<ImplicitUsings>enable</ImplicitUsings>
+				<Nullable>enable</Nullable>
+				<!--#endif -->
+		</PropertyGroup>
+
+		<ItemGroup>
+				<PackageReference Include="Microsoft.NET.Test.SDK" Version="*" />
+				<PackageReference Include="Benchmarker.TestAdapter" Version="*" />
+		</ItemGroup>
+</Project>

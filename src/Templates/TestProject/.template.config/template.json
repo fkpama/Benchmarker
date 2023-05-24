@@ -1,0 +1,52 @@
+﻿{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Kpama Frederic",
+  "name": "Benchmarks",
+  "classifications": [ "Benchmarks", "csharp" ],
+  "shortName": "benchmarks",
+  "defaultName": "Benchmarks",
+  "description": "Benchmark Test Project",
+  "sourceName": "Benchmarker.TestProject",
+  "identity": "Benchmarker.TestProject",
+  "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+    "TargetFramework": {
+      "type": "parameter",
+      "description": "The target framework of the project",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "net5.0"
+        },
+        {
+          "choice": "net7.0"
+        },
+        {
+          "choice": "netstandard2.1"
+        },
+        {
+          "choice": "net461"
+        },
+        {
+          "choice": "net472"
+        }
+      ],
+      "defaultValue": "net7.0",
+      "replaces": "{TargetFramework}"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(TargetFramework != 'net7.0')",
+          "exclude": ["Usings.cs"]
+        }
+      ]
+    }
+  ]
+}
