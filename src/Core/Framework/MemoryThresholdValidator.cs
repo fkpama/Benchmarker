@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
-using Benchmarker.Framework.Validators;
+using Benchmarker.Validation;
 
 namespace Benchmarker.Framework
 {

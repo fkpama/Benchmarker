@@ -32,8 +32,4 @@
 				<ProjectReference Include="..\MsTests.Common\MsTests.Common.csproj" PrivateAssets="all" />
 		</ItemGroup>
 
-		<ItemGroup Condition="'$(Configuration)'=='Debug'">
-				<InternalsVisibleTo Include="FrameworkTests" />
-		</ItemGroup>
-
 </Project>

@@ -10,7 +10,7 @@
 		</PropertyGroup>
 
 		<ItemGroup>
-				<PackageReference Include="Sodiware.Core" Version="*-*" />
+				<PackageReference Include="Sodiware.Core" Version="0.0.0.1" />
 				<PackageReference Include="StronglyTypedId" Version="*-*" />
 				<PackageReference Include="System.Text.Json" Version="*" />
 		</ItemGroup>

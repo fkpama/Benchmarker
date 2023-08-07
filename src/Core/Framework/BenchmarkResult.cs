@@ -1,4 +1,4 @@
-﻿using Benchmarker.Engine.Serialization;
+﻿using Benchmarker.Framework.Serialization;
 
 namespace Benchmarker.Serialization
 {

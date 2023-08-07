@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Benchmarker.Engine;
 using Benchmarker.MsTests.TestAdapter;
+using Benchmarker.Testing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Moq;

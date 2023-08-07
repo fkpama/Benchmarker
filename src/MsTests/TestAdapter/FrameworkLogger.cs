@@ -1,15 +1,15 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Benchmarker.Engine;
 using Benchmarker.Running;
+using Benchmarker.Testing;
 using TestAdapter;
 
 namespace Benchmarker.MsTests.TestAdapter
 {
     internal sealed partial class BenchmarkerExecutor
     {
-        sealed class FrameworkLogger : ILogger
+        sealed class FrameworkSession : BenchmarkerSession
         {
             readonly struct MessageItem
             {
@@ -28,14 +28,13 @@ namespace Benchmarker.MsTests.TestAdapter
             private readonly TestCaseCollection collection;
             private readonly StringBuilder output = new();
             private readonly StringBuilder error = new();
-            private readonly ConditionalWeakTable<BenchmarkTestCase, List<string>> outputs = new();
+            private readonly StringBuilder stats = new();
+            private readonly ConditionalWeakTable<BenchmarkTestCase, List<LogOutput>> outputs = new();
             private BenchmarkTestCase<TestCase>? currentTest;
-            private List<string>? currentOutputs;
+            private List<LogOutput>? currentOutputs;
 
-            public string Id { get; } = nameof(FrameworkLogger);
-            public int Priority { get; }
-
-            public FrameworkLogger(IFrameworkHandle handle, TestCaseCollection<TestCase> collection)
+            public FrameworkSession(IFrameworkHandle handle, TestCaseCollection<TestCase> collection)
+                : base(collection)
             {
                 this.handle = handle;
                 this.collection = collection;
@@ -72,7 +71,7 @@ namespace Benchmarker.MsTests.TestAdapter
                 }
             }
 
-            public void Flush()
+            public override void Flush()
             {
                 lock (this.output)
                 {
@@ -86,25 +85,41 @@ namespace Benchmarker.MsTests.TestAdapter
             {
                 return kind == LogKind.Statistic;
             }
-            public void Write(LogKind logKind, string text)
+            protected override void Write(LogKind logKind, string text)
             {
-                if (!string.IsNullOrEmpty(text))
+                string? str;
+                if (!string.IsNullOrWhiteSpace(str = text?.Trim()))
                 {
-                    var str = text;
-                    if (!str.Trim().StartsWith("// AfterAll"))
-                        this.currentOutputs?.Add(str);
-
-                    if (logKind == LogKind.Error)
+                    this.currentOutputs?.Add((logKind, str));
+                    switch (logKind)
                     {
-                        lock(this.error)
-                            this.error.Append(text);
+                        case LogKind.Error:
+                            lock (this.error)
+                                this.error.Append(text);
+                            break;
+                        case LogKind.Statistic:
+                            lock(this.stats)
+                                this.stats.Append(text);
+                            break;
+                        default:
+                            break;
+
                     }
-                    lock(this.output)
+                    if (logKind != LogKind.Error)
+                    {
+                        File.AppendAllText(@"C:\Temp\run.log", text);
+                    }
+                    lock (this.output)
                         this.output.Append(text);
-                    this.handle
-                        .SendMessage(convert(logKind), $"{logKind}: {str}");
+
+                    if (IsImmediateLogging(logKind))
+                        this.handle.SendMessage(convert(logKind), $"{logKind}: {str}");
                 }
             }
+
+            private bool IsImmediateLogging(LogKind logKind)
+                => logKind != LogKind.Statistic
+                && logKind != LogKind.Default;
 
             private static TestMessageLevel convert(LogKind logKind)
                 => logKind switch
@@ -113,28 +128,32 @@ namespace Benchmarker.MsTests.TestAdapter
                     _ => TestMessageLevel.Informational,
                 };
 
-            public void WriteLine()
+            public override void WriteLine()
             {
                 this.Flush();
             }
 
-            public void WriteLine(LogKind logKind, string text)
-            {
-                if (isOutput(logKind))
-                    text += Environment.NewLine;
-                this.Write(logKind, text);
-                this.Flush();
-            }
+            //public override void WriteLine(LogKind logKind, string text)
+            //{
+            //    if (isOutput(logKind))
+            //        text += Environment.NewLine;
+            //    this.Write(logKind, text);
+            //    this.Flush();
+            //}
 
             internal string GetOutput(BenchmarkTestCase<TestCase> testCase)
             {
                 lock (this.outputs)
                 {
-                    if(!this.outputs.TryGetValue(testCase, out var val))
+                    if (!this.outputs.TryGetValue(testCase, out var val))
                     {
                         return string.Empty;
                     }
-                    return string.Join(Environment.NewLine, val);
+                    IEnumerable<LogOutput>  o = val
+                        .Where(x => x.Kind != LogKind.Default);
+                    if (!testCase.HasResult)
+                        o = o.Where(x => x.Kind != LogKind.Statistic);
+                    return string.Join(Environment.NewLine, o.Select(x => x.Text));
                 }
             }
 
@@ -147,6 +166,19 @@ namespace Benchmarker.MsTests.TestAdapter
                     return str;
                 }
             }
+        }
+    }
+
+    internal record struct LogOutput(LogKind Kind, string Text)
+    {
+        public static implicit operator (LogKind, string)(LogOutput value)
+        {
+            return (value.Kind, value.Text);
+        }
+
+        public static implicit operator LogOutput((LogKind, string) value)
+        {
+            return new LogOutput(value.Item1, value.Item2);
         }
     }
 }

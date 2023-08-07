@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using Benchmarker.Engine;
-using Benchmarker.Framework.Engine;
-using Benchmarker.Running;
+using Benchmarker.Testing;
 using MsTests.Common.Serialization;
 using TestAdapter;
+using static Benchmarker.TestCaseLoader;
 
 namespace Benchmarker.MsTests.TestAdapter
 {
@@ -39,8 +39,8 @@ namespace Benchmarker.MsTests.TestAdapter
         }
         internal static IEnumerable<BenchmarkTestCase<TestCase>> GetTestCases(string item,
             IBenchmarkIdGenerator idGenerator,
-            TestCaseCollection<TestCase>.TestFilter? filter)
-            => TestCaseCollection<TestCase>
+            TestFilter? filter)
+            => TestCaseLoader
             .GetTestCases(item,
                           idGenerator,
                           Platform.History,

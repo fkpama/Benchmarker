@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Benchmarker.Analyzers;
 using Benchmarker.Diagnosers;
-using Benchmarker.Engine;
 using Benchmarker.Engine.Settings;
-using Benchmarker.Framework.Engine;
 using Benchmarker.Running;
+using Benchmarker.Testing;
 using TestAdapter;
+using static Benchmarker.TestCaseLoader;
 
 namespace Benchmarker.MsTests.TestAdapter
 {
@@ -24,7 +25,7 @@ namespace Benchmarker.MsTests.TestAdapter
             IRunContext? runContext,
             IFrameworkHandle frameworkHandle,
             PlatformObjectFactory<TestCase> testFactory,
-            TestCaseCollection<TestCase>.TestFilter? filter = null)
+            TestFilter? filter = null)
         {
             if (sources is null)
             {
@@ -45,7 +46,7 @@ namespace Benchmarker.MsTests.TestAdapter
             var generator = BenchmarkIdGenerator.Instance;
             if (sources is null || frameworkHandle is null) return;
             var cases = new TestCaseCollection<TestCase>(generator);
-            var logger = new FrameworkLogger(frameworkHandle, cases);
+            var logger = new FrameworkSession(frameworkHandle, cases);
             var infos = CreateRunInfos(frameworkHandle,
                                        filtered,
                                        cases,
@@ -76,7 +77,7 @@ namespace Benchmarker.MsTests.TestAdapter
 
         private void prepareForRun(TestCaseCollection<TestCase> cases,
                                    IFrameworkHandle frameworkHandle,
-                                   FrameworkLogger logger)
+                                   FrameworkSession logger)
         {
             cases.Initialize();
             cases.Result += (o, e) =>
@@ -110,28 +111,37 @@ namespace Benchmarker.MsTests.TestAdapter
                     ErrorMessage = string.Join(Environment.NewLine, errors),
                 };
 
-                var duration = eventArgs
+                if (testCase.ExceptionDatas.Count > 0)
+                {
+                    var str = string.Join(" --- Other unrelated ex (shouldn't happen) --- ", testCase.ExceptionDatas.Select(x => x.StackTrace));
+                    result.ErrorStackTrace = str;
+                }
+
+                if (testCase.HasResult)
+                {
+                    var duration = eventArgs
                     .Summary
                     .GetMean(testCase)
                     .ToTimeSpan();
 
-                result.Duration = duration;
+                    result.Duration = duration;
 
 
-                var sb = new StringBuilder();
-                if (columns.IsPresent())
-                {
+                    var sb = new StringBuilder();
+                    if (columns.IsPresent())
+                    {
 
-                    sb.AppendLine();
+                        sb.AppendLine();
 
-                    sb.AppendLine(columns);
+                        sb.AppendLine(columns);
 
-                    sb.AppendLine();
-                    sb.AppendLine();
+                        sb.AppendLine();
+                        sb.AppendLine();
+                    }
+
+                    sb.AppendLine(output);
+                    result.AddOutput(sb.ToString());
                 }
-
-                sb.AppendLine(output);
-                result.AddOutput(sb.ToString());
                 return result;
             }
         }
@@ -182,21 +192,21 @@ namespace Benchmarker.MsTests.TestAdapter
                 $"{string.Join(", ", btests)} || {string.Join(", ", ids.Select(x => x.ToString()))}");
 
             RunTests(btests,
-                runContext,
-                frameworkHandle,
-                (source, tcase) =>
-                {
-                    var id = tcase.Id;
-                    if (!testById.TryGetValue(id, out var testCase))
-                    {
-                        return null;
-                    }
-                    return testCase;
-                },
-                (id, bdncase)  =>
-                {
-                    return ids.Contains(id);
-                });
+                     runContext,
+                     frameworkHandle,
+                     (source, tcase) =>
+                     {
+                         var id = tcase.Id;
+                         if (!testById.TryGetValue(id, out var testCase))
+                         {
+                             return null;
+                         }
+                         return testCase;
+                     },
+                     (id, bdncase) =>
+                     {
+                         return ids.Contains(id);
+                     });
         }
 
         public void RunTests(IEnumerable<string>? sources,
@@ -213,13 +223,10 @@ namespace Benchmarker.MsTests.TestAdapter
         }
 
         private static IConfig CreateGlobalConfig(IFrameworkHandle handle,
-                                                  FrameworkLogger logger,
-                                                  TestCaseCollection<TestCase> cases)
+                                                  FrameworkSession logger)
         {
-            var config = ManualConfig
-                .CreateEmpty()
-                .AddLogger(logger)
-                //.AddDiagnoser(new Diagnozer(new Listener(handle, cases)))
+            var config = ManualConfig.CreateEmpty()
+                .AddBenchmarker(logger)
                 .WithOption(ConfigOptions.DisableOptimizationsValidator, true)
                 .WithOption(ConfigOptions.JoinSummary, false)
                 .AddColumnProvider(DefaultColumnProviders.Instance);
@@ -233,13 +240,13 @@ namespace Benchmarker.MsTests.TestAdapter
             //BenchmarkHistory? history,
             BenchmarkerSettings settings,
             PlatformObjectFactory<TestCase> factory,
-            FrameworkLogger logger,
-            TestCaseCollection<TestCase>.TestFilter? filter)
+            FrameworkSession logger,
+            TestFilter? filter)
         {
             var idgen = Helpers.DefaultIdGenerator;
-            var globalConf = CreateGlobalConfig(handle, logger, cases);
+            var globalConf = CreateGlobalConfig(handle, logger);
             foreach (var group in sources
-                .SelectMany(x => TestCaseCollection<TestCase>
+                .SelectMany(x => TestCaseLoader
                 .GetTestCases(x,
                               idgen,
                               Platform.History,

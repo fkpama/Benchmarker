@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Exporters.Json;
-using Benchmarker.Engine.Serialization;
+using Benchmarker.Framework.Serialization;
 
 namespace Benchmarker
 {
@@ -13,7 +13,7 @@ namespace Benchmarker
         {
             this.FullName = benchmark.FullName;
             this.Mean = benchmark.Statistics.Mean;
-            this.BytesAllocated = benchmark.Memory.BytesAllocatedPerOperation;
+            this.BytesAllocated = benchmark.Memory.BytesAllocatedPerOperation ?? -1;
         }
     }
 }

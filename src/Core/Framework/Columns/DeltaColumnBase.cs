@@ -2,8 +2,7 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using Benchmarker.Engine;
-using Benchmarker.Running;
+using Benchmarker.Testing;
 
 namespace Benchmarker.Columns
 {
@@ -33,7 +32,7 @@ namespace Benchmarker.Columns
                                BenchmarkCase benchmarkCase)
         {
             var collection = this.collection
-                ?? TestCaseCollection.InternalBuild(summary);
+                ?? CorePlatform.InternalBuild(summary);
             var id = Collection.GetId(benchmarkCase);
             var bcase = Collection[benchmarkCase];
             string str = $"no id {bcase is null} { bcase?.Record is null } {bcase?.Record?.Mean}";

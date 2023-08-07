@@ -1,8 +1,7 @@
 ﻿using System.Globalization;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
-using Benchmarker.Engine;
-using Benchmarker.Running;
+using Benchmarker.Testing;
 
 namespace Benchmarker.Columns
 {

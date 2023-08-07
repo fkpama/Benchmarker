@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
-using Benchmarker.Running;
+using Benchmarker.Testing;
 
 namespace Benchmarker
 {

@@ -1,58 +1,11 @@
 ﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Validators;
-using Benchmarker.Engine;
-using Benchmarker.Framework.Engine;
-using Benchmarker.Running;
-using Perfolizer.Horology;
+using Benchmarker.Testing;
+using Benchmarker.Validation;
 
 namespace Benchmarker.Framework.Validators
 {
-    public sealed class BenchmarkValidationContext
-    {
-        private List<BenchmarkValidationError>? errors;
-        internal BenchmarkValidationContext(string id,
-                                            BenchmarkTestCase testCase,
-                                            Summary summary,
-                                            BenchmarkReport report)
-        {
-            this.ValidatorId = id;
-            this.TestCase = testCase;
-            this.Summary = summary;
-            this.Report = report;
-        }
-
-        internal string ValidatorId { get; }
-        public BenchmarkTestCase TestCase { get; }
-        public Summary Summary { get; }
-        public BenchmarkReport Report { get; }
-        internal IReadOnlyList<BenchmarkValidationError>? Errors
-        {
-            get => this.errors;
-        }
-        public TimeInterval Mean
-        {
-            get => new(this.Report.ResultStatistics!.Mean);
-        }
-        public double Allocated => this.Report.GetAllocated(this.TestCase);
-
-        public BenchmarkValidationError AddError(string message,
-            BenchmarkReport? report = null)
-            => AddError(message, true, report);
-        public BenchmarkValidationError AddError(string message, bool isCritical,
-            BenchmarkReport? report)
-        {
-            var error = new BenchmarkValidationError(
-                this.TestCase,
-                isCritical,
-                message,
-                report ?? this.Report);
-            (this.errors ??= new()).Add(error);
-            return error;
-
-        }
-    }
     internal class ThresholdAnalyser : IAnalyser
     {
         private readonly TestCaseCollection? collection;
@@ -84,7 +37,7 @@ namespace Benchmarker.Framework.Validators
                 if (reports.Length == 0)
                     continue;
                 var collection = this.collection
-                ?? Platform.GetCollection(bdnTc, summary);
+                ?? CorePlatform.GetCollection(bdnTc, summary);
                 var id = this.idGenerator.GetId(bdnTc);
                 if (id.IsMissing)
                     continue;
@@ -109,7 +62,7 @@ namespace Benchmarker.Framework.Validators
                             lst.Add(Conclusion
                             .CreateError(this.Id, msg, report, false));
                             //ti.RaiseValidationError(ex);
-                            Platform.Log.WriteLineError(ex.ToString());
+                            CorePlatform.Log.WriteLineError(ex.ToString());
                             continue;
                         }
                         var errors = context.Errors;

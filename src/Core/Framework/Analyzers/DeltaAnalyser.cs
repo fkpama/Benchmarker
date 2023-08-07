@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Reports;
-using Benchmarker.Engine;
+using Benchmarker.Testing;
 
 namespace Benchmarker.Analyzers
 {

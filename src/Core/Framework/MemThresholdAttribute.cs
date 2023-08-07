@@ -1,21 +1,10 @@
-﻿using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Validators;
-using Benchmarker.Engine;
-using Benchmarker.Framework.Utils;
-using Benchmarker.Framework.Validators;
-using Benchmarker.Running;
+﻿using Benchmarker.Framework.Utils;
+using Benchmarker.Testing;
+using Benchmarker.Validation;
 using Perfolizer.Horology;
 
 namespace Benchmarker.Framework
 {
-    public interface IBenchmarkValidator
-    {
-        string Name { get; }
-
-        void Validate(BenchmarkValidationContext context);
-    }
 
     public sealed class MaxTimeAttribute : BenchmarkValidatorAttribute
     {

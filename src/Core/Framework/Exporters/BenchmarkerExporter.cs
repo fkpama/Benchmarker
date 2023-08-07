@@ -4,23 +4,12 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
-using Benchmarker.Framework.Engine;
-using Benchmarker.Serialization;
 using Benchmarker.Storage;
-using Sodiware;
 
 namespace Benchmarker.Framework.Exporters
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
-    public class BenchmarkerExporterAttribute : BenchmarkDotNet.Attributes.ExporterConfigBaseAttribute
-    {
-        public BenchmarkerExporterAttribute()
-            : base(Platform.GetExporter())
-        {
-        }
-    }
 
-    public sealed class BenchmarkerExporter : ExporterBase
+    internal sealed class BenchmarkerExporter : ExporterBase
     {
         private readonly IBenchmarkStoreFactory storeFactory;
 
@@ -63,7 +52,7 @@ namespace Benchmarker.Framework.Exporters
 
                 var config = group.Key;
                 var store = this.storeFactory
-                .GetAsync(config, cancellationToken)
+                .GetAsync(config.ArtifactsPath, cancellationToken)
                 .GetAwaiter().GetResult();
                 mem.Position = 0;
                 try

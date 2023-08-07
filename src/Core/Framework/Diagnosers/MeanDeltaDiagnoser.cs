@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -7,11 +6,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using Benchmarker.Analyzers;
-using Benchmarker.Engine;
-using Benchmarker.Framework.Engine;
 using Benchmarker.Framework.Validators;
-using Sodiware;
+using Benchmarker.Testing;
 
 namespace Benchmarker.Diagnosers
 {
@@ -57,7 +53,7 @@ namespace Benchmarker.Diagnosers
         {
             var bdnCase = parameters.BenchmarkCase;
             if (bdnCase is not null
-                && Platform.GetCollection(bdnCase, out var testCase) is not null)
+                && CorePlatform.GetCollection(bdnCase, out var testCase) is not null)
             {
                 Debug.Assert(testCase is not null);
                 switch (signal)

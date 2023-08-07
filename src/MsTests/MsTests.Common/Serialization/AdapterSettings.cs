@@ -71,11 +71,11 @@ namespace MsTests.Common.Serialization
 
     public class BenchmarkIdCollection
     {
-        public const char Separator = ';';
+        public const string Separator = ";";
         [XmlAttribute]
         public required string Source { get; init; }
 
         [XmlText]
-        public string Methods { get; set; }
+        public string? Methods { get; set; }
     }
 }

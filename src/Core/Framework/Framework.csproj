@@ -17,18 +17,9 @@
 		</ItemGroup>
 
 		<ItemGroup>
-				<PackageReference Include="BenchmarkDotnet" Version="*" />
-		</ItemGroup>
-
-		<ItemGroup>
-		  <ProjectReference Include="..\Models\Models.csproj"
-												PrivateAssets="all"
-												/>
+		  <ProjectReference Include="..\Core\Core.csproj" />
+		  <ProjectReference Include="..\Models\Models.csproj" PrivateAssets="all" />
 		  <ProjectReference Include="..\Storage\Storage.csproj" />
-		</ItemGroup>
-
-		<ItemGroup>
-				<InternalsVisibleTo Include="Benchmarker.Engine" />
 		</ItemGroup>
 
 </Project>

@@ -3,7 +3,8 @@ using System.Reflection;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Validators;
-using Benchmarker.Engine;
+using Benchmarker.Analyzers;
+using Benchmarker.Testing;
 
 namespace Benchmarker
 {

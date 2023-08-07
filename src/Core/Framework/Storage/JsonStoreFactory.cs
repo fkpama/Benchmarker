@@ -1,20 +1,16 @@
-﻿using BenchmarkDotNet.Configs;
-using Benchmarker.Framework.Engine;
-using Sodiware;
-
-namespace Benchmarker.Storage
+﻿namespace Benchmarker.Storage
 {
     public class JsonStoreFactory : IBenchmarkStoreFactory
     {
         private readonly Dictionary<string, JsonStorage> cache =new();
-        private string getPath(IConfig config)
+        private string getPath(string artifactsPath)
         {
-            if (config.ArtifactsPath.IsMissing())
+            if (artifactsPath.IsMissing())
             {
                 return Platform.DefaultHistoryPath;
             }
 
-            var path = Path.Combine(config.ArtifactsPath, Platform.HistoryFilename);
+            var path = Path.Combine(artifactsPath, Platform.HistoryFilename);
             return path;
         }
 
@@ -22,9 +18,9 @@ namespace Benchmarker.Storage
         {
         }
 
-        public ValueTask<IBenchmarkStore> GetAsync(IConfig config, CancellationToken cancellationToken)
+        public ValueTask<IBenchmarkStore> GetAsync(string articatsPath, CancellationToken cancellationToken)
         {
-            var path = getPath(config);
+            var path = getPath(articatsPath);
             if (this.cache.TryGetValue(path, out var store))
             {
                 return new(store);

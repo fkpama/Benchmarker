@@ -2,7 +2,6 @@
 using System.Xml.Serialization;
 using Benchmarker.Engine;
 using Benchmarker.Engine.Settings;
-using Benchmarker.Framework.Engine;
 using Benchmarker.Framework.Utils;
 using Benchmarker.Serialization;
 using Benchmarker.Storage;
@@ -54,7 +53,7 @@ namespace Benchmarker.MsTests.TestAdapter
             }
             return null;
         }
-        internal static TestCaseCollection<TestCase>.TestFilter?
+        internal static TestCaseLoader.TestFilter?
             GetFilter(AdapterSettings? settings,
                       string source,
                       SignatureFormatter? formatter = null)
@@ -78,7 +77,7 @@ namespace Benchmarker.MsTests.TestAdapter
             return GetFilter(item, formatter);
 
         }
-        internal static TestCaseCollection<TestCase>.TestFilter?
+        internal static TestCaseLoader.TestFilter?
             GetFilter(BenchmarkIdCollection settings,
             SignatureFormatter? formatter = null)
         {
@@ -86,7 +85,9 @@ namespace Benchmarker.MsTests.TestAdapter
             {
                 return null;
             }
-            var methods = settings.Methods.Split(BenchmarkIdCollection.Separator);
+            if (settings.Methods is null)
+                return null;
+            var methods = settings.Methods.Split(BenchmarkIdCollection.Separator.ToArray());
             if (methods.Length == 0)
                 return null;
             formatter ??= new SignatureFormatter();

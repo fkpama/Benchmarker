@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
+				<ImplicitUsings>enable</ImplicitUsings>
+				<AssemblyName>Benchmarker.Core</AssemblyName>
+				<RootNamespace>Benchmarker</RootNamespace>
+				<Nullable>enable</Nullable>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<PackageReference Include="BenchmarkDotnet" Version="*" />
+				<PackageReference Include="Sodiware.Core" Version="*" />
+		</ItemGroup>
+
+		<ItemGroup>
+		  <ProjectReference Include="..\Models\Models.csproj" />
+		</ItemGroup>
+
+		<ItemGroup>
+				<InternalsVisibleTo Include="Benchmarker.Engine" />
+				<InternalsVisibleTo Include="Benchmarker.Framework" />
+		</ItemGroup>
+
+</Project>

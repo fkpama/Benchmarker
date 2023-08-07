@@ -1,13 +1,9 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using Benchmarker.Engine.Serialization;
-using Benchmarker.Framework.Engine;
+using Benchmarker.Framework.Serialization;
 using Benchmarker.Serialization;
 using Benchmarker.Storage;
-using Sodiware;
 
 namespace Benchmarker
 {
@@ -64,14 +60,14 @@ namespace Benchmarker
     public sealed class ExportParser : IExportParser
     {
         private readonly IBenchmarkConverter converter;
-        private readonly IBenchmarkIdGenerator idGenerator;
+        private readonly IBenchmarkModelIdProvider idGenerator;
 
         public ExportParser()
             : this(BenchmarkConverter.Instance,
-                  BenchmarkIdGenerator.Instance)
+                  BenchmarkModelIdGenerator.Instance)
         { }
         public ExportParser(IBenchmarkConverter converter,
-            IBenchmarkIdGenerator idGenerator)
+            IBenchmarkModelIdProvider idGenerator)
         {
             this.converter = converter;
             this.idGenerator = idGenerator;

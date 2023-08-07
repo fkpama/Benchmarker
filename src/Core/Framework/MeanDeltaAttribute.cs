@@ -1,8 +1,6 @@
-﻿using System.Configuration;
-using BenchmarkDotNet.Configs;
+﻿using BenchmarkDotNet.Configs;
 using Benchmarker.Columns;
 using Benchmarker.Diagnosers;
-using Benchmarker.Framework.Engine;
 using Benchmarker.Framework.Validators;
 
 namespace Benchmarker

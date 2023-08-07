@@ -1,5 +1,4 @@
-﻿using Sodiware;
-using StronglyTypedIds;
+﻿using StronglyTypedIds;
 
 namespace Benchmarker
 {
@@ -10,7 +9,7 @@ namespace Benchmarker
         | StronglyTypedIdImplementations.Default)]
     public partial struct TestId
     {
-        public bool IsMissing => Value.IsMissing();
+        public bool IsMissing => Guid.Empty.Equals(Value);
         public TestId(string str)
             : this(Guid.Parse(str)) { }
 

@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
-using Benchmarker.Engine;
+using Benchmarker.Testing;
 
 namespace Benchmarker.Columns
 {
@@ -16,7 +16,7 @@ namespace Benchmarker.Columns
         public IEnumerable<IColumn> GetColumns(Summary summary)
         {
             var collection = this.collection
-                ?? TestCaseCollection.InternalBuild(summary);
+                ?? CorePlatform.InternalBuild(summary);
             var lst = new List<IColumn>()
             {
                 new MeanDeltaColumn(collection),

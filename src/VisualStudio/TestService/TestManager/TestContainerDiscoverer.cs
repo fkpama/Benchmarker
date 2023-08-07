@@ -43,6 +43,11 @@ namespace Benchmarker.VisualStudio.TestsService.TestManager
             }
         }
 
+        private void OperationState_StateChanged1(object sender, OperationStateChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         private T? test<T>(IComponentModel model)
             where T : class
         {
