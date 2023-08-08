@@ -1,0 +1,5 @@
+{
+  "id": "sw-benchmarker-dev",
+  "baseUri": "https://localhost:3000",
+  "name": "Benchmarker Extension (Dev)"
+}

@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ES5",
+        "outDir": "dist",
+        "sourceMap": false,
+        "types": [
+            "mocha",
+            "node"
+        ]
+    },
+    "include": [
+        ".",
+        "../lib/node/http-client-impl.ts"
+    ]
+}

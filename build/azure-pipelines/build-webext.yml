@@ -1,0 +1,49 @@
+trigger:
+- web-extension
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- name: ExtensionRootDirectory
+  value: src/DevOps/Extension
+- group: Benchmarker
+
+steps:
+- task: Npm@1
+  displayName: Npm install
+  inputs:
+    command: 'install'
+    workingDir: $(ExtensionRootDirectory)
+
+- task: Npm@1
+  displayName: Run Tests
+  inputs:
+    command: 'custom'
+    workingDir: $(ExtensionRootDirectory)
+    customCommand: 'run test'
+
+    
+- task: Bash@3
+  displayName: Build Vsix
+  inputs:
+    targetType: 'inline'
+    script: |
+      vso='##vso'
+      errPrefix="${vso}[task.logissue type=error]"
+      pat_file=pat.txt
+
+      set +e -x
+      pat=$(Benchmarker.AccessToken)
+      if [ "${pat}x" == "x" ]; then
+        echo "${errPrefix}Build access token missing"
+        exit 1
+      fi
+
+      cd $(ExtensionRootDirectory) && \
+      echo "$(Benchmarker.AccessToken)" > "$pat_file" && \
+      npx webpack build --env vsix-output-dir=$(Build.ArtifactStagingDirectory)
+      rc=$?
+
+      rm -f $pat_file
+      exit $rc

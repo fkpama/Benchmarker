@@ -1,0 +1,4 @@
+*.vsix
+.taskkey
+node_modules/
+dist/

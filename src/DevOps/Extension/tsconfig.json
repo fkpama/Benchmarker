@@ -1,0 +1,61 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES5",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "alwaysStrict": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "outDir": "dist/scripts",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "lib": [
+      "ES5",
+      "ES6",
+      "DOM",
+      "ES2015.Promise"
+    ]
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "ES2020",
+      "outDir": "bin",
+      "rootDir": ".",
+      "noImplicitAny": true,
+      "noImplicitThis": true,
+      "noImplicitReturns": true,
+      "noImplicitOverride": true,
+      "alwaysStrict": true,
+      "strict": true,
+      "allowJs": true,
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "lib": [
+        "ES2015"
+      ],
+      "types": [
+        "node",
+        "webpack"
+      ]
+    },
+    "include": [
+      "./src/lib/node/**/*.ts"
+    ]
+  },
+  "include": [
+    "src/scripts/**/*.ts",
+    "src/lib/models.d.ts",
+    "src/lib/manifest.d.ts",
+    "src/lib/common/**/*.ts"
+, "src/lib/node/console-logger.ts"  ],
+  "exclude": [
+    "bin",
+    "obj",
+    "node_modules"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+    "id": "5557b64a-8c04-4a07-abeb-343ef9ab5870",
+    "name": "sw-benchmark-publish-task",
+    "friendlyName": "Publish Benchmark",
+    "description": "Publish Benchmarks",
+    "helpMarkDown": "",
+    "category": "Test",
+    "author": "Kpama Frederic",
+    "version": {
+        "Major": 0,
+        "Minor": 0,
+        "Patch": 20
+    },
+    "demands": [],
+    "instanceNameFormat": "Publish Benchmarks",
+    "inputs": [
+        {
+            "name": "reportPaths",
+            "type": "multiLine",
+            "label": "Report Paths",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": ""
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "publish-benchmark-reports.js"
+        },
+        "Node16": {
+            "target": "publish-benchmark-reports.js"
+        }
+    }
+}

@@ -28,7 +28,7 @@ namespace TestProject
         }
 
         [MethodImpl(MethodImplOptions.NoOptimization)]
-        [Benchmark, MaxMem("105 KB"), MemThreshold("1KB")]
+        [Benchmark, MaxMem("102 KB"), MemThreshold("1KB")]
         public void Benchmark__1()
         {
             var attr = new byte[101 * SizeUnit.KB.ByteAmount];

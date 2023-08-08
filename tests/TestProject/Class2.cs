@@ -9,7 +9,7 @@ namespace TestProject
     public class Class2
     {
         [MethodImpl(MethodImplOptions.NoOptimization)]
-        [Benchmark, MaxMem("101 KB")]
+        [Benchmark, MaxMem("2 KB")]
         public void Benchmark__1()
         {
 

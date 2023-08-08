@@ -4,17 +4,18 @@ namespace Benchmarker.Serialization
 {
     public sealed class BenchmarkRunModel
     {
+        public DateTime TimeStamp { get; set; }
+        public string? Title { get; set; }
+        public string? CommitId { get; set; }
+        public List<BenchmarkRecord> Records { get; set; }
+        public Dictionary<string, string> Properties { get; set; }
+
         public BenchmarkRunModel() : this(DateTime.UtcNow) { }
 
         public BenchmarkRunModel(DateTime utcNow)
         {
             this.TimeStamp = utcNow.ToUniversalTime();
         }
-
-        public DateTime TimeStamp { get; set; }
-        public string? Title { get; set; }
-        public string? CommitId { get; set; }
-        public List<BenchmarkRecord> Records { get; set; }
 
         public void Add(BenchmarkRecord record)
         {

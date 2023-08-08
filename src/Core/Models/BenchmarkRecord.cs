@@ -13,6 +13,7 @@ namespace Benchmarker.Serialization
     {
         public TestId DetailId { get; set; }
         public double? Mean { get; set; }
+        public long? RunId { get; set; }
         public long? BytesAllocated { get; set; }
         public Dictionary<string, object> Properties { get; set; }
 
