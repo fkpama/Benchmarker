@@ -1,9 +1,13 @@
 import { ErrnoException } from "@nodelib/fs.stat/out/types";
 import child_process, { exec, ExecOptions } from "child_process";
 import { copyFile, mkdirSync, NoParamCallback, read, readFile, rm, rmdir, RmDirOptions, RmOptions, stat, Stats, statSync, writeFile } from "fs";
-import path1, { basename, dirname, extname, resolve } from "path";
+import path1, { basename, dirname, extname, join, resolve } from "path";
 import ts from "typescript";
 
+export function ensureParentDirectory(path: string)
+{
+    ensureDirectory(dirname(path));
+}
 export function ensureDirectory(path: string)
 {
     let stat: Stats;
@@ -214,8 +218,20 @@ export function changeExt(path: string, newExt: string, oldExt?: string): string
     return `${dirname(path)}${path1.sep}${base}${newExt}`;
 }
 
-export function isSamePath(path1: string, path2: string)
+export function filenamehWithoutExtension(path: string, extension?: string): string
 {
+    return basename(path, !extension ? extname(path) : extension);
+}
+export function filePathWithoutExtension(path: string, extension?: string): string
+{
+    return join(dirname(path), filenamehWithoutExtension(path, extension));
+}
+export function isSamePath(path1?: string, path2?: string): boolean
+{
+    if (!path1 || !path2)
+    {
+        return false;
+    }
     path1 = resolve(path1)
     path2 = resolve(path2);
     if (!ts.sys.useCaseSensitiveFileNames)

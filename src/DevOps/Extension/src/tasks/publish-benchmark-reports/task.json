@@ -28,6 +28,9 @@
         "Node": {
             "target": "publish-benchmark-reports.js"
         },
+        "Node10": {
+			"target": "publish-benchmark-reports.js"
+		},
         "Node16": {
             "target": "publish-benchmark-reports.js"
         }

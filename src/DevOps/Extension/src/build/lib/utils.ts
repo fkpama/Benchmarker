@@ -9,6 +9,13 @@ export const logInfo =  log.info;
 export const logError =  log.error;
 export const logWarn =  log.warn;
 export const logDebug =  log.info;
+export function logVerbose(msg: string)
+{
+    if (!msg) return;
+
+    let lines = msg.split('\n');
+    lines.forEach(x => `${chalk.greenBright('Verbose: ')} x`)
+}
 
 export interface WebpackOptions
 {
@@ -18,7 +25,9 @@ export function webpackAsync(config: Configuration | (Configuration[] & { parall
 export function webpackAsync(config: Configuration | Configuration, option?: WebpackOptions)  : Promise<Stats>;
 export function webpackAsync(config: Configuration | (Configuration[] & { parallelism?: number }), options?: WebpackOptions) : Promise<Stats | MultiStats>
 {
+    logVerbose('Start webpack')
     return new Promise((resolve, reject) => {
+        logVerbose('Running webpack')
         webpack(config, (err: any, stats: any) => {
             let silent = options 
                 && typeof options.silent !== 'undefined'
@@ -54,7 +63,7 @@ export function webpackAsync(config: Configuration | (Configuration[] & { parall
 
             if (stats.hasErrors())
             {
-                reject('webpack Failed');
+                reject(new Error(stats.toString({ colors: true })));
             }
             else
             {

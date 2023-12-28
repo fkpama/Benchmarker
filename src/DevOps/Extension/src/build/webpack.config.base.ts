@@ -3,6 +3,7 @@
 /// <reference types="../lib/manifest.d.ts" />
 import { Configuration, DefinePlugin, EntryObject, IgnorePlugin, MultiStats, ProgressPlugin, Stats, WebpackPluginInstance } from 'webpack';
 import { readdirSync } from 'fs';
+const JsonMinimizerPlugin = require("json-minimizer-webpack-plugin");
 import { join, relative, resolve } from 'path';
 import { cwd } from 'process';
 import { GenerateManifestWebpackPlugin } from './webpack/generate-vss-extension-manifest-webpack-plugin';
@@ -14,7 +15,7 @@ import path from 'path';
 import { VssTaskGenerationWebpackPlugin } from './webpack/task-generation-webpack-plugin';
 import { BinDir, DistDir, RootDir, SrcDir } from './config';
 import { ConfigMode, GetConfigFn, GetDefaultBuildConfigFn, WebpackEnv } from './declarations';
-import { WebpackOptions, webpackAsync } from './lib/utils';
+import { WebpackOptions, logDebug, logWarn, webpackAsync } from './lib/utils';
 
 export const CommandLineArgs = {
     VsixOutputDir: 'vsix-output-dir'
@@ -50,7 +51,7 @@ export function GetCommandLineSwitch(env: WebpackEnv, name: string, fallback: bo
     }
     else {
         // the variable contains rubbish. Assumes it meeant `enable'
-        log.warn('Invalid command line or environment value for', name, '. Assuming true');
+        logWarn('Invalid command line or environment value for', name, '. Assuming true');
         return true;
     }
 }
@@ -101,7 +102,7 @@ function printEntryPoints(entryPoints: EntryObject)
         str += `${chalk.greenBright(entry)} => ${entryPoints[entry]}`;
     }
         
-    if (str) log.info(str);
+    if (str) logDebug(str);
 }
 
 // Function to generate entry points dynamically
@@ -209,6 +210,7 @@ function GetConfigImpl(...args: any[]): Configuration
         configName = 'Extension';
         taskEntry = {
             entry: generateEntryPoints(),
+            /*
             plugins: (<WebpackPluginInstance[]>[
                 new GenerateManifestWebpackPlugin({
                     incrementVersion: increment_version,
@@ -220,6 +222,7 @@ function GetConfigImpl(...args: any[]): Configuration
                     waitToken: (<WaitToken>waitPlugin)
                 })
             ]).concat((waitPlugin ?  [waitPlugin] : []))
+            */
         }
     }
     else
@@ -296,6 +299,12 @@ function GetConfigImpl(...args: any[]): Configuration
                     exclude: /node_modules/
 
                 }
+            ]
+        },
+        optimization: {
+            minimize: false,
+            minimizer: [
+                new JsonMinimizerPlugin()
             ]
         },
         plugins: (<WebpackPluginInstance[]>[

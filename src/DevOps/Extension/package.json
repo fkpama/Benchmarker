@@ -45,6 +45,7 @@
     "fs.promises": "^0.1.2",
     "gulp": "^4.0.2",
     "gulp-typescript": "^6.0.0-alpha.1",
+    "json-minimizer-webpack-plugin": "^4.0.0",
     "merge2": "^1.4.1",
     "minimatch": "^9.0.3",
     "mocha": "^10.2.0",

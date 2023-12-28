@@ -1,69 +1,22 @@
 import { glob } from "fast-glob";
-import {
-    Compiler, EntryPlugin, WebpackPluginInstance} from "webpack";
+import webpack, {
+    Compiler, EntryOptions, EntryPlugin, WebpackPluginInstance,
+    sources, Compilation, NormalModule, dependencies,
+} from "webpack";
 import {
     changeExt,
-    copyFileAsync, ensureDirectory, readFileAsync,
+    copyFileAsync, ensureDirectory, ensureParentDirectory, filePathWithoutExtension, isSamePath, readFileAsync,
     writeFileAsync
 } from "../../lib/node/node-utils";
 import { TaskManifest, normalizePath } from "../lib/manifest-utils";
-import { basename, dirname, extname, isAbsolute, join, relative } from "path";
+import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "path";
 import {  existsSync } from "fs";
 import { cwd } from "process";
 
-const PluginName = 'vss-task-generation';
-
 export type TaskNodeExecutionVersion = 'default' | 10 | 16;
-
-import log from 'fancy-log';
-import { logInfo, logWarn, logDebug } from "../lib/utils";
-
-interface TaskCompilationContext {
-    manifestPath: string;
-    context: string;
-    compiler: Compiler;
-    compParams?: { [key: string]: any };
-    tasks: TaskData[];
-    files: string[];
-    taskJsons: {
-        source: string,
-        target: string
-    }[];
-    contributions: ManifestContribution[];
-    manifestFiles: ManifestFile[];
-}
-
-interface TaskDataPartial {
-    /** path (full) of the vsix root directory */
-    context: string;
-    /** entry to be declared for the .js file */
-    entryKey: string;
-    /** Path to the task.json target (in the output directory) */
-    target: string;
-    /** Path of the source (.ts or .js) of the task target (.js file of the task).
-     * 
-     * @remarks
-     * it is in a format suitable for the entry file
-      */
-    targetSrc: string;
-
-    /** name of the task as appearing in the task.json finle */
-    name: string
-}
-
-interface TaskData extends TaskDataPartial
-{
-    /** task.json path (relative to the vsix source directory) */
-    file: string;
-    /** task.json targets full path */
-    contribution: ManifestContribution;
-    jsonData: {
-    }
-}
-interface PluginContext {
-    contributions: ManifestContribution[];
-    files: ManifestFile[];
-}
+import { logInfo, logWarn, logDebug, logError } from "../lib/utils";
+import { Constants, TaskCompilationContext, TaskData, TaskDataPartial } from "./internal";
+import { TaskPipelineHandler } from "./internal/task-pipeline-handler";
 
 export interface VssTaskGenerationOptions {
     rootDir: string;
@@ -108,75 +61,62 @@ export class VssTaskGenerationWebpackPlugin implements WebpackPluginInstance
             files: [],
             context: context,
             taskJsons: [],
-            manifestPath: this._options.manifestPath
+            manifestPath: this._options.manifestPath,
+            handlers:  [] 
         };
 
-        compiler.hooks.afterEmit.tapPromise("vss-task-generation", async compilation => {
+        compiler.hooks.afterEmit.tapPromise(PluginName, async compilation => {
             if (pluginContext.contributions.length == 0 && pluginContext.files.length == 0)
             {
                 logWarn('Nothing to do for tasks?')
                 return;
             }
+            logDebug(`${PluginName}: Begin`)
             let items = {
                 contributions: pluginContext.contributions,
                 files: pluginContext.manifestFiles
             };
             const manifestPath = pluginContext.manifestPath;
             let content = JSON.stringify(items);
-            await writeFileAsync(manifestPath, content);
+            logDebug(`Writing task manifest to ${manifestPath}`)
+            try
+            {
+                ensureParentDirectory(manifestPath);
+                await writeFileAsync(manifestPath, content);
+                logInfo(`Manifest file successfully written: ${manifestPath}`);
+            }
+            catch(ex)
+            {
+                logError(`Failed to write manifest file: ${ex}`)
+                throw ex
+            }
             for (let op of pluginContext.taskJsons)
             {
                 logInfo(`${relative(cwd(), op.source)} => ${relative(cwd(), op.target)}`);
-                ensureDirectory(dirname(op.target));
-                copyFileAsync(op.source, op.target);
+                //ensureDirectory(dirname(op.target));
+                //copyFileAsync(op.source, op.target);
             }
         });
-        /*
-        compiler.hooks.make.tapAsync(PluginName, (compilation, callback) => {
-            if (tasks.length === 0) {
-                // no task.json found?
-                return;
-            }
 
-            /*
-            let factory = compiler.createNormalModuleFactory();
-            let module = factory.create({
-                context: compiler.context,
-                contextInfo: {
-                    compiler: compiler.name!,
-                    issuer: PluginName
-                },
-                dependencies: []
-            }, (err, module) => {
-            })
-            new IgnorePlugin({
-                checkResource: (resource, context) => {
-                    let fpath2 = join(context, resource);
-                    let ignored = tasks.findIndex(x => {
-                        const fullPath = join(compiler.outputPath, x.target);
-                        if (isSamePath(fullPath, fpath2)) {
-                            logDebug(`Ignoring resource '${resource}'`);
-                            return true;
-                        }
-                        return false
-                    }) >= 0;
-                    return ignored;
+        compiler.hooks.beforeRun.tapPromise(PluginName,
+            async () => {
+                await this._beforeCompile(pluginContext);
+                for(let task of pluginContext.tasks)
+                {
+                    let handler = new TaskPipelineHandler(task, pluginContext);
+                    handler.hook(compiler);
+                    pluginContext.handlers.push(handler);
                 }
-            }).apply(compiler);
-        })
-            //*/
-        compiler.hooks.beforeCompile .tapPromise(PluginName,
-            async compParams => await this._beforeCompile(compParams, pluginContext));
+            });
     }
-    private async _beforeCompile(compParams: any, pluginContext: TaskCompilationContext)
+
+    private async _beforeCompile(pluginContext: TaskCompilationContext)
     {
-        pluginContext.compParams = compParams;
         const context = pluginContext.context;
         const compiler = pluginContext.compiler
         const files = pluginContext.files;
         const taskJsons = pluginContext.taskJsons;
         const tasks = pluginContext.tasks;
-        const manifestPath = pluginContext.manifestPath;
         const contributions = pluginContext.contributions;
         const manifestFiles = pluginContext.manifestFiles;
 
@@ -237,21 +177,15 @@ export class VssTaskGenerationWebpackPlugin implements WebpackPluginInstance
                     targets: ['ms.vss-distributed-task.tasks'],
                     properties: { name }
                 },
-                jsonData: { name }
             };
             tasks.push(data)
 
             contributions.push(data.contribution);
         }
-
-        let pluginParams: PluginContext = {
-            contributions,
-            files: manifestFiles
-        };
-        (<any>compParams)[PluginName] = pluginParams;
-        ensureDirectory(dirname(manifestPath));
     }
 }
+
+const PluginName = Constants.TaskGenerationPluginName;
 
 function addWebpackEntry(compiler: Compiler, context: string, file: string, targetPath: string): TaskDataPartial
 {
@@ -260,41 +194,56 @@ function addWebpackEntry(compiler: Compiler, context: string, file: string, targ
     let existingTargetFileExtension: string = extname(targetPath);
     /** full path of the file referenced in task.json */
     let sourcePath = targetPath;
-    if (!existsSync(targetPath))
-    {
-        if(existingTargetFileExtension.toLowerCase() ==='.js')
+    if (!existsSync(sourcePath) && existingTargetFileExtension.toLowerCase() ==='.js')
         {
-            targetPath = changeExt(targetPath, '.ts');
-            if (!existsSync(targetPath))
-            {
-                throw  new Error(`Cannot find target (${origTargetPath}) of task ${relative(context, file)} `)
-            }
+            sourcePath = changeExt(targetPath, '.ts');
             existingTargetFileExtension = '.ts';
-            sourcePath = targetPath;
-        }
     }
-    let webpackSource = isAbsolute(targetPath) ? relative(context, targetPath) : targetPath;
-    webpackSource = `./${normalizePath(webpackSource)}`
-    let webpackTarget = normalizePath(`${dirname(webpackSource)}/${basename(targetPath, existingTargetFileExtension)}`);
 
-    new EntryPlugin(context, webpackSource, {
-        name: webpackSource,
-        filename: `${webpackTarget}.js`
+    if (!existsSync(sourcePath)) {
+        throw new Error(`Cannot find target (${origTargetPath}) of task ${relative(context, file)} `)
+    }
+
+    let webpackSource = isAbsolute(sourcePath) ? relative(context, sourcePath) : sourcePath;
+    webpackSource = `./${normalizePath(webpackSource)}`
+    let webpackTarget = normalizePath(filePathWithoutExtension(webpackSource));
+    let taskJsonName = normalizePath(`${relative(context, dirname(sourcePath))}`);
+
+
+    let targetJsonPath = `./${normalizePath(relative(context, file))}`;
+    //let targetRelPath = `./${normalizePath(relative(context, targetPath))}`;
+
+    let pluginEntry = `./${normalizePath(relative(context, sourcePath))}`;
+    let targetFile = normalizePath(filePathWithoutExtension(relative(context, targetPath)));
+    new EntryPlugin(context, pluginEntry, {
+        name: targetFile,
+        filename: '[name].js',
     }).apply(compiler);
-    /*
-    new EntryPlugin(context, sourcePath, {
-        name: sourcePath,
-        filename: `./${webpackTarget}.js`
-    }).apply(compiler);
-    */
+
+    let targetSrcWithoutExtension = join(resolve(dirname(targetPath), basename(targetPath, extname(targetPath))));
     return {
+        assetId: targetJsonPath,
+        moduleId: '',
+        targetJson: targetJsonPath,
+        file: relative(context, file),
+        fileFullPath: file,
         context: context,
-        entryKey: webpackTarget,
-        target: webpackSource,
-        targetSrc: `./${normalizePath(webpackSource)}`,
-        name: webpackTarget,
+        target: targetJsonPath,
+        scriptSrc: webpackSource,
+        targetSrcWithoutExtension,
+        nameInTaskJson: taskJsonName,
+        entryOptions: {
+            name: targetJsonPath,
+            filename: targetJsonPath,
+        },
+        jsEntryOptions: {
+            name: webpackTarget,
+            filename: relative(compiler.context, sourcePath)
+        },
     }
 }
+
+
 function addFileEntry(compiler: Compiler, context: string, targetPath: string) : ManifestFile {
     targetPath = isAbsolute(targetPath) ? relative(context, dirname(targetPath)) : dirname(targetPath);
     let relativePath = relative(context, join(compiler.outputPath, targetPath));

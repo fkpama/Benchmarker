@@ -15,6 +15,15 @@ const chalk = require('chalk');
 const gulpFilePath = './bin/build/gulpfile';
 const config = require('./src/build/config');
 const { defaultReporter } = require('gulp-typescript/release/reporter');
+const { glob } = require('fast-glob');
+
+log.verbose = msg => {
+    if (!msg) { return }
+    let lines = msg.split('\n')
+    lines.forEach(x => log.info(`${chalk.green('Verbose:')} ${x}`))
+    
+}
+
 /**
  * Little utility class to print `follow link' compatible
  * errors in the DEBUG CONSOLE output
@@ -113,6 +122,34 @@ function mkFn(name, fn, description, flags)
 
 
 
+function cleanBinDir(cb)
+{
+    const binDir = path.join(config.RootDir, config.BinDir);
+    return glob('**/*', { cwd: binDir, absolute: true })
+    .then(function (files) {
+        let count = files.length;
+        let err = [];
+        let promises = [];
+        for(let fi of files)
+        {
+            let toDelete = fi;
+            promises.push(new Promise((resolve, reject) => {
+                rm(toDelete, function  (e) {
+                    if (e) {
+                        log.error('Could not delete file', toDelete, ':', e);
+                        reject(e);
+                    }
+                    else {
+                        resolve();
+                    }
+                })
+            }))
+        }
+        Promise.all(promises).then(function() { cb(); },function (e) { cb(e); });
+    },
+    function (err) { cb(err); })
+}
+
 function compile()
 {
     const binDir = config.BinDir;
@@ -121,6 +158,9 @@ function compile()
     let opts = _conf.compilerOptions;
     const tsProject = ts.createProject(opts);
     const base = path.relative(__dirname, path.join(config.RootDir, config.SrcDir));
+
+    log.verbose(`Bin Dir: ${binDir}`)
+    log.verbose(`TS Config: ${JSON.stringify(opts, null, ' ')}`)
 
     const tsResult = gulp.src([
         mk('src/build/**/*.ts'),
@@ -151,7 +191,7 @@ function compile()
     }
 }
 compile.description = 'Builds the build system files';
-gulp.task('build:compile', compile);
+gulp.task('build:compile', gulp.series(mkFn('clean:bindir', cleanBinDir), mkFn('build:compile:core', compile)));
 
 function makeTask(name, description, flags)
 {
@@ -162,6 +202,10 @@ function makeTask(name, description, flags)
         fn.flags = flags;
     return gulp.task(name, fn);
 }
+
+/*
+ * create a task chained to build:compile
+ */
 function chain()
 {
     let arg = ['build:compile'];

@@ -224,7 +224,7 @@ export class WaitPlugin implements WebpackPluginInstance
     apply(compiler: Compiler) {
         this._run.enable(compiler);
         compiler.hooks.afterDone.tap("wait-plugin", stats => {
-            let msg = `Done building for config ${chalk.yellow(compiler.name)}: ${stats.hasErrors() ? chalk.red('FAILED') : chalk.greenBright('SUCCEEDED')}`;
+            let msg = `Done building for config ${chalk.yellow(compiler.name)}: ${(stats && stats.hasErrors()) ? chalk.red('FAILED') : chalk.greenBright('SUCCEEDED')}`;
             log.info(msg);
             this._run.finish(stats);
         })

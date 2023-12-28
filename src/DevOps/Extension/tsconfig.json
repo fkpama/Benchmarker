@@ -44,15 +44,18 @@
       ]
     },
     "include": [
-      "./src/lib/node/**/*.ts"
+      "./src/lib/node/**/*.ts",
+      "webpack/types.d.ts"
     ]
   },
   "include": [
     "src/scripts/**/*.ts",
     "src/lib/models.d.ts",
     "src/lib/manifest.d.ts",
-    "src/lib/common/**/*.ts"
-, "src/lib/node/console-logger.ts"  ],
+    "src/lib/common/**/*.ts",
+    "node_modules/webpack/types.d.ts",
+     "src/lib/node/console-logger.ts"
+  ],
   "exclude": [
     "bin",
     "obj",
