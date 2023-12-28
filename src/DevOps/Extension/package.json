@@ -39,6 +39,7 @@
     "chai-as-promised": "^7.1.1",
     "chalk": "^4",
     "copy-webpack-plugin": "^11.0.0",
+    "eslint": "^8.56.0",
     "fancy-log": "^2.0.0",
     "fast-glob": "^3.3.1",
     "file-loader": "^6.2.0",

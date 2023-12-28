@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'path';
 import { cwd } from 'process';
-import { sources, Compilation, Compiler, Module, WebpackPluginInstance } from 'webpack';
+import { sources, Compilation, Compiler, Module, WebpackPluginInstance, WebpackError } from 'webpack';
 import {
     getManifestInfos, ManifestInfo, findPATToken,
     getServerManifestInfosAsync, ServerManifest, parseAndIncrementVersion, normalizePath
@@ -12,7 +12,7 @@ import { getLastVersion } from '../lib/server-extension';
 import log from 'fancy-log';
 import chalk from 'chalk';
 import { WaitToken } from './wait-plugin';
-import { webpackThrow } from '../lib/utils';
+import { logDebug, logError, logInfo, logTrace, logVerbose, webpackThrow } from '../lib/utils';
 
 class FakeSource extends sources.SizeOnlySource {
     constructor(private _size: number){
@@ -106,6 +106,7 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
     }
     private async _process(compilation: Compilation): Promise<void>
     {
+        logTrace(`VSIX generation plugin BEGIN`)
         const compiler = compilation.compiler;
         let manifest = this.options.manifest;
         let outputPath: string | undefined;
@@ -133,29 +134,47 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         let publisher = manifestInfo.publisher;
         let serverManifest: ServerManifest;
         if (pat) {
-            serverManifest = await getServerManifestInfosAsync(pat, manifestInfo.id, publisher);
-            let lastVer = getLastVersion(serverManifest);
-            serverVersion = lastVer.version;
-            if (this.options.incrementVersion) {
-                serverVersion = parseAndIncrementVersion(serverVersion);
-                log.info(`Incremented version from server: ${chalk.greenBright(serverVersion)}`);
+            try
+            {
+                logTrace(`Trying to get server extension version`)
+                serverManifest = await getServerManifestInfosAsync(pat, manifestInfo.id, publisher);
+                let lastVer = getLastVersion(serverManifest);
+                serverVersion = lastVer.version;
+                if (this.options.incrementVersion)
+                {
+                    serverVersion = parseAndIncrementVersion(serverVersion);
+                    logInfo(`Incremented version from server: ${chalk.greenBright(serverVersion)}`);
+                }
+            }
+            catch(ex)
+            {
+                logError(`Failed to obtain server version: ${ex}`);
+                if (ex instanceof Error)
+                {
+                    let error : WebpackError = new WebpackError(ex.message);
+                    error.stack = ex.stack;
+                    error.name = ex.name;
+                    compilation.errors.push(error);
+                }
+                return;
             }
         }
 
         let vsixOutputPath = this._getOutputPath(compiler.outputPath, manifestInfo, serverVersion);
+        logVerbose(`Generating extension manifest: ${vsixOutputPath}`)
         let overrideFile = this.options.overridesFile;
         if (serverVersion) {
             overrideFile = this._writeOverridesFile(manifestInfo, serverVersion);
         }
         let cmdLine = generateManifestGlobs(gl, overrideFile);
-        console.log('Increment version:', this.options.incrementVersion);
+        logDebug('Increment version:', this.options.incrementVersion);
         if (!serverVersion && this.options.incrementVersion) {
             cmdLine += " --rev-version";
         }
 
         cmdLine += ` --output-path "${vsixOutputPath}"`;
 
-        console.log('Executing command ' + cmdLine);
+        logDebug('Executing command ' + cmdLine);
         let result = await execAsync(`npx tfx-cli extension create --no-prompt ${cmdLine}`, {
             sharedIo: true
         });

@@ -2,7 +2,8 @@
 import log from 'fancy-log';
 import { existsSync, readFileSync } from "fs";
 import { dirname, join } from 'path';
-import { changeExt, execAsync, readFileAsync } from '../../lib/node/node-utils';
+import { changeExt, execAsync, readFileAsync, sanitizeExecOutput } from '../../lib/node/node-utils';
+import { logDebug, logTrace } from './utils';
 
 const extensionCache =new Map<string, ServerManifest>();
 
@@ -158,12 +159,13 @@ export function findPATToken(): string | undefined
         if (existsSync(patPath))
         {
             const pat = readFileSync(patPath, 'ascii');
+            logDebug(`Using PAT token at location: ${patPath}`);
             return pat.trim();
         }
         const parent = dirname(current);
         if (current == parent)
         {
-            console.warn('Could not find the PAT file');
+            logTrace('Could not find the PAT file');
             break;
         }
         current =  parent;
@@ -171,7 +173,7 @@ export function findPATToken(): string | undefined
     let val = process.env['SYSTEM_ACCESSTOKEN'];
     if (val)
     {
-        console.log('Using environment access token')
+        logDebug('Using environment (SYSTEM_ACCESSTOKEN) access token')
         return val;
     }
     return undefined;
@@ -199,14 +201,25 @@ export async function getServerManifestInfosAsync(pat: string, ...args: any[]): 
         return cached;
     }
 
-    let output = await execAsync(`npx tfx-cli extension show --no-prompt --json --publisher ${publisher} --extension-id ${extension_id} -t ${pat}`);
+    const placeHolder = '*****'
+    let cmdStr = `npx tfx-cli extension show --no-prompt --no-color --json --publisher ${publisher} --extension-id ${extension_id} -t ${placeHolder}`
+    //let cmdStr = `npx tfx-cli extension show --no-prompt --json --publisher ${publisher} --extension-id ${extension_id} -t ${pat}`;
+    cmdStr = cmdStr.replace(placeHolder, pat)
+    let output = await execAsync(cmdStr, { noThrowOnError: true });
     if (output.exitCode)
     {
-        let err = 'Could not get extension infos:\n' + output.stderr;
+        let stderr = sanitizeExecOutput(output.stderr?.trim());
+        if (stderr?.startsWith('error: '))
+        {
+            stderr = stderr.substring(7);
+        }
+        if (stderr) stderr = `: ${stderr}`
+        let exitCode = output.exitCode;
+        let err = `Could not get extension infos (${exitCode})` + stderr
         log.error(err);
         throw Error(err);
     }
-    if (!output.stdout || !output.stdout.trim() || output.stdout.trim() === 'null')
+    if (!(output.stdout?.trim()) || output.stdout.trim() === 'null')
     {
         throw new Error(`Extension ${extension_id} (Publisher: ${publisher}) was not found on the server`);
     }

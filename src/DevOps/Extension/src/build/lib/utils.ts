@@ -9,6 +9,14 @@ export const logInfo =  log.info;
 export const logError =  log.error;
 export const logWarn =  log.warn;
 export const logDebug =  log.info;
+
+export function logTrace(msg: string)
+{
+    if (!msg) return;
+    let lines = msg.split('\n');
+    lines.forEach(x => `${chalk.greenBright('Trace : ')} x`)
+}
+
 export function logVerbose(msg: string)
 {
     if (!msg) return;

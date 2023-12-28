@@ -197,6 +197,12 @@ function GetConfigImpl(...args: any[]): Configuration
             vsixOutputDir = GetCommandLineArg(env, CommandLineArgs.VsixOutputDir, Constants.DefaultVsixOutputDir);
     }
 
+    if (vsixOutputDir)
+    {
+        vsixOutputDir = path.resolve(vsixOutputDir)
+        logDebug('VSIX Output directory: ', vsixOutputDir)
+    }
+
     if (!env.production)
         overrideFile = makeRel(join(Constants.BuildRootDir, 'manifest', 'vss-extension.dev.json'));
 
@@ -210,7 +216,7 @@ function GetConfigImpl(...args: any[]): Configuration
         configName = 'Extension';
         taskEntry = {
             entry: generateEntryPoints(),
-            /*
+            //*
             plugins: (<WebpackPluginInstance[]>[
                 new GenerateManifestWebpackPlugin({
                     incrementVersion: increment_version,
@@ -222,7 +228,7 @@ function GetConfigImpl(...args: any[]): Configuration
                     waitToken: (<WaitToken>waitPlugin)
                 })
             ]).concat((waitPlugin ?  [waitPlugin] : []))
-            */
+            //*/
         }
     }
     else

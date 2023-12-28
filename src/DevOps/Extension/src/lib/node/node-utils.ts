@@ -4,6 +4,14 @@ import { copyFile, mkdirSync, NoParamCallback, read, readFile, rm, rmdir, RmDirO
 import path1, { basename, dirname, extname, join, resolve } from "path";
 import ts from "typescript";
 
+let isInVsCode : undefined | boolean
+function ensureIsInVsCode()
+{
+    if (typeof isInVsCode === 'undefined')
+    { 
+        isInVsCode = !!process.env['VSCODE_INSPECTOR_OPTIONS']
+    }
+}
 export function ensureParentDirectory(path: string)
 {
     ensureDirectory(dirname(path));
@@ -147,6 +155,33 @@ export function getFileSizeAsync(path: string): Promise<number>
         }
     });
 }
+
+/**
+ * @summary Sanitize exec output.
+ * 
+ * @description VSCode adds a bunch of gibberish to the output.
+ * Tries to remove it
+ * 
+ * @param {string} output Exec output
+ * 
+ * @returns {string} The sanitize output
+ */
+export function sanitizeExecOutput<T extends string | undefined | null>(output: string): T
+{
+    if (!output) {
+        return output as T
+    }
+
+    ensureIsInVsCode()
+    if (isInVsCode)
+    {
+        output = output.replace(/Debugger attached.(\r\n)?/g, '');
+        output = output.replace(/\u001B\[\d+m/g, '');
+        output = output.replace(/Waiting for the debugger to disconnect...(\r\n)?/g, '')
+    }
+    return output as T
+}
+
 export function readFileAsync(path: string, encoding: BufferEncoding = 'utf-8'): Promise<string>
 {
     return new Promise<string>((resolve, reject) => {

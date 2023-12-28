@@ -27,7 +27,7 @@ export class VssTaskGenerationWebpackPlugin implements WebpackPluginInstance
 {
     private _options: VssTaskGenerationOptions;
     constructor(options: VssTaskGenerationOptions);
-    constructor(rootDir: string,manifestPath: string, vsixOutputDir?: string);
+    constructor(rootDir: string, manifestPath: string, vsixOutputDir?: string);
     constructor();
     constructor(...args: any[])
     { 
@@ -83,7 +83,7 @@ export class VssTaskGenerationWebpackPlugin implements WebpackPluginInstance
             {
                 ensureParentDirectory(manifestPath);
                 await writeFileAsync(manifestPath, content);
-                logInfo(`Manifest file successfully written: ${manifestPath}`);
+                logInfo(`Task manifest file successfully written: ${manifestPath}`);
             }
             catch(ex)
             {
