@@ -1,0 +1,122 @@
+{
+    "manifestVersion": 1,
+    "scopes": [
+        "vso.extension.data_write",
+        "vso.features_write"
+    ],
+    "contributions": [
+        {
+            "id": "benchmark-report-available-feature",
+            "type": "ms.vss-web.feature",
+            "description": "Show the new ABC hub in the Pipelines hub group",
+            "targets": [
+                "ms.vss-web.managed-features",
+                "ms.vss-web.managed-features-onprem"
+            ],
+            "properties": {
+                "name": "Benchmarks",
+                "userConfigurable": true,
+                "hostConfigurable": false,
+                "visible": false
+            }
+        },
+        {
+            "id": "benchmarker.benchmarks-details-tab",
+            "type": "ms.vss-web.action",
+            "description": "Benchmark Detail tab",
+            "targets": [
+                "ms.vss-test-web.test-results-actions-menu"
+            ],
+            "properties": {
+                "text": "Benchmarks",
+                "group": "actions",
+                "order": 100,
+                "title": "Benchmarks",
+                "name": "Benchmarks",
+                "uri": "storage.html",
+                "icon": "show-properties.png",
+                "registeredObjectId": "openBenchmarks"
+            }
+        },
+        {
+            "id": "test-benchmark-detail-tab",
+            "description": "Tab Description",
+            "type": "ms.vss-build-web.build-results-tab",
+            "targets": [
+                "ms.vss-build-web.build-results-view"
+            ],
+            "properties": {
+                "uri": "benchmarks-build-summary-tab.html",
+                "name": "Benchmarks",
+                "dynamic": true,
+                "supportsTasks": [
+                    "5557b64a-8c04-4a07-abeb-343ef9ab5870"
+                ]
+            },
+            "constraints": [
+                {
+                    "name": "Feature",
+                    "properties": {
+                        "featureId": "frederic-kpama.sw-benchmarker.benchmark-report-available-feature"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "benchmarks-queryparams-subscription",
+            "type": "ms.vss-web.event-subscription",
+            "targets": [
+                "ms.vss-web.tfs-website"
+            ],
+            "properties": {
+                "eventName": "page-interactive",
+                "command": {
+                    "uri": "query-params-service.html",
+                    "serviceName": "SwQueryParamsService",
+                    "methodName": "handleQueryParams"
+                }
+            },
+            "constraints": [
+                {
+                    "name": "QueryParameters",
+                    "inverse": true,
+                    "properties": {
+                        "filters": {
+                            "buildId": ""
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "abcfef-build-status-section",
+            "type": "ms.vss-build-web.build-results-section",
+            "description": "ABC Scan Summary",
+            "targets": [
+                "ms.vss-build-web.build-results-summary-tab"
+            ],
+            "properties": {
+                "name": "ABC Summary Section",
+                "uri": "storage.html",
+                "order": 20,
+                "height": 500
+            }
+        },
+        {
+            "id": "5557b64a-8c04-4a07-abeb-343ef9ab5870",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/publish-benchmark-reports"
+            }
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "uri": "https://<TODO>"
+    },
+    "baseUri": "https://localhost:3000",
+    "contributionTypes": []
+}

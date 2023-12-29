@@ -62,9 +62,9 @@ steps:
 
       extpath=$(find '$(Build.ArtifactStagingDirectory)' -type f -name 'sw-*.vsix' -exec readlink -f '{}' \;)
 
-      nblines=$($extPath | wc -l)
+      nblines=$($extpath | wc -l)
       [[ $nbLines > 1 ]] && \
-      echo -e "##[error]Multiple vsix extension files found:\n$extPath" && \
+      echo -e "##[error]Multiple vsix extension files found:\n$extpath" && \
       exit 1
 
       [[ $nbLines == 0 ]] && \
@@ -72,7 +72,7 @@ steps:
       ls '$(Build.ArtifactStagingDirectory)' && \
       exit 1
 
-      echo "##vso[task.setvariable variable=Extension.VsixPath]$extPath"
+      echo "##vso[task.setvariable variable=Extension.VsixPath]$extpath"
 
       rm -f $pat_file
       exit $rc
