@@ -4,6 +4,7 @@
         "module": "CommonJS",
         "target": "ES5",
         "outDir": "dist",
+        "sourceRoot": "",
         "sourceMap": false,
         "types": [
             "mocha",

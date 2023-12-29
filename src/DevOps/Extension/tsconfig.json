@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "outDir": "dist/scripts",
     "sourceMap": true,
+    "sourceRoot": ".",
     "esModuleInterop": true,
     "lib": [
       "ES5",

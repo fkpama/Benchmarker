@@ -15,7 +15,7 @@ export class DotNetExe
 
   constructor()
   {
-    this.reportPath = tl.getInput('reportPaths', true);
+    this.reportPath = tl.getInput('projects', true);
     this._arguments = tl.getInput('arguments', false) || '';
     this.command = tl.getInput('command', true);
     this._projects = tl.getDelimitedInput('projects', '\n', false);
