@@ -1,9 +1,6 @@
 param(
     [Parameter(Mandatory)]
-    $Path,
-
-    [Parameter()]
-    $Manifest,
+    $Vsix,
 
     [Parameter()]
     $PAT
@@ -66,20 +63,24 @@ if (-not $Manifest)
     throw "Not implemented: get manifest from .vsix"
 }
 
-checkNpx
+checkNpxCli
 
 $traceSet = Test-Path Env:\TFX_TRACE
 if ($traceSet)
 {
     Remove-Item Env:\TFX_TRACE
 }
-$output = &npx tfx-cli extension show --output json --no-prompt --token $PAT --vsix $PATH
+if (-not (Test-Path $Vsix))
+{
+    throw "File not found $Vsix"
+}
+$output = &npx tfx-cli extension show --output json --no-prompt --token $PAT --vsix $Vsix
 $content = ($output | ConvertFrom-Json)
 
 $publisher = $content.publisher.publisherId
 $extensionId = $content.extensionId
 
-$output = &npx tfx-cli extension publish --no-prompt --output json --token $PAT --vsix $PATH
+$output = &npx tfx-cli extension publish --no-prompt --output json --token $PAT --vsix $Vsix
 $content = ($output | ConvertFrom-Json)
 
 if (-not $content.published)
