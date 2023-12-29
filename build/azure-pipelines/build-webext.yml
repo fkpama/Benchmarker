@@ -62,7 +62,7 @@ steps:
 
       extpath=$(find '$(Build.ArtifactStagingDirectory)' -type f -name 'sw-*.vsix' -exec readlink -f '{}' \;)
 
-      nblines=$($extpath | wc -l)
+      nbLines=$($extpath | wc -l)
       [[ $nbLines > 1 ]] && \
       echo -e "##[error]Multiple vsix extension files found:\n$extpath" && \
       exit 1
