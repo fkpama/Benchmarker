@@ -56,10 +56,9 @@ steps:
 
       set +e -x
       pat=$(Benchmarker.AccessToken)
-      if [ "${pat}x" == "x" ]; then
-        echo "${errPrefix}Build access token missing"
+      [ "${pat}x" == "x" ] && \
+        echo "${errPrefix}Build access token missing" && \
         exit 1
-      fi
 
       cd $(ExtensionRootDirectory) && \
       echo "$(Benchmarker.AccessToken)" > "$pat_file" && \
@@ -88,4 +87,4 @@ steps:
   inputs:
     workingDirectory: $(ExtensionRootDirectory)
     filePath: $(SourcesDirectory)build/scripts/Publish-Extension.ps1
-    arguments: -PAT $(Benchmarker.AccessToken) --Vsix "$(Extension.VsixPath)"
+    arguments: -PAT '$(Benchmarker.AccessToken)' "$(Extension.VsixPath)"
