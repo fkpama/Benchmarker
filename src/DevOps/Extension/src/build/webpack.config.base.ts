@@ -2,7 +2,7 @@
 /// <reference types="copy-webpack-plugin" />
 /// <reference types="../lib/manifest.d.ts" />
 import { Configuration, DefinePlugin, EntryObject, IgnorePlugin, MultiStats, ProgressPlugin, Stats, WebpackPluginInstance } from 'webpack';
-import { readdirSync } from 'fs';
+import { readdirSync, writeFile, writeFileSync } from 'fs';
 const JsonMinimizerPlugin = require("json-minimizer-webpack-plugin");
 import { join, relative, resolve } from 'path';
 import { cwd } from 'process';
@@ -13,9 +13,14 @@ import log from 'fancy-log';
 import chalk from 'chalk';
 import path from 'path';
 import { VssTaskGenerationWebpackPlugin } from './webpack/task-generation-webpack-plugin';
-import { BinDir, DistDir, RootDir, SrcDir } from './config';
+import { BinDir, DistDir, ObjDir, RootDir, SrcDir } from './config';
 import { ConfigMode, GetConfigFn, GetDefaultBuildConfigFn, WebpackEnv } from './declarations';
 import { WebpackOptions, logDebug, logWarn, webpackAsync } from './lib/utils';
+import { TaskCompilationContext } from './webpack/internal';
+import { TaskComponent as VsixTask, VsixCompilation } from './webpack/vsix-compilation';
+import { DEFAULT_EXTENSION_FILENAME } from '../lib/node/task-initialization';
+import { ManifestInfo } from './lib/manifest-utils';
+import { ensureDirectory, ensureParentDirectory, writeFileAsync } from '../lib/node/node-utils';
 
 export const CommandLineArgs = {
     VsixOutputDir: 'vsix-output-dir'
@@ -33,6 +38,55 @@ const inspect = require('util').inspect.styles;
 inspect.date = 'grey';
 
 const isCiBuild = !!process.env['BUILD_BUILDID']
+
+async function writeExtensionManifest(compilation: VsixCompilation): Promise<string>
+{
+    let parameters: ExtensionParameters | undefined;
+    let files : ManifestFile[] = [];
+    const fname = DEFAULT_EXTENSION_FILENAME;
+    const parametersPath = join(objPath, fname);
+    const vssExtensionPath = join(objPath, 'vss-extension-parameters.json');
+    for(let task of compilation.getTasks())
+    {
+        if (!parameters)
+        {
+            parameters = await generateManifest();
+        }
+        let target = join(task.OutputDir, fname)
+        files.push({
+            path: parametersPath,
+            addressable: false,
+            packagePath: target
+        })
+    }
+
+    const vssExtcontent = JSON.stringify({ files }, null, '  ');
+    await writeFileAsync(vssExtensionPath, vssExtcontent)
+
+    return vssExtensionPath;
+
+    async function generateManifest(): Promise<ExtensionParameters>
+    {
+        const publisher = compilation.extensionInfos.publisher;
+        const extensionId = compilation.extensionInfos.id;
+        const version = compilation.extensionInfos.version;
+
+        let parameters : ExtensionParameters = {
+            publisher,
+            extensionId,
+            version,
+            document: {
+                collection: 'TestCollection',
+                name: 'History.json'
+            }
+        }
+        let json = JSON.stringify(parameters);
+        await writeFileAsync(parametersPath, json, {
+            createDirectory: true
+        });
+        return parameters;
+    }
+}
 
 export function GetCommandLineSwitch(env: WebpackEnv, name: string, fallback: boolean = false) : boolean
 {
@@ -73,7 +127,7 @@ const sourceDirectory = 'src/scripts'; // Source directory path
 const outputDirectory = 'scripts'; // Output directory path
 const baseOutputPath = 'dist';
 //const vsixRootDir = resolve(path.join(buildRootDir, 'dist'))
-const objPath = path.join(Constants.BuildRootDir, 'obj');
+const objPath = path.join(Constants.BuildRootDir, ObjDir);
 let overrideFile: string | undefined;
 
 const vssManifests: string[] = [
@@ -223,6 +277,9 @@ function GetConfigImpl(...args: any[]): Configuration
                     overridesFile: overrideFile,
                     objDir: objPath,
                     globs: [...vssManifests, taskManifestPath],
+                    additionalFiles: [
+                        writeExtensionManifest
+                    ],
                     vsixOutputDir,
                     updateDisabled,
                     waitToken: (<WaitToken>waitPlugin)
@@ -330,6 +387,7 @@ function GetConfigImpl(...args: any[]): Configuration
                 BENCHMARKER_VERSION: '',
                 BENCHMAEKER_COMMIT_ID: '',
                 BENCHMAEKER_MODE: '',
+                BENCHMAEKER_BUILD_AT: Date.now()
             })
         ]).concat(isCiBuild ? [new ProgressPlugin()] : []),
         stats:

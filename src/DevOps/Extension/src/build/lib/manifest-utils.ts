@@ -3,6 +3,7 @@ import log from 'fancy-log';
 import { existsSync, readFileSync } from "fs";
 import { dirname, join } from 'path';
 import { changeExt, execAsync, readFileAsync, sanitizeExecOutput } from '../../lib/node/node-utils';
+import { initializeTaskEnvironment } from '../../lib/node/task-initialization';
 import { logDebug, logTrace } from './utils';
 
 const extensionCache =new Map<string, ServerManifest>();

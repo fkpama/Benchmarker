@@ -17,11 +17,13 @@ export type TaskNodeExecutionVersion = 'default' | 10 | 16;
 import { logInfo, logWarn, logDebug, logError } from "../lib/utils";
 import { Constants, TaskCompilationContext, TaskData, TaskDataPartial } from "./internal";
 import { TaskPipelineHandler } from "./internal/task-pipeline-handler";
+import { TaskComponent, VsixCompilationImpl as VsixCompilation } from "./vsix-compilation";
 
 export interface VssTaskGenerationOptions {
     rootDir: string;
     manifestPath: string;
     excludedDirectories?: string[];
+    postProcess?: (manifest: TaskCompilationContext) => void | Promise<void>;
 }
 export class VssTaskGenerationWebpackPlugin implements WebpackPluginInstance
 {
@@ -72,6 +74,7 @@ export class VssTaskGenerationWebpackPlugin implements WebpackPluginInstance
                 return;
             }
             logDebug(`${PluginName}: Begin`)
+            const vsixCompilation = VsixCompilation.Get(compilation);
             let items = {
                 contributions: pluginContext.contributions,
                 files: pluginContext.manifestFiles
@@ -84,6 +87,8 @@ export class VssTaskGenerationWebpackPlugin implements WebpackPluginInstance
                 ensureParentDirectory(manifestPath);
                 await writeFileAsync(manifestPath, content);
                 logInfo(`Task manifest file successfully written: ${manifestPath}`);
+                if (this._options.postProcess)
+                    this._options.postProcess(pluginContext);
             }
             catch(ex)
             {
@@ -95,6 +100,11 @@ export class VssTaskGenerationWebpackPlugin implements WebpackPluginInstance
                 logInfo(`${relative(cwd(), op.source)} => ${relative(cwd(), op.target)}`);
                 //ensureDirectory(dirname(op.target));
                 //copyFileAsync(op.source, op.target);
+            }
+            for(let i = 0; i < pluginContext.taskJsons.length; i++)
+            {
+                let wrapper = new TaskComponent(pluginContext.tasks[i]);
+                vsixCompilation.addComponent(wrapper);
             }
         });
 

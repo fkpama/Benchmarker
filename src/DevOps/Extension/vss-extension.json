@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "sw-benchmarker",
-  "version": "0.0.39",
+  "version": "0.0.53",
   "public": false,
   "publisher": "frederic-kpama",
   "name": "Benchmarker Extension",

@@ -1,31 +1,21 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'path';
 import { cwd } from 'process';
-import { sources, Compilation, Compiler, Module, WebpackPluginInstance, WebpackError } from 'webpack';
+import { sources, Compilation, Compiler, WebpackPluginInstance, WebpackError } from 'webpack';
 import {
     getManifestInfos, ManifestInfo, findPATToken,
     getServerManifestInfosAsync, ServerManifest, parseAndIncrementVersion, normalizePath
 } from '../lib/manifest-utils';
-import { changeExt, copyFileAsync, execAsync, getFileSizeAsync, readFileAsync, rmdirAsync } from '../../lib/node/node-utils';
+import { changeExt, copyFileAsync, execAsync, readFileAsync, rmdirAsync } from '../../lib/node/node-utils';
 import { tmpdir } from 'os';
 import { getLastVersion } from '../lib/server-extension';
 import log from 'fancy-log';
 import chalk from 'chalk';
 import { WaitToken } from './wait-plugin';
 import { logDebug, logError, logInfo, logTrace, logVerbose, webpackThrow } from '../lib/utils';
+import { VsixCompilationImpl as VsixCompilation } from './vsix-compilation';
+import { isPromise } from 'util/types';
 
-class FakeSource extends sources.SizeOnlySource {
-    constructor(private _size: number){
-        super(_size);
-        console.log('MY SIZE:', _size);
-    }
-    override size(): number {
-        return this._size;
-    }
-    override buffer(): Buffer {
-        return Buffer.from('');
-    }
-}
 function generateManifestGlobs(paths: string[], overridesFile?: string)
 {
     let cmdLine = '--manifest-globs';
@@ -59,6 +49,7 @@ export interface ManifestOutputOptions
     incrementVersion?: boolean,
     overridesFile?: string,
     globs?: (string | (() => string))[],
+    additionalFiles?: Array<string | ((compilation: VsixCompilation) => (string | Promise<string>))>,
     updateDisabled?: boolean;
     waitToken?: WaitToken;
 }
@@ -131,6 +122,10 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         let gl = getGlobs(globs);
         let serverVersion: string | undefined;
         let manifestInfo = getManifestInfos(gl, this.options.overridesFile)
+
+        // second pass
+        let vsixCompilation = VsixCompilation.Get(compilation);
+
         let publisher = manifestInfo.publisher;
         let serverManifest: ServerManifest;
         if (pat) {
@@ -161,18 +156,25 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         }
 
         let vsixOutputPath = this._getOutputPath(compiler.outputPath, manifestInfo, serverVersion);
+        vsixCompilation.setInfos(manifestInfo);
+        vsixCompilation.setOutputPath(vsixOutputPath);
+        let cmdLine = `--output-path "${vsixOutputPath}" `
+
+        let addFiles = await this._processAdditionalFiles(vsixCompilation)
+        if (addFiles)
+        {
+            gl = [...gl, ...addFiles];
+        }
         logVerbose(`Generating extension manifest: ${vsixOutputPath}`)
         let overrideFile = this.options.overridesFile;
         if (serverVersion) {
             overrideFile = this._writeOverridesFile(manifestInfo, serverVersion);
         }
-        let cmdLine = generateManifestGlobs(gl, overrideFile);
+        cmdLine += generateManifestGlobs(gl, overrideFile);
         logDebug('Increment version:', this.options.incrementVersion);
         if (!serverVersion && this.options.incrementVersion) {
             cmdLine += " --rev-version";
         }
-
-        cmdLine += ` --output-path "${vsixOutputPath}"`;
 
         logDebug('Executing command ' + cmdLine);
         let result = await execAsync(`npx tfx-cli extension create --no-prompt ${cmdLine}`, {
@@ -181,9 +183,12 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         if (result.exitCode) {
             webpackThrow(result.stderr);
         }
+
         let size = await readFileAsync(vsixOutputPath, 'binary');
         const buffer = Buffer.from(size, 'binary');
+        /*
         await copyFileAsync(vsixOutputPath, `${changeExt(vsixOutputPath, '.bak.zip')}`);
+        //*/
         await rmdirAsync(vsixOutputPath, true);
         let src = new sources.RawSource(buffer, false);
 
@@ -210,6 +215,46 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         let fname = join(this._ensureObjDir(), newOfileName);
         writeFileSync(fname, newOfile)
         return fname;
+    }
+
+    private async _processAdditionalFiles(compilation: VsixCompilation): Promise<string[]>
+    {
+        const opts = this.options;
+        if (!opts.additionalFiles)
+        {
+            return [];
+        }
+
+        let result: string[] = [];
+        let cwd = process.cwd();
+        for(let file of opts.additionalFiles)
+        {
+            let str: string;
+            if (typeof file === 'function')
+            {
+                let ret = file(compilation);
+                if (isPromise(ret))
+                {
+                    str = await ret;
+                }
+                else
+                {
+                    str = ret;
+                }
+            }
+            else
+            {
+                str = file;
+            }
+
+            if (str)
+            {
+                let p = relative(cwd, str);
+                result.push(p);
+            }
+        }
+
+        return result;
     }
 
     private _getOutputPath(compilerOutput: string, infos: ManifestInfo, version: string | undefined) {

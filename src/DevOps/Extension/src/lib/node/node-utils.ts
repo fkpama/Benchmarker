@@ -123,8 +123,23 @@ export function copyFileAsync(source: string, target: string): Promise<void>
 {
     return makeFunc(cb => copyFile(source, target, cb));
 }
-export function writeFileAsync(path: string, content: string): Promise<void>
+export interface WriteFileOptions
 {
+    createDirectory?: boolean;
+}
+
+const defaultWriteFileOptions : WriteFileOptions = {
+    createDirectory: false
+}
+export function writeFileAsync(path: string, content: string, options?: WriteFileOptions): Promise<void>
+{
+    let opts: WriteFileOptions = Object.assign({}, defaultWriteFileOptions, options);
+    if (opts.createDirectory)
+    {
+        let dir = dirname(path);
+        if (dir)
+            mkdirSync(dir, { recursive: true });
+    }
     return makeFunc(cb => writeFile(path, content, cb));
 }
 export function statAsync(path: string): Promise<Stats>

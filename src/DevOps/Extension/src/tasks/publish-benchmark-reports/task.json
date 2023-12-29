@@ -13,7 +13,7 @@
         "Patch": 21
     },
     "demands": [],
-    "instanceNameFormat": "Publish Benchmarks",
+    "instanceNameFormat": "Benchmarker $(command)",
     "groups": [
         {
             "name": "testAdvanced",
@@ -76,13 +76,16 @@
     ],
     "execution": {
         "Node": {
-            "target": "publish-benchmark-reports.js"
+            "target": "publish-benchmark-reports.js",
+			"argumentFormat": ""
         },
         "Node10": {
-			"target": "publish-benchmark-reports.js"
+			"target": "publish-benchmark-reports.js",
+			"argumentFormat": ""
 		},
         "Node16": {
-            "target": "publish-benchmark-reports.js"
+            "target": "publish-benchmark-reports.js",
+			"argumentFormat": ""
         }
     },
     "messages": {
