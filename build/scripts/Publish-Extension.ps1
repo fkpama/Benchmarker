@@ -58,11 +58,6 @@ if (-not $PAT)
     $PAT = findAccessToken
 }
 
-if (-not $Manifest)
-{
-    throw "Not implemented: get manifest from .vsix"
-}
-
 checkNpxCli
 
 $traceSet = Test-Path Env:\TFX_TRACE
