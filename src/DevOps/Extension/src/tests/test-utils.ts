@@ -1,25 +1,10 @@
-import { existsSync, readFileSync } from "fs";
-import path, { dirname, join } from "path";
-import { cwd, env } from "process";
+import { initializeTaskEnvironment } from "../lib/node/task-initialization";
 
 export function setupPatToken()
 {
-    for(let current = cwd(); !!current;)
-    {
-        let patPath = join(current, 'pat.txt');
-        if (existsSync(patPath))
-        {
-            const pat = readFileSync(patPath, 'ascii');
-            process.env['SYSTEM_ACCESSTOKEN'] = pat.trim();
-        }
-        const parent = dirname(current);
-        if (current == parent)
-        {
-            console.warn('Could not find the PAT file');
-            break;
-        }
-        current =  parent;
-    }
-
-    env['SYSTEM_COLLECTIONID'] = 'kpamafrederic';
+    const parameters = initializeTaskEnvironment('pat.json');
+    let pat = (parameters.pat || process.env['SYSTEM_ACCESSTOKEN'])?.trim();
+    if (!pat)
+        throw new Error('The system parameters is missing the personal access token');
+    process.env['SYSTEM_ACCESSTOKEN'] = pat;
 }

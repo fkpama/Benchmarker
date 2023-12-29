@@ -1,4 +1,3 @@
-
 declare interface BenchmarkHistoryModel
 {
     version?: string;

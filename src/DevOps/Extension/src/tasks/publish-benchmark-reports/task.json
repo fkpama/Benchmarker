@@ -84,5 +84,8 @@
         "Node16": {
             "target": "publish-benchmark-reports.js"
         }
+    },
+    "messages": {
+        "noProjectFilesFound": "Project file(s) matching the specified pattern were not found."
     }
 }

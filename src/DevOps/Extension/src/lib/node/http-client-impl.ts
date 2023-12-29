@@ -149,7 +149,8 @@ export class HttpClientImpl implements HttpClient
                     try {
                         if (isErrorStatusCode(res.statusCode)) {
                             //reject(new HttpResponseError(res.statusCode, res.statusMessage, resp));
-                            reject(new HttpResponseError(res.statusCode, res.statusMessage, resp));
+                            let error = new HttpResponseError(res.statusCode, res.statusMessage, resp);
+                            reject(error);
                         }
                         else if (isRedirectStatusCode(res.statusCode)) {
                             reject(new HttpResponseError(res.statusCode, res.statusMessage, resp));

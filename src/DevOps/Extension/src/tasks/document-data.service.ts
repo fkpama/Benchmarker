@@ -1,9 +1,41 @@
-import { EXTENSION_NAME, PUBLISHER_NAME, getCollectionName, getExtensionManagementHostUri } from '../lib/node/task-utilities';
+import { getCollectionName, getExtensionId, getExtensionManagementHostUri, getPublisherName } from '../lib/node/task-utilities';
 import { HttpClient, HttpErrors, HttpResponseError } from '../lib/common/http-client';
 import { NullLogger, Logger } from '../lib/common/logging';
 import { isNullOrWhitespace } from '../lib/common/utilities';
 
 const API_VERSION = '7.1-preview.1';
+
+function processError(ex: any, log: Logger): Error
+{
+    if (ex instanceof HttpResponseError && ex.responseContent)
+    {
+        try
+        {
+            let error: ServerException;
+            if (typeof ex.responseContent === 'string')
+            {
+                error = JSON.parse(ex.responseContent);
+            }
+            else
+            {
+                error = ex.responseContent;
+            }
+            if (error)
+            {
+                log?.error(JSON.stringify(error, null, ' '));
+                (<any>ex).serverError = error
+                ex.message = `${ex.message}: ${error.message.replace(/%.+=.+;%:/g, '').trim()}`;
+            }
+        }
+        catch { }
+    }
+
+    return ex;
+}
+function isHttpError(arg: any): arg is HttpResponseError
+{
+    return arg && arg.statusCode;
+}
 
 export interface CollectionResult<T> {
     count: number;
@@ -143,7 +175,15 @@ export class DocumentDataService implements IDocumentDataService
             id: documentId,
             value: content
         };
-        return await this._handler.postAsync(url, doc);
+        try
+        {
+            return await this._handler.postAsync(url, doc);
+        }
+        catch (ex)
+        {
+            ex = processError(ex, this._logger);
+            throw ex
+        }
     }
 
     private _getDocumentUri(document_id: string | boolean, document_collection: string | undefined, scope: DocumentScope | undefined): string;
@@ -181,7 +221,7 @@ export class DocumentDataService implements IDocumentDataService
         }
         let scopeUrl = getScope(scope);
         let url = `${getExtensionManagementHostUri()}/${getCollectionName()}/`
-        + `_apis/ExtensionManagement/InstalledExtensions/${PUBLISHER_NAME}/${EXTENSION_NAME}/`
+        + `_apis/ExtensionManagement/InstalledExtensions/${getPublisherName()}/${getExtensionId()}/`
         + `Data/Scopes/${scopeUrl}/Collections/${document_collection}/Documents`;
         if (document_id)
             url += `/${document_id}`

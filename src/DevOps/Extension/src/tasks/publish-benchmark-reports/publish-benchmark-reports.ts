@@ -44,7 +44,7 @@ export class DotNetExe
 
     const projectFiles = utils.getProjectFiles(this._projects)
     if (projectFiles.length == 0) {
-      tl.warning('NoProjectFilesFound');
+      tl.warning(tl.loc('noProjectFilesFound'));
     }
 
     const failedProjects: string[] = [];

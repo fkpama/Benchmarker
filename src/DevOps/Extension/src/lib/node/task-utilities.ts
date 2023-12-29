@@ -1,8 +1,19 @@
-//import { glob } from "glob";
+/// <reference path="../../index.d.ts" />
 import { glob } from "fast-glob";
 import { Minimatch } from "minimatch";
 import { env } from "process";
-import extensionInfo from '../../../vss-extension.json'
+import { initializeTaskEnvironment } from './task-initialization';
+
+let extensionParameters: ExtensionParameters | undefined;
+
+function ensureInitialized(): ExtensionParameters
+{
+    if (!extensionParameters)
+    {
+        extensionParameters = initializeTaskEnvironment();
+    }
+    return extensionParameters;
+}
 
 export interface SearchPatternCollection
 {
@@ -71,6 +82,27 @@ export function getExtensionManagementHostUri()
 {
     return 'https://extmgmt.dev.azure.com'
 }
+export function getPublisherName() : string
+{
+    return ensureInitialized().publisher;
+}
+
+export function getExtensionId() : string
+{
+    return ensureInitialized().extensionId;
+}
+
+
+export function getDocumentName() : string
+{
+    return ensureInitialized().document.name;
+}
+
+export function getDocumentCollection() : string
+{
+    return ensureInitialized().document.collection;
+}
+
 export function getCollectionName() : string | undefined
 {
     return env['SYSTEM_COLLECTIONID'];
@@ -84,6 +116,3 @@ export function getCollectionUri() : string | undefined
 export const BUILD_DEFINITION_ID = env['SYSTEM_DEFINITIONID']
 export const BUILD_ID = env['BUILD_BUILDID']
 export const BUILD_NUMBER = env['BUILD_BUILNUMBER']
-
-export const PUBLISHER_NAME = extensionInfo.publisher;
-export const EXTENSION_NAME = extensionInfo.name;

@@ -15,7 +15,7 @@ describe('HttpClient', function() {
     it('should not follow redirects if not specified', async function() {
         let httpClient = new HttpClient();
 
-        await expect(httpClient.getAsync('https://dev.azure.com/kpamafrederic'))
+        await expect(httpClient.getAsync('https://dev.azure.com/KpamaFrederic-Dev'))
             .to
             .be
             .rejectedWith(HttpResponseError);

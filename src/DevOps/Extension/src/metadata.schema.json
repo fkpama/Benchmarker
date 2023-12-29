@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "pat": {
+      "type": "string",
+      "description": "Personal Access Token (PAT). This is used only in DEV environments."
+
+    },
+    "extensionId": {
+      "type": "string",
+      "description": "The ID of the extension."
+    },
+    "publisher": {
+      "type": "string",
+      "description": "The publisher of the extension."
+    },
+    "document": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the document."
+        },
+        "collection": {
+          "type": "string",
+          "description": "The collection associated with the document."
+        }
+      },
+      "required": ["name", "collection"]
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number"],
+        "description": "Description for the environment property" 
+      },
+      "description": "The environment-related properties."
+    }
+  },
+  "required": ["extensionId", "publisher", "document", "environment"],
+  "description": "Description for the entire JSON structure."
+}
