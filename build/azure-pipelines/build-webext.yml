@@ -79,7 +79,7 @@ steps:
 
 - task: PowerShell@2
   displayName: Publish Extension
-  workingDirectory: $(ExtensionRootDirectory)
   inputs:
+    workingDirectory: $(ExtensionRootDirectory)
     filePath: $(SourcesDirectory)build/scripts/Publish-Vsix.ps1
     arguments: -PAT $(Benchmarker.AccessToken) --Vsix "$(Extension.VsixPath)"
