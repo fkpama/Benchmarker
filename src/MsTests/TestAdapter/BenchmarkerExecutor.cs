@@ -22,10 +22,10 @@ namespace Benchmarker.MsTests.TestAdapter
         }
 
         void RunTests(IEnumerable<string>? sources,
-            IRunContext? runContext,
-            IFrameworkHandle frameworkHandle,
-            PlatformObjectFactory<TestCase> testFactory,
-            TestFilter? filter = null)
+                      IRunContext? runContext,
+                      IFrameworkHandle frameworkHandle,
+                      PlatformObjectFactory<TestCase> testFactory,
+                      TestFilter? filter = null)
         {
             if (sources is null)
             {
@@ -55,7 +55,6 @@ namespace Benchmarker.MsTests.TestAdapter
                                        logger,
                                        (id, tc) =>
                                        {
-
                                            return filter?.Invoke(id, tc) ?? true;
                                        })
                 .ToArray();
@@ -246,15 +245,15 @@ namespace Benchmarker.MsTests.TestAdapter
             var idgen = Helpers.DefaultIdGenerator;
             var globalConf = CreateGlobalConfig(handle, logger);
             foreach (var group in sources
-                .SelectMany(x => TestCaseLoader
-                .GetTestCases(x,
-                              idgen,
-                              Platform.History,
-                              globalConf,
-                              factory,
-                              null,
-                              typeConfigFactory: (type, config) => createBenchmarkConfig(handle, type, config, cases, settings, idgen),
-                              filter)
+                .SelectMany(x => GetTestCases(x,
+                                              idgen,
+                                              Platform.History,
+                                              globalConf,
+                                              factory,
+                                              null,
+                                              typeConfigFactory: (type, config)
+                                              => createBenchmarkConfig(handle, type, config, cases, settings, idgen),
+                                              filter)
                 .GroupBy(x => x.RunInfo)
                 .Where(x => x.Any())))
             {

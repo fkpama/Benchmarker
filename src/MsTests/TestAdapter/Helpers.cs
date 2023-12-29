@@ -166,9 +166,7 @@ namespace Benchmarker.MsTests.TestAdapter
             {
                 var serializer = new XmlSerializer(typeof(BenchmarkerSettings));
                 using var str = new StringReader(node.OuterXml);
-                settings = (BenchmarkerSettings?)serializer
-                    .Deserialize(str)
-                    ?? new();
+                settings = (BenchmarkerSettings?)serializer.Deserialize(str) ?? new();
             }
             else
             {

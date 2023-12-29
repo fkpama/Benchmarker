@@ -1,12 +1,12 @@
 /// <reference types="chai-as-promised" />
 import { DocumentDataService } from '../tasks/document-data.service';
-import { HttpClientImpl as HttpClient } from '../tasks/http-client-impl';
+import { HttpClientImpl as HttpClient } from '../lib/node/http-client-impl';
 import { describe } from "mocha";
 import { setupPatToken } from './test-utils';
-import { getAccessToken } from '../tasks/task-utilities';
-import { ConsoleLogger } from '../common/logging';
+import { getAccessToken } from '../tasks/azure-sdk-utils';
+import { ConsoleLogger } from '../lib/node/console-logger';
 import chai, { expect } from 'chai';
-import { HttpResponseError } from '../common/http-client';
+import { HttpResponseError } from '../lib/common//http-client';
 const chaiAsPromised = require('chai-as-promised');
 
 chai.use(chaiAsPromised);

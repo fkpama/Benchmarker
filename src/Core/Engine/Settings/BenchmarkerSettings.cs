@@ -6,6 +6,7 @@ namespace Benchmarker.Engine.Settings
     [XmlRoot("Benchmarks")]
     public sealed class BenchmarkerSettings
     {
+        public string? RunId { get; set; }
         public string? History { get; set; }
         public string? MeanThreshold { get; set; }
         public string? MemoryThreshold { get; set; }

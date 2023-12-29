@@ -2,8 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.LanguageServices;
-using Microsoft.VisualStudio.Shell.Events;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Benchmarker.VisualStudio.TestsService
 {

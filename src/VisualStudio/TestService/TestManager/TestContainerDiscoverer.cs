@@ -1,9 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using Benchmarker.MsTests;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestWindow.Extensibility;
 
 namespace Benchmarker.VisualStudio.TestsService.TestManager

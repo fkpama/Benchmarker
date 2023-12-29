@@ -1,6 +1,6 @@
 ﻿using DevOps.Tests;
 
-namespace DevOpsTests
+namespace DevOps.Tests
 {
     public abstract class BaseTestClass
     {
@@ -17,7 +17,7 @@ namespace DevOpsTests
             this.TestContext = null!;
         }
         [TestInitialize]
-        public void TestInitialize()
+        public void BaseTestInitialize()
         {
             if (Token.IsMissing())
             {

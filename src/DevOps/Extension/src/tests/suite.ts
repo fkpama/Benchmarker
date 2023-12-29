@@ -1,5 +1,5 @@
 import { describe } from 'mocha';
-import { SearchPatternCollection, filterPatterns, splitPatterns } from '../tasks/task-utilities';
+import { SearchPatternCollection, filterPatterns, splitPatterns } from '../lib/node/task-utilities';
 import { expect } from 'chai';
 
 describe('Utilities:Tasks', () => {

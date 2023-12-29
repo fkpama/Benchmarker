@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace Benchmarker.Storage.DevOps.Serialization
+namespace Benchmarker.Storage.DevOps.Serialization;
+
+internal sealed class ArrayModel<T>
 {
-    internal sealed class DocumentModel
-    {
-        [JsonProperty("id")]
-        public string? Name { get; set; }
-        [JsonProperty("value")]
-        public string Value { get; set; }
-        [JsonProperty("__etag", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling =  DefaultValueHandling.Ignore)]
-        public int? Etag { get; set; }
-    }
+    public int Count { get; set; }
+    public T[] Value { get; set; } = Array.Empty<T>();
+}
+
+internal sealed class DocumentModel
+{
+    [JsonProperty("id")]
+    public string? Name { get; set; }
+    [JsonProperty("value")]
+    public string? Value { get; init; }
+    [JsonProperty("__etag", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling =  DefaultValueHandling.Ignore)]
+    public int? Etag { get; set; }
 }

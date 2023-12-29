@@ -14,7 +14,39 @@
     },
     "demands": [],
     "instanceNameFormat": "Publish Benchmarks",
+    "groups": [
+        {
+            "name": "testAdvanced",
+            "displayName": "Advanced",
+            "isExpanded": false,
+            "visibleRule": "command = test"
+        }
+    ],
     "inputs": [
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Action",
+            "defaultValue": "test",
+            "required": true,
+            "helpMarkDown": "Run tests",
+            "options": {
+                "test": "Test",
+                "publish": "Publish"
+            },
+            "properties": {
+                "EditableOptions": "False"
+            }
+        },
+        {
+            "name": "projects",
+            "type": "multiLine",
+            "label": "Path to project(s)",
+            "defaultValue": "",
+            "visibleRule": "command = test",
+            "required": false,
+            "helpMarkDown": "The path to the csproj or dll file(s) to test. You can use wildcards (e.g. **/*.csproj for all .csproj files in all subfolders). **This field follows glob pattern, and is run against root of the repository at all times irrespective of Working Directory.**"
+        },
         {
             "name": "reportPaths",
             "type": "multiLine",
@@ -22,6 +54,24 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": ""
+        },
+        {
+            "name": "arguments",
+            "type": "string",
+            "label": "Arguments",
+            "defaultValue": "",
+            "visibleRule": "command = test",
+            "required": false,
+            "helpMarkDown": "Arguments to the test [dotnet command](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test). For example, build configuration, output folder, runtime."
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working directory",
+            "helpMarkDown": "Current working directory where the script is run. Empty is the root of the repo (build) or artifacts (release), which is $(System.DefaultWorkingDirectory). The project search pattern is **NOT** relative to working directory.",
+            "required":false,
+            "groupName": "generalAdvanced",
+            "visibleRule": "command != restore && command != push && command != pack"
         }
     ],
     "execution": {

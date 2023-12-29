@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Benchmarker.Serialization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Benchmarker.Serialization;
 
 namespace FrameworkTests
 {

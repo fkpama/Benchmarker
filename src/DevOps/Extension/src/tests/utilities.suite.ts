@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { parseDate } from "../common/utilities";
+import { parseDate } from "../lib/common/utilities";
 
 describe('Utilities', () => {
     describe('Datetime', () => {

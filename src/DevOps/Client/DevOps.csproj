@@ -10,10 +10,12 @@
 
 		<ItemGroup>
 				<PackageReference Include="Microsoft.Extensions.Http" Version="*" />
+				<PackageReference Include="Newtonsoft.Json" Version="*" />
+				<PackageReference Include="Microsoft.VisualStudio.Services.ExtensionManagement.WebApi" Version="*" />
 		</ItemGroup>
 
 		<ItemGroup Condition="'$(Configuration)'=='Debug'">
-				<InternalsVisibleTo Include="DevOps.Tests" />
+				<InternalsVisibleTo Include="Benchmarker.DevOps.Tests" />
 		</ItemGroup>
 
 		<ItemGroup>

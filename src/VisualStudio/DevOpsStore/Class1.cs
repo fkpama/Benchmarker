@@ -36,7 +36,7 @@ namespace DevOpsStore
             }
         }
 
-        private T getService<T>()
+        private T? getService<T>()
             where T : class
         {
             try

@@ -4,7 +4,9 @@ import path from 'path';
 import sinon from 'sinon';
 import { DocumentDataService, ExtensionDocument } from '../../document-data.service';
 
-console.log(process.version);
+// see: https://github.com/microsoft/azure-pipelines-task-lib/blob/master/node/test/mocktests.ts
+
+console.log(`Node Version: ${process.version}`);
 
 let stub = sinon.stub(DocumentDataService.prototype, 'listDocumentsAsync')
 .callsFake(() => {
@@ -15,12 +17,37 @@ let stub = sinon.stub(DocumentDataService.prototype, 'listDocumentsAsync')
 let mod = {
     DocumentDataService: stub
 }
-let taskPath = path.join(__dirname, '../publish-benchmark-reports.js');
+let taskPath = path.join(__dirname, '../publish-benchmark-reports');
 const tmr = new TaskMockRunner(taskPath);
 
 tmr.registerMockExport('getEndpointAuthorizationParameter', () => {
     return 'SOME_TOKEN'
 });
 tmr.registerMock('../document-data-service', mod);
-tmr.setInput('ReportPaths', 'some')
+
+tmr.setInput('reportPaths', 'some')
+tmr.setInput('command', 'test')
+
+let cmd = "/dummy/dotnet";
+let chp :{ [key: string]: boolean; } = {}
+chp[cmd] = true;
+const args = 'test';
+const str = `${cmd} ${args}`
+var answers: ma.TaskLibAnswers = <ma.TaskLibAnswers>{
+    which: {
+        'dotnet': cmd
+    },
+    checkPath: {
+        [cmd]: true
+    },
+    exec: {
+        [str]: {
+            "code": 0,
+            "stdout": '',
+            'stderr': ''
+        }
+    }
+};
+tmr.setAnswers(answers);
+
 tmr.run();

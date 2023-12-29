@@ -1,5 +1,5 @@
 import { describe, before, setup, beforeEach } from 'mocha';
-import { BenchmarkHistory } from '../common/benchmark-history';
+import { BenchmarkHistory } from '../lib/common/benchmark-history';
 import { TaskLogger } from '../tasks/task-logger';
 import { expect, should } from 'chai';
 describe('BenchmarkHistory', () =>{
