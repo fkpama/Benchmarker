@@ -1,3 +1,10 @@
+resources:
+ repositories:
+   - repository: BuildTools
+     type: git
+     name: Framework/BuildTools
+     ref: dev
+
 trigger:
 - web-extension
 
@@ -5,11 +12,19 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
+- name: SourcesDirectory
+  value: Benchmarker/
+
 - name: ExtensionRootDirectory
-  value: src/DevOps/Extension
+  value: $(SourcesDirectory)src/DevOps/Extension
+
 - group: Benchmarker
 
 steps:
+- checkout: BuildTools
+
+- checkout: self
+  
 - task: Npm@1
   displayName: Npm install
   inputs:
@@ -45,5 +60,26 @@ steps:
       npx webpack build --env vsix-output-dir=$(Build.ArtifactStagingDirectory)
       rc=$?
 
+      extpath=$(find '$(Build.ArtifactStagingDirectory)' -type f -name 'sw-*.vsix' -exec readlink -f '{}' \;)
+
+      nblines=($extPath | wc -l)
+      [[ $nbLines > 1 ]] && \
+      echo -e "##[error]Multiple vsix extension files found:\n$extPath" && \
+      exit 1
+
+      [[ $nbLines == 0 ]] && \
+      echo -e "##[error]No .vsix files found in directory $(Build.ArtifactStagingDirectory)" && \
+      ls '$(Build.ArtifactStagingDirectory)' && \
+      exit 1
+
+      echo "##vso[task.setvariable variable=Extension.VsixPath]$extPath"
+
       rm -f $pat_file
       exit $rc
+
+- task: PowerShell@2
+  displayName: Publish Extension
+  workingDirectory: $(ExtensionRootDirectory)
+  inputs:
+    filePath: $(SourcesDirectory)build/scripts/Publish-Vsix.ps1
+    arguments: -PAT $(Benchmarker.AccessToken) --Vsix "$(Extension.VsixPath)"
