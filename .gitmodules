@@ -1,0 +1,3 @@
+[submodule "tests/BenchmarkerTestProject"]
+	path = tests/BenchmarkerTestProject
+	url = https://KpamaFrederic-Dev@dev.azure.com/KpamaFrederic-Dev/Benchmarker/_git/BencharmerTestProject
