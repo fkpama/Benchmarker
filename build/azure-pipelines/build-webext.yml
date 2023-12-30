@@ -57,7 +57,6 @@ steps:
 - checkout: self
 
 - task: DotNetCoreCLI@2
-  enabled: false
   displayName: Generate Typings
   inputs:
     command: 'build'
@@ -71,15 +70,13 @@ steps:
     script: |
       Import-Module $(BuildToolsDirectory)Pipelines/Utils.ps1
 
-
-      Log-Info "Restoring packages"
       $loc = Get-Location
       foreach($dir in (Get-ChildItem -Directory))
       {
         $pkgJsonPath = Join-Path $dir "package.json"
         if (Test-Path $pkgJsonPath)
         {
-          Log-Info "Restoring module ${dir.Name}"
+          Log-Info "Restoring module $($dir.Name)"
           try
           {
             cd $dir
