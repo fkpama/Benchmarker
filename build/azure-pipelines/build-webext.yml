@@ -64,7 +64,7 @@ steps:
     projects: '$(TsGenProjects)'
 
 - task: PowerShell@2
-  displayName: Build Modules
+  displayName: Restore Modules
   inputs:
     targetType: inline
     workingDirectory: $(WebDirectory)
@@ -79,7 +79,7 @@ steps:
         $pkgJsonPath = Join-Path $dir "package.json"
         if (Test-Path $pkgJsonPath)
         {
-          Log-Info "Restoring module $dir.Name"
+          Log-Info "Restoring module ${dir.Name}"
           try
           {
             cd $dir
@@ -91,10 +91,46 @@ steps:
           }
         }
       }
-      Log-Info "Generating Common Module"
-      Set-Location .\Common
-      npm install
+
+- task: PowerShell@2
+  displayName: Restore Modules
+  inputs:
+    targetType: inline
+    workingDirectory: $(WebDirectory)
+    script: |
+      Import-Module $(BuildToolsDirectory)Pipelines/Utils.ps1
+      $loc = Get-Location
+
+      Log-Debug "Build Common package"
+      Set-Location Common
       npm run build
+      if ($LASTEXITCODE -ne 0)
+      {
+        exit 1
+      }
+
+      foreach($dir in (Get-ChildItem -Directory))
+      {
+        if ($dir.Name -eq 'Common')
+        {
+          continue;
+        }
+        $pkgJsonPath = Join-Path $dir "package.json"
+        if (Test-Path $pkgJsonPath)
+        {
+          Log-Info "Restoring module ${dir.Name}"
+          try
+          {
+            cd $dir
+            npm run build
+          }
+          finally
+          {
+            Set-Location $loc
+          }
+        }
+      }
+
 
 - task: Bash@3
   displayName: Build Vsix
