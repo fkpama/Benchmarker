@@ -57,4 +57,7 @@ function makeDeclarations()
 }
 makeDeclarations.description = 'Create TypeScript declaration file'
 //gulp.task('declarations', makeDeclarations)
-gulp.task('default', gulp.series(buildShared, makeDeclarations))
+gulp.task('build', gulp.series(buildShared, makeDeclarations))
+gulp.task('default', ['build'])
+
+gulp.task('tests', gulp.series(['build']))

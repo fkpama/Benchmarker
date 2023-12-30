@@ -1,7 +1,8 @@
 import {
     copyFileAsync, execAsync, execSync,
-    existsAsync, readFileAsync
-} from '../../lib/node/node-utils'
+    existsAsync, readFileAsync,
+    MochaTestInfo
+} from '@sw/benchmarker-buildtools'
 import { basename, dirname, join, relative, resolve } from 'path';
 import { glob } from 'fast-glob';
 import { existsSync, readFileSync, rmSync } from 'fs';
@@ -16,7 +17,6 @@ import chalk from 'chalk';
 import log from 'fancy-log';
 import { GetConfig } from '../webpack.config.base';
 import { BinDir, RootDir, SrcDir, TaskDirName } from '../config';
-import { SourceMapper } from '../../lib/node/source-mapper';
 import { sleep } from '../../lib/common/utilities';
 import { getTaskManifestTargetAsync } from '../lib/manifest-utils';
 import { cwd } from 'process';
@@ -37,32 +37,12 @@ if (process.platform === 'linux' && process.env['BUILD_BUILDID'])
     mochaCmd = `${nodeExe} "${RootDir}/node_modules/mocha/bin/mocha.js"`
 }
 
-export interface TestSession {
-    failed: string[];
-    sourceMap?: SourceMapper
-}
-
 async function cleanupTestSuite(suiteFpath: string)
 {
     let dir = dirname(suiteFpath);
     for(let path of await glob('**/*.js.log', { cwd: dir, absolute: true }))
     {
         rmSync(path);
-    }
-}
-
-interface MochaTestInfo{
-    title: string;
-    fullTitle: string;
-    file: string;
-    err: {
-        stack: string;
-        message: string;
-        name: string;
-        code: string;
-        actual: string;
-        expected: string;
-        operator: string;
     }
 }
 

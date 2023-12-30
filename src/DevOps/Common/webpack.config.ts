@@ -11,7 +11,10 @@ interface WebpackEnv {
 const configurator: (env: WebpackEnv) => Configuration = (env) => {
     let config: Configuration = {
         entry: {
-            'index': path.join(__dirname, 'src', 'index')
+            'index': path.join(__dirname, 'src', 'index'),
+            'testtools': path.join(__dirname, 'src', 'test-tools.ts'),
+            'logging': path.join(__dirname, 'src', 'logging.ts'),
+            'webpack': path.join(__dirname, 'src', 'webpack.ts'),
         },
         mode: 'development',
         target: 'node',

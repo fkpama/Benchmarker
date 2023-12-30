@@ -10,7 +10,7 @@ import {
     dirname, relative, resolve
 } from 'path';
 import { TestSession, runTaskTests } from './gulp/gulpfile.test';
-import { execAsync, rmdirAsync } from '../lib/node/node-utils';
+import { rmdirAsync } from '@sw/benchmarker-buildtools';
 import { SourceMapper } from '../lib/node/source-mapper';
 import chalk from 'chalk';
 import { ConfigMode } from './declarations';
