@@ -16,7 +16,8 @@
 
 		<ItemGroup>
 
-				<PackageReference Include="Microsoft.ClearScript.V8" Version="*" />
+				<PackageReference Condition="'$(OS)'=='Windows_NT'" Include="Microsoft.ClearScript.V8" Version="*" />
+				<PackageReference Condition="'$(OS)'!='Windows_NT'" Include="Microsoft.ClearScript.linux-x64" Version="7.4.4" />
 				<PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="*" />
 				<PackageReference Include="CliWrap" Version="*" />
 				<PackageReference Include="Microsoft.NET.Test.Sdk" Version="*" />
