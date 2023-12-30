@@ -124,10 +124,10 @@ steps:
       rm -f $pat_file
       exit $rc
 
-- ${{ if parameters.PublishExtension }}
-- task: PowerShell@2
-  displayName: Publish Extension
-  inputs:
-    workingDirectory: $(ExtensionRootDirectory)
-    filePath: $(SourcesDirectory)build/scripts/Publish-Extension.ps1
-    arguments: -PAT '$(Benchmarker.AccessToken)' "$(Extension.VsixPath)"
+- ${{ if parameters.PublishExtension }}:
+  - task: PowerShell@2
+    displayName: Publish Extension
+    inputs:
+      workingDirectory: $(ExtensionRootDirectory)
+      filePath: $(SourcesDirectory)build/scripts/Publish-Extension.ps1
+      arguments: -PAT '$(Benchmarker.AccessToken)' "$(Extension.VsixPath)"
