@@ -1,28 +1,15 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 import { webpack, Configuration, Stats, MultiStats  } from 'webpack';
 //import chalk from 'chalk';
-import path, { isAbsolute, relative, resolve } from 'path';
+import { isAbsolute, relative, resolve } from 'path';
+import * as path from 'path';
 import { cwd } from 'process';
+import { isPathUnder } from './fs';
 
 //export const logInfo =  log.info;
 //export const logError =  log.error;
 //export const logWarn =  log.warn;
 //export const logDebug =  log.info;
-
-export function logTrace(msg: string)
-{
-    if (!msg) return;
-    let lines = msg.split('\n');
-    //lines.forEach(x => `${chalk.greenBright('Trace : ')} x`)
-}
-
-export function logVerbose(msg: string)
-{
-    if (!msg) return;
-
-    let lines = msg.split('\n');
-    //lines.forEach(x => `${chalk.greenBright('Verbose: ')} x`)
-}
 
 export interface WebpackOptions
 {
@@ -86,14 +73,6 @@ export function webpackThrow(msg?: string): never
     err.stack = msg;
     throw err;
 }
-
-export function gulpThrow(str: string) : never
-{
-    let err = new Error(str);
-    (<any>err).showStack = false;
-    throw err;
-}
-
 
 export function normalizeStack(text?: string)
 {
@@ -164,15 +143,3 @@ export function normalizeStack(text?: string)
 
     return text;
 }
-
-export function isPathUnder(baseDir: string, loc: string) : boolean {
-    let path1 = resolve(baseDir);
-    let path2 = resolve(loc);
-    if (!ts.sys.useCaseSensitiveFileNames)
-    {
-        path1 = path1.toLowerCase();
-        path2 = path2.toLowerCase();
-    }
-    return path2.startsWith(path1);
-}
-

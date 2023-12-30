@@ -2,9 +2,7 @@
 import log from 'fancy-log';
 import { existsSync, readFileSync } from "fs";
 import { dirname, join } from 'path';
-import { changeExt, execAsync, readFileAsync, sanitizeExecOutput } from '../../lib/node/node-utils';
-import { initializeTaskEnvironment } from '../../lib/node/task-initialization';
-import { logDebug, logTrace } from './utils';
+import { changeExt, execAsync, readFileAsync, logDebug, logTrace } from '@sw/benchmarker-buildtools';
 
 const extensionCache =new Map<string, ServerManifest>();
 
@@ -209,7 +207,7 @@ export async function getServerManifestInfosAsync(pat: string, ...args: any[]): 
     let output = await execAsync(cmdStr, { noThrowOnError: true });
     if (output.exitCode)
     {
-        let stderr = sanitizeExecOutput(output.stderr?.trim());
+        let stderr = output.stderr?.trim();
         if (stderr?.startsWith('error: '))
         {
             stderr = stderr.substring(7);

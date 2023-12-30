@@ -12,9 +12,11 @@ const configurator: (env: WebpackEnv) => Configuration = (env) => {
     let config: Configuration = {
         entry: {
             'index': path.join(__dirname, 'src', 'index'),
-            'testtools': path.join(__dirname, 'src', 'test-tools.ts'),
+            'test-tools': path.join(__dirname, 'src', 'test-tools.ts'),
             'logging': path.join(__dirname, 'src', 'logging.ts'),
             'webpack': path.join(__dirname, 'src', 'webpack.ts'),
+            'ts': path.join(__dirname, 'src', 'ts.ts'),
+            'gulp': path.join(__dirname, 'src', 'gulp.ts'),
         },
         mode: 'development',
         target: 'node',

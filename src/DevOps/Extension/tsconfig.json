@@ -25,7 +25,10 @@
           "../Package/"
         ],
         "@sw/benchmarker-buildtools":[
-          "../Common"
+          "../Common/"
+        ],
+        "@sw/benchmarker-buildtools/*": [
+          "../Common/*"
         ]
       }
   },
@@ -51,6 +54,12 @@
       "paths": {
         "@sw/benchmarker-core": [
           "../Package/"
+        ],
+        "@sw/benchmarker-buildtools": [
+          "../Common/"
+        ],
+        "@sw/benchmarker-buildtools/*": [
+          "../Common/*"
         ]
       },
       "types": [

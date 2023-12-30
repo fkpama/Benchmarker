@@ -1,20 +1,18 @@
 import { glob } from "fast-glob";
-import webpack, {
-    Compiler, EntryOptions, EntryPlugin, WebpackPluginInstance,
-    sources, Compilation, NormalModule, dependencies,
+import {
+    Compiler, EntryPlugin, WebpackPluginInstance,
 } from "webpack";
 import {
     changeExt,
-    copyFileAsync, ensureDirectory, ensureParentDirectory, filePathWithoutExtension, isSamePath, readFileAsync,
-    writeFileAsync
-} from "../../lib/node/node-utils";
+    ensureParentDirectory, filePathWithoutExtension, readFileAsync,
+    writeFileAsync, logInfo, logWarn, logDebug, logError
+} from '@sw/benchmarker-buildtools'
 import { TaskManifest, normalizePath } from "../lib/manifest-utils";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "path";
 import {  existsSync } from "fs";
 import { cwd } from "process";
 
 export type TaskNodeExecutionVersion = 'default' | 10 | 16;
-import { logInfo, logWarn, logDebug, logError } from "../lib/utils";
 import { Constants, TaskCompilationContext, TaskData, TaskDataPartial } from "./internal";
 import { TaskPipelineHandler } from "./internal/task-pipeline-handler";
 import { TaskComponent, VsixCompilationImpl as VsixCompilation } from "./vsix-compilation";

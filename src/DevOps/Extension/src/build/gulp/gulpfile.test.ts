@@ -1,18 +1,22 @@
 import {
     copyFileAsync, execAsync, execSync,
-    existsAsync, readFileAsync,
-    MochaTestInfo
+    existsAsync, readFileAsync, logInfo, logError, logWarn, webpackAsync
 } from '@sw/benchmarker-buildtools'
+import { MochaTestInfo, TestSession } from '@sw/benchmarker-buildtools/dist/test-tools'
+import { formatDiagnostic  } from '@sw/benchmarker-buildtools/dist/ts'
+import { gulpThrow as gThrow , gulpThrow } from '@sw/benchmarker-buildtools/dist/gulp'
 import { basename, dirname, join, relative, resolve } from 'path';
 import { glob } from 'fast-glob';
 import { existsSync, readFileSync, rmSync } from 'fs';
 import ts, { CompilerOptions } from 'typescript';
-import { Configuration } from 'webpack';
+import { Configuration, webpack } from 'webpack';
+/*
 import {
     webpackAsync as webpack, formatDiagnostic,
-    gulpThrow as gThrow, logError,
+    , logError,
     logInfo, logWarn
-} from '../lib/utils'
+} ;
+*/
 import chalk from 'chalk';
 import log from 'fancy-log';
 import { GetConfig } from '../webpack.config.base';
@@ -141,7 +145,7 @@ export async function runTaskTypescript(taskDir: string,
     if (parsed.errors && parsed.errors.length > 0)
     {
         let str = parsed.errors.map(x => formatDiagnostic(x)).join('\n');
-        gThrow(str);
+        gulpThrow(str);
     }
 
     compilerOptions.outDir = join(outDir, relPath);
@@ -171,7 +175,7 @@ export async function runTaskTypescript(taskDir: string,
     if (result.diagnostics && result.diagnostics.length > 0)
     {
         let str = result.diagnostics.map(x => formatDiagnostic(x)).join('\n');
-        log.warn(str);
+        logWarn(str);
     }
     //console.log(JSON.stringify(result));
     //console.log(emittedFiles);
@@ -319,7 +323,7 @@ async function generateWebpackTask(outDir: string, taskDirName: string) {
     console.log(JSON.stringify(cfg, undefined, '  '));
     for (let i = 0; i < 3; i++) {
         try {
-            await webpack(cfg);
+            await webpackAsync(cfg);
             log.info(`Webpack ${chalk.greenBright('Succeeded')}`);
             break;
         }

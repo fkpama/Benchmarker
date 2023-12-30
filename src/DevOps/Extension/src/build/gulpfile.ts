@@ -1,6 +1,5 @@
 import { glob } from 'fast-glob';
 import { info as logInfo } from 'fancy-log';
-import { webpackAsync as webpack } from './lib/utils'
 import { RootDir, BinDir, ObjDir, TaskDirName, DistDir, TokenFilename } from './config';
 import * as gulp from 'gulp';
 import { statSync, existsSync, readFileSync, rmSync } from 'fs';
@@ -9,9 +8,9 @@ import {
     join,
     dirname, relative, resolve
 } from 'path';
-import { TestSession, runTaskTests } from './gulp/gulpfile.test';
+import { runTaskTests } from './gulp/gulpfile.test';
 import { rmdirAsync } from '@sw/benchmarker-buildtools';
-import { SourceMapper } from '../lib/node/source-mapper';
+import { TestSession, SourceMapper } from '@sw/benchmarker-buildtools/dist/test-tools';
 import chalk from 'chalk';
 import { ConfigMode } from './declarations';
 import { findPATToken } from './lib/manifest-utils';

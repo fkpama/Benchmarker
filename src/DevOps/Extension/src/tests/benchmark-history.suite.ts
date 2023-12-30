@@ -1,5 +1,5 @@
 import { describe, before, setup, beforeEach } from 'mocha';
-import { BenchmarkHistory } from '../lib/common/benchmark-history';
+import { BenchmarkDetail, BenchmarkHistory, BenchmarkRunModel } from '@sw/benchmarker-core';
 import { TaskLogger } from '../tasks/task-logger';
 import { expect, should } from 'chai';
 describe('BenchmarkHistory', () =>{
@@ -8,11 +8,11 @@ describe('BenchmarkHistory', () =>{
     const dummy_detail_name = 'some_name';
     const dummy_detail_fullname = 'some_fullname';
     let dummyDetail: BenchmarkDetail;
-    let dummyRun: BenchmarkRun;
+    let dummyRun: BenchmarkRunModel;
     let sut: BenchmarkHistory;
     let logger = new TaskLogger();
     beforeEach(function () {
-        sut = new BenchmarkHistory(undefined, logger)
+        sut = new BenchmarkHistory(logger)
         dummyRun = {
             records: [{
                 detailId: dummy_detail_id,

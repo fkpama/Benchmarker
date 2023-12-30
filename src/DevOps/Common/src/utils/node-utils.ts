@@ -1,8 +1,7 @@
-import { ErrnoException } from "@nodelib/fs.stat/out/types";
-import child_process, { exec, ExecOptions } from "child_process";
-import { copyFile, mkdirSync, NoParamCallback, read, readFile, rm, rmdir, RmDirOptions, RmOptions, stat, Stats, statSync, writeFile } from "fs";
-import path1, { basename, dirname, extname, join, resolve } from "path";
-import ts from "typescript";
+import { exec, ExecOptions, spawnSync } from "child_process";
+import { copyFile, mkdirSync, NoParamCallback, readFile, rm, rmdir, RmDirOptions, RmOptions, stat, Stats, statSync, writeFile } from "fs";
+import { basename, dirname, extname, join, resolve, sep as dirsep } from "path";
+import * as ts from "typescript";
 
 let isInVsCode : undefined | boolean
 function ensureIsInVsCode()
@@ -35,13 +34,16 @@ interface ExecResult {
     stderr: string;
 }
 interface ExecOptions2 extends ExecOptions {
+    /**
+     * If true, write to the current process stdout and stderr
+     */
     sharedIo?: boolean;
     noThrowOnError?: boolean
 }
 export function execSync(cmd: string): ExecResult
 {
     try {
-        let bufs = child_process.spawnSync(cmd).toString();
+        let bufs = spawnSync(cmd).toString();
         return {
             exitCode: 0,
             stderr: '',
@@ -265,7 +267,7 @@ export function changeExt(path: string, newExt: string, oldExt?: string): string
     }
 
     let base = basename(path, ext);
-    return `${dirname(path)}${path1.sep}${base}${newExt}`;
+    return `${dirname(path)}${dirsep}${base}${newExt}`;
 }
 
 export function filenamehWithoutExtension(path: string, extension?: string): string

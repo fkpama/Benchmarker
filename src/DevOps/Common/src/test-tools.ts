@@ -1,12 +1,14 @@
 import { readFileSync, rmSync } from "fs";
 import { dirname, relative } from "path";
 import { execAsync, execSync, existsAsync, readFileAsync } from "./utils/node-utils";
-import glob from 'fast-glob';
+import * as glob from 'fast-glob';
 import { cwd } from "process";
-import chalk from 'chalk';
+import * as chalk from 'chalk';
 import { RootDir } from './config'
 import { SourceMapper } from './testtools/source-mapper';
 import { logError, logInfo } from "./logging";
+
+export * from './testtools/source-mapper';
 
 let mochaCmd = 'npx mocha'
 if (process.platform === 'linux' && process.env['BUILD_BUILDID'])
@@ -29,7 +31,7 @@ export interface TestSession {
 }
 
 
-export interface MochaTestInfo{
+export interface MochaTestInfo {
     title: string;
     fullTitle: string;
     file: string;

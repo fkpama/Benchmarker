@@ -1,7 +1,6 @@
-import { Compilation, Compiler, EntryPlugin, NormalModule, WebpackError, dependencies, sources, webpack } from "webpack";
+import { Compilation, Compiler, sources } from "webpack";
 import { Constants, TaskCompilationContext, TaskData } from ".";
-import { logError } from "../../lib/utils";
-import { readFileAsync } from "../../../lib/node/node-utils";
+import { readFileAsync } from '@sw/benchmarker-buildtools';
 
 const PluginName = Constants.TaskGenerationPluginName;
 

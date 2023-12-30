@@ -9,6 +9,7 @@
 		<ItemGroup>
 				<PackageReference Include="Reinforced.Typings" Version="*" />
 				<PackageReference Include="Sodiware.Core" Version="*" />
+				<PackageReference Include="StronglyTypedId" />
 		</ItemGroup>
 
 		<ItemGroup>

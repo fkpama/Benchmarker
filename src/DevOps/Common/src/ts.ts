@@ -1,7 +1,9 @@
-import ts from 'typescript';
-import chalk from 'chalk';
-import path, { isAbsolute, relative, resolve } from 'path';
+import * as ts from 'typescript';
+import * as chalk from 'chalk';
 import { cwd } from 'process';
+import { isAbsolute, relative, sep } from 'path';
+import { isPathUnder } from './fs';
+import { logWarn } from './logging';
 
 export function formatDiagnostic(diag: ts.Diagnostic): string
 {
@@ -70,18 +72,18 @@ export function normalizeStack(text?: string)
                         loc = `.${ch}${loc}`;
                     }
                     else if (loc.length < 2) {
-                        loc = `.${path.sep}${loc}`;
+                        loc = `.${sep}${loc}`;
                     }
                 }
                 else {
-                    loc = `.${path.sep}${loc}`;
+                    loc = `.${sep}${loc}`;
                 }
             }
             else {
                 // absolute path. Check if it's under the workspace
                 if (isPathUnder(baseDir, loc))
                 {
-                    loc = `.${path.sep}${relative(baseDir, loc)}`;
+                    loc = `.${sep}${relative(baseDir, loc)}`;
                 }
                 else {
                     result[i] = textLine;
@@ -101,15 +103,4 @@ export function normalizeStack(text?: string)
     }
 
     return text;
-}
-
-export function isPathUnder(baseDir: string, loc: string) : boolean {
-    let path1 = resolve(baseDir);
-    let path2 = resolve(loc);
-    if (!ts.sys.useCaseSensitiveFileNames)
-    {
-        path1 = path1.toLowerCase();
-        path2 = path2.toLowerCase();
-    }
-    return path2.startsWith(path1);
 }

@@ -15,12 +15,11 @@ import path from 'path';
 import { VssTaskGenerationWebpackPlugin } from './webpack/task-generation-webpack-plugin';
 import { BinDir, DistDir, ObjDir, RootDir, SrcDir } from './config';
 import { ConfigMode, GetConfigFn, GetDefaultBuildConfigFn, WebpackEnv } from './declarations';
-import { WebpackOptions, logDebug, logWarn, webpackAsync } from './lib/utils';
 import { TaskCompilationContext } from './webpack/internal';
 import { TaskComponent as VsixTask, VsixCompilation } from './webpack/vsix-compilation';
 import { DEFAULT_EXTENSION_FILENAME } from '../lib/node/task-initialization';
-import { ManifestInfo } from './lib/manifest-utils';
-import { ensureDirectory, ensureParentDirectory, writeFileAsync } from '../lib/node/node-utils';
+import { WebpackOptions, webpackAsync } from '@sw/benchmarker-buildtools/dist/webpack';
+import { logDebug, logWarn, writeFileAsync } from '@sw/benchmarker-buildtools';
 
 export const CommandLineArgs = {
     VsixOutputDir: 'vsix-output-dir'

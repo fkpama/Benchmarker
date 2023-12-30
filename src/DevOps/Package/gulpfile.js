@@ -3,7 +3,8 @@ const ts = require('gulp-typescript');
 const { resolve } = require('path');
 const { spawn } = require('child_process');
 const log = require('fancy-log');
-const { vsCodeReporter } = require('../Common')
+const { vsCodeReporter, buildDotNetProject } = require('../Common')
+const { TypingsProjects } = require('./build/config');
 
 function mkErr(msg)
 {
@@ -56,8 +57,21 @@ function makeDeclarations()
     return tsResult.dts.pipe(gulp.dest('dist'));
 }
 makeDeclarations.description = 'Create TypeScript declaration file'
-//gulp.task('declarations', makeDeclarations)
-gulp.task('build', gulp.series(buildShared, makeDeclarations))
-gulp.task('default', ['build'])
 
-gulp.task('tests', gulp.series(['build']))
+async function runTests()
+{
+}
+
+async function generateTypings()
+{
+    for(let project of TypingsProjects)
+    {
+        await buildDotNetProject(project);
+    }
+}
+generateTypings.displayName = 'Generate Typings';
+//gulp.task('declarations', makeDeclarations)
+gulp.task('build', gulp.series(gulp.parallel(buildShared, generateTypings), makeDeclarations))
+gulp.task('default', gulp.parallel('build'))
+
+gulp.task('tests', gulp.series('build', runTests))

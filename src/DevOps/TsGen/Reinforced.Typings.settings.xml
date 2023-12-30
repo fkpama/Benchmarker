@@ -9,17 +9,21 @@
 		
 		Reinforced.Typings has completely few parameters. So, here we go.
 	-->
+		<ItemGroup>
+				<UpToDateCheckOutput Include="$(RtTargetFile)"/>
+		</ItemGroup>
 	
 	<PropertyGroup>
-	
-		<!-- 
+
+
+				<!-- 
 			This property points target file where to put generated sources. 
 			It is not used if RtDivideTypesAmongFiles='true' specified.
 			Important! Do not forget to include generated file to solution.
 		-->
-    <RtTargetFile>$(NpmPackageProjectDirectory)\src\_generated\models.ts</RtTargetFile>
-		
-		<!--
+			<RtTargetFile>$(NpmPackageProjectDirectory)\src\_generated\models.ts</RtTargetFile>
+
+			<!--
 			This property sets RT configuration method for fluent configuration.
 			If you don't want to use attributes for some reason then here you can
 			specify full-qualified configuration method name (including namespace, 

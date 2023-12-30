@@ -6,13 +6,13 @@ import {
     getManifestInfos, ManifestInfo, findPATToken,
     getServerManifestInfosAsync, ServerManifest, parseAndIncrementVersion, normalizePath
 } from '../lib/manifest-utils';
-import { changeExt, copyFileAsync, execAsync, readFileAsync, rmdirAsync } from '../../lib/node/node-utils';
+import * as benchmarkerBuildtools from '@sw/benchmarker-buildtools'
 import { tmpdir } from 'os';
 import { getLastVersion } from '../lib/server-extension';
 import log from 'fancy-log';
 import chalk from 'chalk';
 import { WaitToken } from './wait-plugin';
-import { logDebug, logError, logInfo, logTrace, logVerbose, webpackThrow } from '../lib/utils';
+import {  } from '@sw/benchmarker-buildtools';
 import { VsixCompilationImpl as VsixCompilation } from './vsix-compilation';
 import { isPromise } from 'util/types';
 
@@ -97,7 +97,7 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
     }
     private async _process(compilation: Compilation): Promise<void>
     {
-        logTrace(`VSIX generation plugin BEGIN`)
+        benchmarkerBuildtools.logTrace(`VSIX generation plugin BEGIN`)
         const compiler = compilation.compiler;
         let manifest = this.options.manifest;
         let outputPath: string | undefined;
@@ -131,19 +131,19 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         if (pat) {
             try
             {
-                logTrace(`Trying to get server extension version`)
+                benchmarkerBuildtools.logTrace(`Trying to get server extension version`)
                 serverManifest = await getServerManifestInfosAsync(pat, manifestInfo.id, publisher);
                 let lastVer = getLastVersion(serverManifest);
                 serverVersion = lastVer.version;
                 if (this.options.incrementVersion)
                 {
                     serverVersion = parseAndIncrementVersion(serverVersion);
-                    logInfo(`Incremented version from server: ${chalk.greenBright(serverVersion)}`);
+                    benchmarkerBuildtools.logInfo(`Incremented version from server: ${chalk.greenBright(serverVersion)}`);
                 }
             }
             catch(ex)
             {
-                logError(`Failed to obtain server version: ${ex}`);
+                benchmarkerBuildtools.logError(`Failed to obtain server version: ${ex}`);
                 if (ex instanceof Error)
                 {
                     let error : WebpackError = new WebpackError(ex.message);
@@ -165,31 +165,31 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         {
             gl = [...gl, ...addFiles];
         }
-        logVerbose(`Generating extension manifest: ${vsixOutputPath}`)
+        benchmarkerBuildtools.logVerbose(`Generating extension manifest: ${vsixOutputPath}`)
         let overrideFile = this.options.overridesFile;
         if (serverVersion) {
             overrideFile = this._writeOverridesFile(manifestInfo, serverVersion);
         }
         cmdLine += generateManifestGlobs(gl, overrideFile);
-        logDebug('Increment version:', this.options.incrementVersion);
+        benchmarkerBuildtools.logDebug('Increment version:', this.options.incrementVersion);
         if (!serverVersion && this.options.incrementVersion) {
             cmdLine += " --rev-version";
         }
 
-        logDebug('Executing command ' + cmdLine);
-        let result = await execAsync(`npx tfx-cli extension create --no-prompt ${cmdLine}`, {
+        benchmarkerBuildtools.logDebug('Executing command ' + cmdLine);
+        let result = await benchmarkerBuildtools.execAsync(`npx tfx-cli extension create --no-prompt ${cmdLine}`, {
             sharedIo: true
         });
         if (result.exitCode) {
-            webpackThrow(result.stderr);
+            benchmarkerBuildtools.webpackThrow(result.stderr);
         }
 
-        let size = await readFileAsync(vsixOutputPath, 'binary');
+        let size = await benchmarkerBuildtools.readFileAsync(vsixOutputPath, 'binary');
         const buffer = Buffer.from(size, 'binary');
         /*
         await copyFileAsync(vsixOutputPath, `${changeExt(vsixOutputPath, '.bak.zip')}`);
         //*/
-        await rmdirAsync(vsixOutputPath, true);
+        await benchmarkerBuildtools.rmdirAsync(vsixOutputPath, true);
         let src = new sources.RawSource(buffer, false);
 
 

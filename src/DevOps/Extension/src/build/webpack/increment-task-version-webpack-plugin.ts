@@ -3,7 +3,7 @@ import log from 'fancy-log';
 import { existsSync, readFileSync, stat, statSync, writeFileSync } from "fs";
 import { dirname, extname, join, relative, resolve } from "path";
 import { Chunk, Compilation, Compiler, WebpackPluginInstance } from "webpack";
-import { changeExt } from "../../lib/node/node-utils";
+import { changeExt } from '@sw/benchmarker-buildtools';
 import {
     TaskManifest, TaskVersion, findPATToken,
     getManifestInfos, getServerManifestInfosAsync,
