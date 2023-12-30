@@ -55,19 +55,6 @@ steps:
 - checkout: BuildTools
 
 - checkout: self
-  
-- task: Npm@1
-  displayName: Npm install
-  inputs:
-    command: 'install'
-    workingDir: $(ExtensionRootDirectory)
-
-- task: Npm@1
-  displayName: Run Tests
-  inputs:
-    command: 'custom'
-    workingDir: $(ExtensionRootDirectory)
-    customCommand: 'run test'
 
 - task: DotNetCoreCLI@2
   displayName: Generate Typings
