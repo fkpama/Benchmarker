@@ -51,7 +51,7 @@ variables:
   value: $(WebDirectory)**/*TsGen.csproj
 
 - name: TestsDirectory
-  value: $(SourcesDirectory)src/Tests
+  value: $(SourcesDirectory)src/Tests/
 
 steps:
 - checkout: BuildTools
