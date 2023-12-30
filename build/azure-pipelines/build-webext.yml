@@ -102,7 +102,7 @@ steps:
 
       Log-Debug "Build Common package"
       Set-Location '$(BuildToolsPackageDirectory)'
-      npm run build
+      npm run build -- --env production
       if ($LASTEXITCODE -ne 0)
       {
         exit 1
