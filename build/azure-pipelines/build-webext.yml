@@ -12,19 +12,44 @@ trigger:
 
   paths:
     include:
-      - src
+      - src/DevOps
 
 pool:
   vmImage: ubuntu-latest
 
+parameters:
+  - name: PublishExtension
+    default: false
+
 variables:
+- group: Benchmarker
+
+- name: BuildToolsDirectory
+  readonly: true
+  value: BuildTools/
+
 - name: SourcesDirectory
+  readonly: true
   value: Benchmarker/
 
-- name: ExtensionRootDirectory
-  value: $(SourcesDirectory)src/DevOps/Extension
+- name: WebDirectory
+  readonly: true
+  value: $(SourcesDirectory)/src/DevOps/
 
-- group: Benchmarker
+- name: ExtensionRootDirectory
+  readonly: true
+  value: $(WebDirectory)Extension
+
+- name: CorePackageDirectory
+  value: $(WebDirectory)Package
+
+- name: BuildToolsPackageDirectory
+  readonly: true
+  value: $(WebDirectory)Package
+
+- name: TsGenProjects
+  value: $(WebDirectory)**/*TsGen.csproj
+
 
 steps:
 - checkout: BuildTools
@@ -44,7 +69,24 @@ steps:
     workingDir: $(ExtensionRootDirectory)
     customCommand: 'run test'
 
-    
+- task: DotNetCoreCLI@2
+  displayName: Generate Typings
+  inputs:
+    command: 'build'
+    projects: '$(TsGenProjects)'
+
+- task: PowerShell@2
+  displayName: Build Modules
+  inputs:
+    targetType: inline
+    workingDirectory: $(WebDirectory)
+    script: |
+      Import-Module $(BuildToolsDirectory)/Pipelines/Utils.ps1
+
+      Log-Info "Generating Common Module"
+      Set-Location .\Common
+      npm run build
+
 - task: Bash@3
   displayName: Build Vsix
   inputs:
@@ -82,6 +124,7 @@ steps:
       rm -f $pat_file
       exit $rc
 
+- ${{ if parameters.PublishExtension }}
 - task: PowerShell@2
   displayName: Publish Extension
   inputs:
