@@ -12,6 +12,10 @@
 		<ItemGroup>
 				<PackageReference Include="Sodiware.Core" Version="*" />
 				<PackageReference Include="StronglyTypedId" />
-				<PackageReference Include="System.Text.Json" Version="*" />
+				<PackageReference Include="System.Text.Json" Version="6.*" />
+		</ItemGroup>
+
+		<ItemGroup Condition="'$(Configuration)'=='Debug'">
+				<InternalsVisibleTo Include="Benchmarker.InteropTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100a972e7aeda783c17ad948ded110f7e2efbbeee2b44cd9d0a0c58cd24fefc539c245fb0b586df2af40114cd3ce078f44e3762fde7f48dbe3275fc9a11a70d65eb75489a2c0973fab8782e3b0f7ed23f7143cea76a282feab5893beeeb90e0cc778faad8d6ea2d1f9bf3e97b01668217f283fa31dd6ffec5affa051c3df68c18d8" />
 		</ItemGroup>
 </Project>

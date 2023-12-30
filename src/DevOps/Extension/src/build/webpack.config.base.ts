@@ -31,7 +31,8 @@ export const Constants = {
     DefaultVsixOutputDir: path.join(resolve(RootDir), BinDir),
     VsixUpdateDisabled: 'update-disabled',
     VsixUpdateDisabled2: 'update-disabled',
-    IncrementManifestsSourceVersions: 'increment_version'
+    IncrementManifestsSourceVersions: 'increment_version',
+    CorePackageDir: path.join(RootDir, '..', 'Packages')
 }
 
 const inspect = require('util').inspect.styles;
@@ -347,6 +348,7 @@ function GetConfigImpl(...args: any[]): Configuration
             alias: {
                 //"azure-devops-extension-sdk": path.join(buildRootDir, "node_modules/azure-devops-extension-sdk"),
                 //'fs/promises': 'fs.promises'
+                '@sw/benchmarker-core': Constants.CorePackageDir
             }
         },
         module: {

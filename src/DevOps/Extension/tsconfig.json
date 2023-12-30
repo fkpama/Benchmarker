@@ -19,14 +19,20 @@
       "ES6",
       "DOM",
       "ES2015.Promise"
-    ]
+    ],
+      "paths": {
+        "@sw/benchmarker-core": [
+          "../Package/"
+        ]
+      }
   },
+
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs",
       "target": "ES2020",
       "outDir": "bin",
-      "rootDir": ".",
+      "rootDir": "..",
       "noImplicitAny": true,
       "noImplicitThis": true,
       "noImplicitReturns": true,
@@ -39,6 +45,11 @@
       "lib": [
         "ES2015"
       ],
+      "paths": {
+        "@sw/benchmarker-core": [
+          "../Package/"
+        ]
+      },
       "types": [
         "node",
         "webpack"
@@ -51,7 +62,6 @@
   },
   "include": [
     "src/scripts/**/*.ts",
-    "src/lib/models.d.ts",
     "src/lib/manifest.d.ts",
     "src/lib/common/**/*.ts",
     "node_modules/webpack/types.d.ts",

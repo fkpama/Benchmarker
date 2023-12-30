@@ -12,7 +12,7 @@ import {
     isJsonContentType,
     isRedirectStatusCode
 } from "../common/http-client";
-import { Logger, NullLogger } from '../common/logging';
+import { Logger, NullLogger } from '@sw/benchmarker-core';
 
 export class HttpClientImpl implements HttpClient
 {

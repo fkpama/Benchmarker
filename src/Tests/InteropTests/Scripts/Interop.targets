@@ -1,0 +1,54 @@
+﻿<Project>
+		<PropertyGroup>
+				<NpmPackageOutputPath Condition="'$(NpmPackageOutputPath)'==''">$(MSBuildProjectDirectory)/$(OutputPath)js</NpmPackageOutputPath>
+				<NpmPackageTarget Condition="'$(NpmPackageTarget)'==''">$(NpmPackageOutputPath)/index.js</NpmPackageTarget>
+		</PropertyGroup>
+
+		<Target Name="_VerifyPackageDirectory" BeforeTargets="PrepareForBuild">
+				<Error Condition="!Exists($(NpmPackageProjectDirectory))" Text="Package Directory Missing or non existent. ($(NpmPackageProjectDirectory))" />
+		</Target>
+
+		<Target Name="_GeneratePackageClass"
+						Condition="'$(NpmPackageProjectDirectory)'!=''"
+						DependsOnTargets="GeneratePackageFiles"
+						BeforeTargets="GenerateAdditionalSources">
+
+				<PropertyGroup>
+						<_Lines>
+								<![CDATA[namespace $(RootNamespace).Lib%3B
+
+partial class TsCompiler
+{
+		internal const string PackageDirectory = "$(NpmPackageProjectDirectory.Replace('\', '\\'))"%3B
+}
+						]]>
+						</_Lines>
+						<_GeneratedClassTargetFile>$(IntermediateOutputPath)TsCompiler.generated.cs</_GeneratedClassTargetFile>
+				</PropertyGroup>
+				<WriteLinesToFile WriteOnlyWhenDifferent="true" Overwrite="true" File="$(_GeneratedClassTargetFile)" Lines="$(_Lines)" />
+
+				<ItemGroup>
+						<Compile Include="$(_GeneratedClassTargetFile)" />
+				</ItemGroup>
+		</Target>
+
+		<Target Name="CompilePackageFiles"
+						Inputs="@(NpmPackageScripts)"
+						Outputs="$(NpmPackageTarget)"
+						Condition="'$(DesignTimeBuild)'!='true'">
+
+				<Exec Command="npm run build:bundle -- --no-color --env output-path=$(NpmPackageOutputPath)"
+							WorkingDirectory="$(NpmPackageProjectDirectory)"
+							/>
+
+				<Error Condition="!Exists($(NpmPackageTarget))"
+							 Text="Target script was not generated: $(NpmPackageTarget)"
+							 />
+		</Target>
+
+		<Target Name="GeneratePackageFiles"
+						Condition="'$(DesignTimeBuild)'!='true'"
+						DependsOnTargets="CompilePackageFiles">
+		</Target>
+
+</Project>

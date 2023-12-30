@@ -53,6 +53,7 @@
             "label": "Report Paths",
             "defaultValue": "",
             "required": false,
+            "visibleRule": "command = publish",
             "helpMarkDown": ""
         },
         {

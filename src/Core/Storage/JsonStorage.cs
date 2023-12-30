@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Benchmarker.Serialization;
 
@@ -18,6 +19,14 @@ namespace Benchmarker.Storage
         private BenchmarkHistory? history;
         private readonly string filePath;
 
+        public JsonStorage()
+            : this(DefaultOptions)
+        {
+        }
+        public JsonStorage(JsonSerializerOptions options)
+        {
+            this.options = options;
+        }
         public JsonStorage(string filePath)
             : this(DefaultOptions, filePath)
         { }
@@ -104,20 +113,21 @@ namespace Benchmarker.Storage
             return detail;
         }
 
-        public async ValueTask SaveAsync(CancellationToken cancellationToken)
+        public async ValueTask SaveAsync(Stream stream, CancellationToken cancellationToken)
         {
-            using var stream = File.OpenWrite(this.filePath);
             var histo = await this.GetAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             await JsonSerializer
-                .SerializeAsync(stream,
-                                histo,
-                                this.options,
-                                cancellationToken);
-            await stream
-                .FlushAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SerializeAsync(stream, histo, this.options, cancellationToken)
+                .NoAwait();
+        }
+        public async ValueTask SaveAsync(CancellationToken cancellationToken)
+        {
+            using var stream = File.OpenWrite(this.filePath);
+            var histo = await this.GetAsync(cancellationToken).NoAwait();
+            await this.SaveAsync(stream, cancellationToken).NoAwait();
+            await stream.FlushAsync(cancellationToken).NoAwait();
         }
 
         public async ValueTask<DateTime?> GetLastRunAsync(TestId id, CancellationToken cancellationToken)

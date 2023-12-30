@@ -1,0 +1,38 @@
+﻿<Project>
+
+		<!-- Implicit top import -->
+		<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+		<PropertyGroup>
+				<TargetFramework>net7</TargetFramework>
+				<ImplicitUsings>enable</ImplicitUsings>
+				<Nullable>enable</Nullable>
+				<IsPackable>false</IsPackable>
+				<IsTestProject>true</IsTestProject>
+				<SignAssembly>true</SignAssembly>
+		</PropertyGroup>
+
+		<Import Project="$(MSBuildProjectDirectory)/Scripts/Interop.props" />
+
+		<ItemGroup>
+
+				<PackageReference Include="Microsoft.ClearScript.V8" Version="*" />
+				<PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="*" />
+				<PackageReference Include="CliWrap" Version="*" />
+				<PackageReference Include="Microsoft.NET.Test.Sdk" Version="*" />
+				<PackageReference Include="Moq" Version="*" />
+				<PackageReference Include="MSTest.TestAdapter" Version="*" />
+				<PackageReference Include="MSTest.TestFramework" Version="*" />
+				<PackageReference Include="coverlet.collector" Version="*" />
+		</ItemGroup>
+
+		<ItemGroup>
+				<ProjectReference Include="..\..\Core\Models\Models.csproj" />
+				<ProjectReference Include="..\..\Core\Storage\Storage.csproj" />
+		</ItemGroup>
+
+		<!-- Implicit bottom import -->
+		<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+		<Import Project="$(MSBuildProjectDirectory)/Scripts/Interop.targets" />
+</Project>

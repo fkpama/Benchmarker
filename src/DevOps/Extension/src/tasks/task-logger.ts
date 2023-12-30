@@ -1,5 +1,5 @@
 import { IssueType, logIssue } from 'azure-pipelines-task-lib';
-import { Logger } from '../lib/common/logging';
+import { Logger } from '@sw/benchmarker-core';
 export class TaskLogger implements Logger
 {
     command(text: string)

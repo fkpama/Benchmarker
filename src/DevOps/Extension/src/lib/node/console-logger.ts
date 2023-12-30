@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { Logger } from '../common/logging';
+import { Logger } from '@sw/benchmarker-core';
 import log from './logging';
 
 export class ConsoleLogger implements Logger {

@@ -1,6 +1,5 @@
 ﻿#nullable disable
 
-
 namespace Benchmarker.Serialization
 {
     public class BenchmarkDetail

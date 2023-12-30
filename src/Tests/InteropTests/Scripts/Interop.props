@@ -1,0 +1,16 @@
+﻿<Project>
+		<PropertyGroup>
+				<NpmPackageProjectDirectory Condition="'$(NpmPackageProjectDirectory)'==''">$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)..\..\..\..\src\DevOps\Package'))</NpmPackageProjectDirectory>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<None Include="$(NpmPackageProjectDirectory)\src\benchmark-history.ts" Link="Scripts\Package\benchmark-history.ts" />
+		</ItemGroup>
+
+		<ItemGroup>
+				<NpmPackageScripts Include="$(NpmPackageProjectDirectory)\src\**\*.ts"
+														Exclude="$(NpmPackageProjectDirectory)\src\**\*.d.ts;$(NpmPackageProjectDirectory)\src\**\_generated\**\*.ts"
+													 />
+				<UpToDateCheckInput Include="@(NpmPackageScripts)" />
+		</ItemGroup>
+</Project>

@@ -1,4 +1,6 @@
-﻿require('source-map-support').install();
+﻿/// <reference path="src/build/gulp/chain.d.ts" />
+
+require('source-map-support').install();
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const sourcemaps = require('gulp-sourcemaps');
@@ -14,8 +16,10 @@ const chalk = require('chalk');
 //const lastRun = require('gulp-last-run');
 const gulpFilePath = './bin/build/gulpfile';
 const config = require('./src/build/config');
-const { defaultReporter } = require('gulp-typescript/release/reporter');
 const { glob } = require('fast-glob');
+
+const { vsCodeReporter } = require('../Common');
+const { spawn } = require('child_process');
 
 log.verbose = msg => {
     if (!msg) { return }
@@ -24,81 +28,80 @@ log.verbose = msg => {
     
 }
 
-/**
- * Little utility class to print `follow link' compatible
- * errors in the DEBUG CONSOLE output
- */
-class vsCodeReporter
-{
-    static _makeColor(msg, code)
-    {
-        return '\u001b[' + code + 'm' + msg + '\u001b[0m';
-    }
-    static _makeYellow(msg)
-    {
-        return '\u001b[31m\u001b[33m' + msg + '\u001b[0m'
-    }
-    static _makeRed(msg)
-    {
-        return vsCodeReporter._makeColor(msg, 91)
-    }
-    error(tsError)
-    {
-        if (!tsError) {
-            console.log(`TSERROR null?`);
-            return;
-        }
-        let position;
-        let code;
-        if (tsError.relativeFilename) {
-            position = `.\\${tsError.relativeFilename}`;
-            if (tsError.startPosition) {
-                position += `:${tsError.startPosition.line}:${tsError.startPosition.character}`;
-            }
-        }
-
-        if (tsError.diagnostic.code) {
-            code = `${vsCodeReporter._makeYellow(`TS${tsError.diagnostic.code}:`)}`
-        }
-        else {
-            code = ''
-        }
-        let msg;
-        let isObject = false;
-
-        if (typeof tsError.diagnostic.messageText === 'string')
-            msg = tsError.diagnostic.messageText;
-        else if (Object.hasOwnProperty.call(tsError.diagnostic.messageText, 'messageText')) {
-            isObject = true;
-            if (code) {
-                code += ' '
-            }
-            msg = '\n' + code + tsError.diagnostic.messageText.messageText + '\n';
-            code = '';
-        }
-        else if (typeof tsError.diagnostic.messageText === 'object')
-            msg = JSON.stringify(tsError.diagnostic.messageText, undefined, '  ');
-        else
-            msg = tsError.diagnostic.messageText;
-
-        if (!isObject) {
-            code = ' ' + code;
-            msg = ' ' + msg;
-        }
-
-        console.log(`${vsCodeReporter._makeRed(position)}:${code}${msg}`)
-    }
-    finish(result) {
-        new defaultReporter().finish(result);
-    }
-}
-
 function mkErr(msg)
 {
     let error = new Error(msg);
     error.showStack = false;
     throw error;
 }
+
+/**
+ * @summary create a task chained to build:compile.
+ * 
+ * @description
+ * it iterates over all the arguments and creates a series
+ * that is suitable to pass to gulp {@link mkFn}
+ * 
+ * @returns {Undertaker.TaskFunction} A task function suitable for gulp
+ */
+function chain()
+{
+    if (arguments.length == 0)
+    {
+        throw "At least one argument required"
+    }
+    let argAr = [];
+    for(let i = 0; i < arguments.length; i++)
+        argAr.push(arguments[i]);
+    let chainBuildCompile = true;
+    if (typeof argAr[0] === 'boolean')
+    {
+        console.log('REMOVING 1');
+        chainBuildCompile = argAr[0];
+        argAr = argAr.slice(1);
+    }
+    let arg = [];
+    if (chainBuildCompile)
+    {
+        arg.push('build:compile');
+    }
+    for(let i = 0; i < argAr.length; i++)
+    {
+        let name = argAr[i];
+        let fn;
+        if (typeof name === 'string')
+        {
+            if (!name)
+            {
+                throw new Error('null or empty string in the chain at position ' + i);
+            }
+            fn = mkFn('chain:' + name, function (cb) {
+                let x = require(gulpFilePath);
+                if (!x[name]) {
+                    mkErr('Task ' + name + ' is not defined in gulpfile.ts')
+                }
+                return x[name](cb);
+            })
+        }
+        else if (typeof name === 'function')
+        {
+            fn = name;
+        }
+        else {
+            throw new Error('Invalid chain arg');
+        }
+        arg[i + 1] = fn;
+    }
+
+    return gulp.series(arg);
+}
+
+/**
+ * 
+ * @param {ChainFunction} fn 
+ * 
+ * @returns 
+ */
 function makeChainFn(fn) {
     return cb => {
         let req = require(gulpFilePath);
@@ -109,6 +112,17 @@ function callTs(name, fn)
 {
     return mkFn('chain:' + name, makeChainFn(fn))
 }
+
+/**
+ * @summary Create a {@link Undertaker.TaskFunction} suitable as a gulp task
+ *  function
+ * 
+ * @param {string} name  The name of the task
+ * @param {Function} fn 
+ * @param {string?} description 
+ * @param {object?} flags An object describing the available options
+ * @returns 
+ */
 function mkFn(name, fn, description, flags)
 {
     fn.name = name;
@@ -149,6 +163,34 @@ function cleanBinDir(cb)
     },
     function (err) { cb(err); })
 }
+
+//gulp.task('build:deps', makeChainFn((req, cb) => req.buildDeps(cb)), 'Build Dependencies');
+
+function buildDeps(cb)
+{
+    const npx = spawn('npm', ['run', 'build:bundle'],
+    {
+        cwd: path.resolve(__dirname, '..', 'Package'),
+        shell: true
+    })
+    npx.stdout.on('data', data => {
+        const str = data.toString().trim();
+        log.info(str);
+    });
+    npx.stderr.on('data', data => {
+        const str = data.toString().trim();
+        log.error(str);
+    });
+    npx.on('error', (err) =>{
+        throw err;
+    })
+    npx.on('close', (code, signals) =>{
+        if (code != 0)
+            cb(mkErr(`Process exited with code ${code}`))
+        cb();
+    });
+}
+gulp.task(mkFn('build:deps', buildDeps, 'Build the module dependencies'));
 
 function compile()
 {
@@ -191,7 +233,8 @@ function compile()
     }
 }
 compile.description = 'Builds the build system files';
-gulp.task('build:compile', gulp.series(mkFn('clean:bindir', cleanBinDir), mkFn('build:compile:core', compile)));
+gulp.task('build:compile', mkFn('', gulp.series(mkFn('clean:bindir', cleanBinDir), 'build:deps', mkFn('build:compile:core', compile)), 'Build necessary build files'));
+
 
 function makeTask(name, description, flags)
 {
@@ -203,38 +246,6 @@ function makeTask(name, description, flags)
     return gulp.task(name, fn);
 }
 
-/*
- * create a task chained to build:compile
- */
-function chain()
-{
-    let arg = ['build:compile'];
-    for(let i = 0; i < arguments.length; i++)
-    {
-        let name = arguments[i];
-        let fn;
-        if (typeof name === 'string')
-        {
-            fn = mkFn('chain:' + name, function (cb) {
-                let x = require(gulpFilePath);
-                if (!x[name]) {
-                    mkErr('Task ' + name + ' is not defined in gulpfile.ts')
-                }
-                return x[name](cb);
-            })
-        }
-        else if (typeof name === 'function')
-        {
-            fn = name;
-        }
-        else {
-            throw new Error('Invalid chain arg');
-        }
-        arg[i + 1] = fn;
-    }
-
-    return gulp.series(arg);
-}
 
 function defFlags(additional)
 {

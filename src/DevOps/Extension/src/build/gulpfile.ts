@@ -153,6 +153,10 @@ async function buildExtensionTask()
     let { Run } = await import('./webpack.config.base');
     await Run(ConfigMode.Extension);
 }
+
+async function buildDepsTask()
+{
+}
 async function buildTasksTask()
 {
     let { Run } = await import('./webpack.config.base');
@@ -177,3 +181,5 @@ export const build = gulp.series(mk('build:core', buildTask));
 //export const buildExtension = gulp.series(cleanDist, cleanOutputs, mk('build:core', buildExtensionTask));
 export const buildExtension = series(mk('build:core', buildExtensionTask));
 export const buildTasks = series(mk('build:tasks', buildTasksTask));
+
+export const buildDeps = series(mk('build:deps', buildDepsTask))

@@ -6,6 +6,10 @@
 		</PropertyGroup>
 
 		<PropertyGroup>
+				<NpmPackageProjectDirectory Condition="'$(NpmPackageProjectDirectory)'==''">$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)src\DevOps\Package'))</NpmPackageProjectDirectory>
+		</PropertyGroup>
+
+		<PropertyGroup>
 				<Authors>Sodiware</Authors>
 				<!--<PackageProjectUrl>https://github.com/fkpama/Benchmarker</PackageProjectUrl>-->
 
