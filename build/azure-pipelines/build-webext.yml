@@ -26,11 +26,11 @@ variables:
 
 - name: BuildToolsDirectory
   readonly: true
-  value: BuildTools/
+  value: $(Build.SourcesDirectory)/BuildTools/
 
 - name: SourcesDirectory
   readonly: true
-  value: Benchmarker/
+  value: $(Build.SourcesDirectory)/Benchmarker/
 
 - name: WebDirectory
   readonly: true
@@ -68,7 +68,7 @@ steps:
     targetType: inline
     workingDirectory: $(WebDirectory)
     script: |
-      Import-Module $(BuildToolsDirectory)/Pipelines/Utils.ps1
+      Import-Module $(BuildToolsDirectory)Pipelines/Utils.ps1
 
       Log-Info "Generating Common Module"
       Set-Location .\Common
