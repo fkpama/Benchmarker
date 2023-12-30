@@ -114,6 +114,7 @@ steps:
       npm run build
 
 - task: DotNetCoreCLI@2
+  displayName: Run Interop Tests
   inputs:
     command: 'test'
     projects: '$(TestsDirectory)**/*InteropTests.csproj'
