@@ -138,6 +138,7 @@ steps:
 
 - task: PublishTestResults@2
   displayName: Publish Tests Results
+  condition: succeededOrFailed()
   inputs:
     testResultsFormat: 'VSTest'
     testResultsFiles: '$(TestResultsDirectory)/*.trx'
