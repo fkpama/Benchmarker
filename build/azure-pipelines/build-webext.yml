@@ -125,20 +125,14 @@ steps:
       $loc = Get-Location
       foreach($dir in (Get-ChildItem -Directory))
       {
-        if ($dir.Name -eq 'Common') { continue;}
+        Set-Location $loc
+        if ($dir.Name -eq 'Common') { continue; }
         $pkgJsonPath = Join-Path $dir "package.json"
         if (Test-Path $pkgJsonPath)
         {
           Log-Info "Running test for module $($dir.Name)"
-          try
-          {
-            cd $dir
-            npm run test -- --trx "${{ variables['TestResultsDirectory'] }}/$($dir.Name)-TestResults.trx"
-          }
-          finally
-          {
-            Set-Location $loc
-          }
+          cd $dir
+          npm run test -- --trx "${{ variables['TestResultsDirectory'] }}/$($dir.Name)-TestResults.trx"
         }
       }
 
