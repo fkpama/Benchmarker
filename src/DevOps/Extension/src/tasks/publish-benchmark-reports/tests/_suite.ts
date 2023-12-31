@@ -14,12 +14,16 @@ function validateRun(tr: MockTestRunner)
 }
 
 
-process.env['NODE_OPTIONS'] = `-r ts-node/register`
-process.env['TS_NODE_PROJECT'] = path.join(__dirname, 'tsconfig.json')
+const ext = path.extname(__filename);
+if (ext == '.ts')
+{
+    process.env['NODE_OPTIONS'] = `-r ts-node/register`
+    process.env['TS_NODE_PROJECT'] = path.join(__dirname, 'tsconfig.json')
+}
 describe('Sample task tests', () => {
     it('should succeed', async function() {
         this.timeout(10000);
-        const tp = path.join(__dirname, 'can-find-reports.ts');
+        const tp = path.join(__dirname, `can-find-reports${ext}`);
         const taskJson = path.join(__dirname, '..', 'task.json');
         const tr = new MockTestRunner(tp,  taskJson);
 

@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "gulp tests",
-    "build:bundle": "webpack",
+    "build:bundle": "gulp build && webpack",
     "build": "npm run build:bundle && gulp",
     "watch": "tsc --project tsconfig.json --watch"
   },
@@ -21,7 +21,6 @@
     "chai": "^4",
     "gulp": "^4.0.2",
     "gulp-typescript": "^5.0.1",
-    "mocha-trx-reporter": "^3.3.1",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",

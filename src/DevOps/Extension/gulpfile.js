@@ -20,7 +20,6 @@ const gulpFilePath = './bin/build/gulpfile';
 const config = require('./src/build/config');
 const { glob } = require('fast-glob');
 
-const { vsCodeReporter, isInPipeline, expandPath } = require('../Common/dist/build');
 const { spawn } = require('child_process');
 
 log.verbose = msg => {
@@ -197,6 +196,7 @@ gulp.task(mkFn('build:deps', buildDeps, 'Build the module dependencies'));
 function compile()
 {
     const binDir = config.BinDir;
+    const { vsCodeReporter, isInPipeline, expandPath } = require('../Common/dist/build');
 
     let configJsonPath = './tsconfig.json'
     const _conf = require(configJsonPath)['ts-node'];
