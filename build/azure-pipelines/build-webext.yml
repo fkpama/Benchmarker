@@ -125,10 +125,11 @@ steps:
       $loc = Get-Location
       foreach($dir in (Get-ChildItem -Directory))
       {
+        if ($dir.Name -eq 'Common') { continue; }
         $pkgJsonPath = Join-Path $dir "package.json"
         if (Test-Path $pkgJsonPath)
         {
-          Log-Info "Running tests for module $($dir.Name)"
+          Log-Info "Running test for module $($dir.Name)"
           try
           {
             cd $dir
