@@ -3,10 +3,6 @@ const ts = require('gulp-typescript');
 const { resolve, join } = require('path');
 const { spawn } = require('child_process');
 const log = require('fancy-log');
-const { logInfo } = require('../Common')
-const { getArguments, buildDotNetProject, tsCompileAsync } = require('../Common/dist/build')
-const { TypingsProjects } = require('./build/config');
-const { runTestsAsync } = require('../Common/dist/test-tools');
 const { env } = require('process');
 
 function mkErr(msg)
@@ -18,8 +14,6 @@ function mkErr(msg)
 
 function buildShared(cb)
 {
-   cb();
-    /*
     const npx = spawn('npm', ['run', 'build'],
     {
         cwd: resolve(__dirname, '..', 'Common'),
@@ -41,12 +35,12 @@ function buildShared(cb)
             cb(mkErr(`Process exited with code ${code}`))
         cb();
     });
-    */
 }
 buildShared.displayName = "Build Shared module"
 
 async function makeDeclarations()
 {
+    const { tsCompileAsync } = require('../Common/dist/build')
     const tsconfig = require('./tsconfig.json');
     let opts = tsconfig.compilerOptions;
     opts.outDir = resolve(__dirname, 'dist');
@@ -61,6 +55,9 @@ makeDeclarations.displayName = 'Create Package Typings'
 
 async function runTests()
 {
+    const { getArguments } = require('../Common/dist/build')
+    const { logInfo } = require('../Common')
+    const { runTestsAsync } = require('../Common/dist/test-tools');
     const tsconfigPath = join(__dirname, 'tsconfig.json');
     let args = await getArguments();
     /** @type {import('../Common/dist/test-tools').TestRunOptions} */
@@ -78,6 +75,8 @@ async function runTests()
 
 async function generateTypings()
 {
+    const { buildDotNetProject, tsCompileAsync } = require('../Common/dist/build')
+    const { TypingsProjects } = require('./build/config');
     for(let project of TypingsProjects)
     {
         await buildDotNetProject(project);
@@ -85,7 +84,7 @@ async function generateTypings()
 }
 generateTypings.displayName = 'Generate Typings';
 //gulp.task('declarations', makeDeclarations)
-gulp.task('build', gulp.series(gulp.parallel(buildShared, generateTypings), makeDeclarations))
+gulp.task('build', gulp.series(buildShared, generateTypings, makeDeclarations))
 gulp.task('default', gulp.parallel('build'))
 
 gulp.task('build:typings', gulp.parallel(makeDeclarations));
