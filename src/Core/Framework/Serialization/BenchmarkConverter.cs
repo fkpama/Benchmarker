@@ -1,5 +1,4 @@
-﻿using Benchmarker.Serialization;
-using BenchmarkDotNet.Loggers;
+﻿using BenchmarkDotNet.Loggers;
 using Benchmarker.Framework.Serialization;
 
 namespace Benchmarker.Serialization
