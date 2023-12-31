@@ -25,7 +25,7 @@ tmr.registerMockExport('getEndpointAuthorizationParameter', () => {
 });
 tmr.registerMock('../document-data-service', mod);
 
-tmr.setInput('reportPaths', 'some')
+tmr.setInput('projects', 'some')
 tmr.setInput('command', 'test')
 
 let cmd = "/dummy/dotnet";
