@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "tsconfig-paths": "^4.2.0",
+    "yargs": "^17.7.2"
+  },
+  "dependencies": {
+    "@sw/benchmarker-buildtools": "file:Common",
+    "@sw/benchmarker-core": "file:Package"
+  }
+}

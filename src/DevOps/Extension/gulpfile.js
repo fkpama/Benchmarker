@@ -168,7 +168,7 @@ function cleanBinDir(cb)
 
 function buildDeps(cb)
 {
-    const npx = spawn('npm', ['run', 'build:bundle'],
+    const npx = spawn('npm', ['run', 'build'],
     {
         cwd: path.resolve(__dirname, '..', 'Package'),
         shell: true

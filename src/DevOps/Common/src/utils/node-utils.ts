@@ -2,6 +2,7 @@ import { exec, ExecOptions, spawnSync } from "child_process";
 import { copyFile, mkdirSync, NoParamCallback, readFile, rm, rmdir, RmDirOptions, RmOptions, stat, Stats, statSync, writeFile } from "fs";
 import { basename, dirname, extname, join, resolve, sep as dirsep } from "path";
 import * as ts from "typescript";
+import { logInfo } from "../logging";
 
 let isInVsCode : undefined | boolean
 function ensureIsInVsCode()
@@ -204,14 +205,25 @@ export function readFileAsync(path: string, encoding: BufferEncoding = 'utf-8'):
     return new Promise<string>((resolve, reject) => {
         readFile(path, {
             encoding: encoding || 'utf-8'
-        },
-            (err, solved) => {
+        }, (err, solved) => {
                 if (err)
                     reject(err);
                 else
+                {
+                    if (solved && typeof solved !== 'string')
+                    {
+                        solved = (<Buffer>solved).toString();
+                    }
                     resolve(solved);
+                }
             })
     })
+}
+
+export async function readJsonAsync<T>(path: string, encoding: BufferEncoding = 'utf-8'): Promise<T>
+{
+    let content = await readFileAsync(path, encoding);
+    return JSON.parse(content);
 }
 
 export function rmdirAsync(path: string): Promise<void>;

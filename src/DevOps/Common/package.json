@@ -8,6 +8,7 @@
   "devDependencies": {
     "@types/fancy-log": "^2.0.2",
     "@types/node": "^20.10.6",
+    "@types/yargs": "^17.0.32",
     "chalk": "^4",
     "fancy-log": "^2.0.0",
     "fast-glob": "^3.3.2",

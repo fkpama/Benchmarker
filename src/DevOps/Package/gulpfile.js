@@ -1,10 +1,14 @@
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
-const { resolve } = require('path');
+const { resolve, join } = require('path');
 const { spawn } = require('child_process');
 const log = require('fancy-log');
-const { vsCodeReporter, buildDotNetProject } = require('../Common')
+const { vsCodeReporter, buildDotNetProject, TsProjectConfig, readFileAsync, readJsonAsync, logInfo } = require('../Common')
+const { getArguments } = require('../Common/dist/gulp')
 const { TypingsProjects } = require('./build/config');
+const { runTestsAsync } = require('../Common/dist/test-tools');
+const { env } = require('process');
+const { readFile } = require('fs');
 
 function mkErr(msg)
 {
@@ -37,7 +41,6 @@ function buildShared(cb)
         cb();
     });
 }
-buildShared.name = "build:shared"
 buildShared.displayName = "Build Shared module"
 
 function makeDeclarations()
@@ -60,7 +63,20 @@ makeDeclarations.description = 'Create TypeScript declaration file'
 
 async function runTests()
 {
+    const tsconfigPath = join(__dirname, 'tsconfig.json');
+    let args = await getArguments();
+    /** @type {import('../Common/dist/test-tools').TestRunOptions} */
+    let options = {
+        cwd: join(__dirname, 'tests'),
+    };
+    if (args.trx) {
+        let trx = resolve(args.trx);
+        logInfo(`Test result report file: ${trx}`)
+        options.trxReportPath = trx
+    }
+    await runTestsAsync('**/*.suite.ts', options);
 }
+//runTests.displayName = 'tests:core'
 
 async function generateTypings()
 {
@@ -74,4 +90,5 @@ generateTypings.displayName = 'Generate Typings';
 gulp.task('build', gulp.series(gulp.parallel(buildShared, generateTypings), makeDeclarations))
 gulp.task('default', gulp.parallel('build'))
 
+gulp.task('tests:core', runTests)
 gulp.task('tests', gulp.series('build', runTests))

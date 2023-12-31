@@ -1,11 +1,6 @@
-export interface Logger
-{
-    debug(message: string): void;
-    info(message: string): void;
-    warn(message: string): void;
-    error(message: string): void;
-    command(message: string): void;
-}
+import { Logger } from '../_generated/models';
+
+export { Logger } from '../_generated/models';
 
 export class NullLogger implements Logger
 {
@@ -15,6 +10,7 @@ export class NullLogger implements Logger
     warn(): void { }
     error(): void { }
     command(): void { }
-
+    verbose(): void { }
+    trace(): void { }
 }
 

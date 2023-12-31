@@ -2,13 +2,16 @@ import { readFileSync, rmSync } from "fs";
 import { dirname, relative } from "path";
 import { execAsync, execSync, existsAsync, readFileAsync } from "./utils/node-utils";
 import * as glob from 'fast-glob';
-import { cwd } from "process";
+import { cwd, env } from "process";
 import * as chalk from 'chalk';
 import { RootDir } from './config'
 import { SourceMapper } from './testtools/source-mapper';
-import { logError, logInfo } from "./logging";
+import { logDebug, logError, logInfo } from "./logging";
+import { gulpThrow } from "./gulp";
 
 export * from './testtools/source-mapper';
+
+type ProcessEnv = { [key: string]: string | undefined};
 
 let mochaCmd = 'npx mocha'
 if (process.platform === 'linux' && process.env['BUILD_BUILDID'])
@@ -24,6 +27,8 @@ if (process.platform === 'linux' && process.env['BUILD_BUILDID'])
     }
     mochaCmd = `${nodeExe} "${RootDir}/node_modules/mocha/bin/mocha.js"`
 }
+
+const isInPipeline = !!env['TF_BUILD']
 
 export interface TestSession {
     failed: string[];
@@ -47,7 +52,7 @@ export interface MochaTestInfo {
 }
 
 
-function getTestEnv() : {[key: string]: string | undefined}
+function getTestEnv() : ProcessEnv
 {
     let testEnv: { [key: string]: string } = {
         TASK_TEST_TRACE: '1'
@@ -65,7 +70,29 @@ async function cleanupTestSuite(suiteFpath: string)
     }
 }
 
-async function runSuiteAsync(session: TestSession, testName: string, suiteFpath: string)
+async function runAllTestsAsync(suiteFpath: string, env: ProcessEnv, session?: TestSession | null, options?: TestRunOptions)
+{
+    let cmd = `${mochaCmd}`
+    if (isInPipeline)
+    {
+        //cmd += `--reporter mocha-trx-reporter`
+    }
+    if (true) { cmd += ` -r tsconfig-paths/register` }
+    if (true) { cmd += ` -r ts-node/register` }
+    if (options?.trxReportPath)
+    {
+        cmd += ` --reporter mocha-trx-reporter --reporter-options output="${options.trxReportPath}"`
+    }
+
+    cmd += ` "${suiteFpath}"`
+    logInfo(`Running mocha: ${cmd}`);
+    let out = await execAsync(cmd, { sharedIo: true, noThrowOnError: true });
+    if (out.exitCode > 0)
+    {
+        gulpThrow(`${out.exitCode} test failed`);
+    }
+}
+async function runSuiteAsync(suiteFpath: string, testName?: string, session?: TestSession, options?: {})
 {
     await cleanupTestSuite(suiteFpath);
 
@@ -106,14 +133,14 @@ async function runSuiteAsync(session: TestSession, testName: string, suiteFpath:
                 let lines = content.filter(x => x.startsWith('##vso[task.issue type=error;]'));
                 let line = lines[lines.length - 1].substring(29);
                 line = decodeURIComponent(line);
-                if (session.sourceMap)
+                if (session?.sourceMap)
                 {
                     line = await session.sourceMap.processAsync(line);
                 }
                 msg += '\n\n' + line;
             }
             logError(msg);
-            session.failed.push(testName);
+            //session?.failed.push(testName);
             return;
         }
         else {
@@ -122,3 +149,31 @@ async function runSuiteAsync(session: TestSession, testName: string, suiteFpath:
     }
 }
 
+export interface TestRunOptions
+{
+    cwd?: string,
+    tsconfig?: string,
+    /**
+     * If set to a non null value, a trx file
+     * will be generated
+     */
+    trxReportPath?: string
+}
+
+export async function runTestsAsync(pattern: string, options?: TestRunOptions)
+{
+    let fileNames = await glob(pattern, Object.assign({}, options, { absolute: true }));
+    let env = getTestEnv();
+    if (options?.tsconfig)
+    {
+        if (!await existsAsync(options.tsconfig))
+        {
+            throw new Error(`TS Config file not found: ${options.tsconfig}.`);
+        }
+        logDebug(`Setting environment variable TS_NODE_PROJECT = ${options.tsconfig}`);
+        env['TS_NODE_PROJECT'] = options.tsconfig;
+    }
+    let promises = fileNames.map(async x => { await runAllTestsAsync(x, env, null, options) })
+
+    await Promise.all(promises);
+}

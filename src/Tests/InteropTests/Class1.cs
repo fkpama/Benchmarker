@@ -1,7 +1,6 @@
 ﻿using Benchmarker.Storage;
-using Benchmarker.Serialization;
 using InteropTests.Lib;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Benchmarker;
 
 namespace InteropTests
 {
@@ -42,7 +41,7 @@ namespace InteropTests
 
             stream.Position = 0;
             using var sr = new StreamReader(stream, leaveOpen: true);
-            await sut.OpenAsync(sr, cancellationToken).NoAwait();
+            await sut.LoadAsync(sr, cancellationToken).NoAwait();
 
             Assert.AreEqual(1, sut.NbTests);
             Console.WriteLine(testId.ToString("D"));

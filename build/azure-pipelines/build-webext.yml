@@ -112,6 +112,39 @@ steps:
       Set-Location '$(ExtensionRootDirectory)'
       npm run build
 
+- task: PowerShell@2
+  displayName: Run Tests
+  inputs:
+    targetType: inline
+    workingDirectory: $(WebDirectory)
+    script: |
+      Import-Module $(BuildToolsDirectory)Pipelines/Utils.ps1
+      $loc = Get-Location
+      foreach($dir in (Get-ChildItem -Directory))
+      {
+        $pkgJsonPath = Join-Path $dir "package.json"
+        if (Test-Path $pkgJsonPath)
+        {
+          Log-Info "Running tests for module $($dir.Name)"
+          try
+          {
+            cd $dir
+            npm run tests -- --trx "$(TestResultsDirectory)/$($dir.Name)-TestResults.trx"
+          }
+          finally
+          {
+            Set-Location $loc
+          }
+        }
+      }
+
+- task: PublishTestResults@2
+  displayName: Publish Tests Results
+  inputs:
+    testResultsFormat: 'VSTest'
+    testResultsFiles: '$(TestResultsDirectory)/*.trx'
+    mergeTestResults: true
+
 - task: DotNetCoreCLI@2
   displayName: Run Interop Tests
   inputs:

@@ -38,7 +38,6 @@
       "module": "commonjs",
       "target": "ES2020",
       "outDir": "bin",
-      "rootDir": "..",
       "noImplicitAny": true,
       "noImplicitThis": true,
       "noImplicitReturns": true,

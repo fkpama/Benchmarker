@@ -19,14 +19,39 @@ namespace InteropTests.Lib
     }
     public class JsLogger : ILogger
     {
-        public void debug(string message)
+        public void command(string message, params object[] args)
         {
             Console.WriteLine(message);
         }
 
-        public void info(string message)
+        public void debug(string message, params object[] args)
         {
             Console.WriteLine(message);
+        }
+
+        public void error(string message, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void info(string message, params object[] args)
+        {
+            Console.WriteLine(message);
+        }
+
+        public void trace(string message, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void verbose(string message, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void warn(string message, params object[] args)
+        {
+            throw new NotImplementedException();
         }
     }
     internal class ScriptBenchmarkHistory
@@ -46,6 +71,7 @@ namespace InteropTests.Lib
         internal Task<ScriptBenchmark> GetTestAsync(string name, CancellationToken cancellationToken)
         {
             var test = this.history.getTestByName(name);
+            cancellationToken.ThrowIfCancellationRequested();
             var bench = new ScriptBenchmark(test);
             return Task.FromResult(bench);
         }
@@ -63,7 +89,7 @@ namespace InteropTests.Lib
             return bench;
         }
 
-        internal async Task OpenAsync(TextReader reader, CancellationToken cancellationToken)
+        internal async Task LoadAsync(TextReader reader, CancellationToken cancellationToken)
         {
             var text =  await reader.ReadToEndAsync(cancellationToken).NoAwait();
             this.history.loadJson(text);

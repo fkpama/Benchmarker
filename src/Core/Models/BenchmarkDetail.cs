@@ -1,14 +1,11 @@
-﻿#nullable disable
-
-namespace Benchmarker.Serialization
+﻿namespace Benchmarker
 {
     public class BenchmarkDetail
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string RefId { get; set; }
-        public string FullName { get; set; }
-        public string MethodTitle { get; set; }
+        public required string Name { get; init; }
+        //public string RefId { get; set; }
+        public required string FullName { get; init; }
+        public string? MethodTitle { get; set; }
     }
 }
-#nullable restore

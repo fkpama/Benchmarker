@@ -8,7 +8,7 @@ namespace Benchmarker.Serialization
         public string? Title { get; set; }
         public string? CommitId { get; set; }
         public List<BenchmarkRecord> Records { get; set; }
-        public Dictionary<string, string> Properties { get; set; }
+        public Dictionary<string, string>? Properties { get; set; }
 
         public BenchmarkRunModel() : this(DateTime.UtcNow) { }
 
