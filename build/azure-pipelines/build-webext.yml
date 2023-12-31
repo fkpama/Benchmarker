@@ -53,6 +53,9 @@ variables:
 - name: TestsDirectory
   value: $(SourcesDirectory)src/Tests/
 
+- name: TestResultsDirectory
+  value: $(Common.TestResultsDirectory)
+
 steps:
 - checkout: BuildTools
 
@@ -129,7 +132,7 @@ steps:
           try
           {
             cd $dir
-            npm run tests -- --trx "$(TestResultsDirectory)/$($dir.Name)-TestResults.trx"
+            npm run tests -- --trx "${{ variables['TestResultsDirectory'] }}/$($dir.Name)-TestResults.trx"
           }
           finally
           {
