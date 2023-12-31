@@ -95,27 +95,6 @@ steps:
       }
 
 - task: PowerShell@2
-  displayName: Build Modules
-  inputs:
-    targetType: inline
-    workingDirectory: $(WebDirectory)
-    script: |
-      Import-Module $(BuildToolsDirectory)Pipelines/Utils.ps1
-      $loc = Get-Location
-
-      Log-Debug "Build Common package"
-      Set-Location '$(BuildToolsPackageDirectory)'
-      npm run build -- --env production
-      if ($LASTEXITCODE -ne 0)
-      {
-        exit 1
-      }
-
-      Log-Debug "Building Extension Module"
-      Set-Location '$(ExtensionRootDirectory)'
-      npm run build
-
-- task: PowerShell@2
   displayName: Run Tests
   inputs:
     targetType: inline
@@ -135,6 +114,27 @@ steps:
           npm run test -- --trx "${{ variables['TestResultsDirectory'] }}/$($dir.Name)-TestResults.trx"
         }
       }
+
+- task: PowerShell@2
+  displayName: Build Modules
+  inputs:
+    targetType: inline
+    workingDirectory: $(WebDirectory)
+    script: |
+      Import-Module $(BuildToolsDirectory)Pipelines/Utils.ps1
+      $loc = Get-Location
+
+      Log-Debug "Build Common package"
+      Set-Location '$(BuildToolsPackageDirectory)'
+      npm run build -- --env production
+      if ($LASTEXITCODE -ne 0)
+      {
+        exit 1
+      }
+
+      Log-Debug "Building Extension Module"
+      Set-Location '$(ExtensionRootDirectory)'
+      npm run build
 
 - task: PublishTestResults@2
   displayName: Publish Tests Results
