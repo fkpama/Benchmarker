@@ -40,11 +40,10 @@ function isSameGuid(uuid1: string, uuid2: string): boolean
     return normalizeUuid(uuid1).toLowerCase() == normalizeUuid(uuid2).toLowerCase();
 }
 
-function isArray<T>(items: any ): items is T[]
+function isArray<T extends ReadonlyArray<any>>(items: any): items is T
 {
     return Array.isArray(items);
 }
-
 
 export const _ = {
     argNotNull,

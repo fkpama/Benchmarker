@@ -1,5 +1,8 @@
 import * as yargs from 'yargs'
 const { hideBin } = require('yargs/helpers')
+export * from './utils/dotnet-utils';
+export * from './vs-code-reporter';
+export * from './ts';
 
 export function gulpThrow(str: string) : never
 {

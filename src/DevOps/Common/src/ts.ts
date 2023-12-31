@@ -1,12 +1,25 @@
+import { _ } from './underscore';
 import * as ts from 'typescript';
 import * as chalk from 'chalk';
 import { cwd } from 'process';
 import { isAbsolute, relative, sep } from 'path';
 import { isPathUnder } from './fs';
-import { logWarn } from './logging';
+import { logDebug, logError, logInfo, logWarn } from './logging';
+import { glob } from 'fast-glob';
+import { gulpThrow } from './gulp';
 
-export function formatDiagnostic(diag: ts.Diagnostic): string
+export function formatDiagnostic(diag: ts.Diagnostic | ReadonlyArray<ts.Diagnostic>): string
 {
+    if (_.isArray(diag))
+    {
+        if (diag.length > 0)
+        {
+            logWarn('Invalid call to formatDiagnostics with empty array');
+            return '';
+        }
+        let res = diag.map(x => formatDiagnostic(x)).join('\n');
+        return res;
+    }
     let str = ts.formatDiagnostic(diag, {
         getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
         getCanonicalFileName: f => f,
@@ -103,4 +116,54 @@ export function normalizeStack(text?: string)
     }
 
     return text;
+}
+
+function writeFile(emittedFileList: string[], fileName: string, text: string, bom?: boolean)
+{
+    emittedFileList.push(fileName);
+    ts.sys.writeFile(fileName, text, )
+}
+
+export async function tsCompileAsync(filesOrPattern: string[] | string, compilerOptions: ts.CompilerOptions)
+{
+    let files: string[];
+    if (_.isString(filesOrPattern))
+    {
+        files = await glob(filesOrPattern, { absolute: true });
+    }
+    else
+    {
+        files = filesOrPattern;
+    }
+
+    let x = ts.convertCompilerOptionsFromJson(compilerOptions, cwd());
+    if (x.errors?.length > 0)
+    {
+        let errStr = formatDiagnostic(x.errors);
+        gulpThrow(errStr);
+    }
+
+    logDebug('Compiling files: ', files.join('\n'));
+
+    console.log(x.options);
+    const program = ts.createProgram(files, x.options);
+
+    let emittedFiles : string[] = [];
+    let result: ts.EmitResult;
+    try
+    {
+        result = program.emit(undefined, (filename, text, bom) => writeFile(emittedFiles, filename, text, bom));
+        logInfo(`TsCompile ${chalk.greenBright('Succeeded')}`);
+    }
+    catch(err: any)
+    {
+        logError('EMIT error: ', err)
+        gulpThrow(err);
+    }
+
+    if (result.diagnostics)
+    {
+        let str = formatDiagnostic(result.diagnostics);
+        logWarn(str);
+    }
 }
