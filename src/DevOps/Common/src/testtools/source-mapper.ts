@@ -1,7 +1,7 @@
 import { glob } from 'fast-glob';
 import { isAbsolute, join, relative, resolve } from 'path';
 import * as smc from 'source-map';
-import { isSamePath, readFileAsync } from '../utils/node-utils';
+import { isSamePath, readFileAsync } from '../node/node-utils';
 import * as ts from 'typescript';
 import { cwd } from 'process';
 declare type SourceMapConsumer = smc.BasicSourceMapConsumer;

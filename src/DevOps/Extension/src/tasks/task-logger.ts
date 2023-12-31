@@ -1,7 +1,15 @@
 import { IssueType, logIssue } from 'azure-pipelines-task-lib';
-import { Logger } from '@sw/benchmarker-core';
+import { Logger } from '@fkpama/benchmarker-core';
 export class TaskLogger implements Logger
 {
+    verbose(message: string, ...args: any[]): void
+    {
+        console.log(message);
+    }
+    trace(message: string, ...args: any[]): void
+    {
+        console.log(message);
+    }
     command(text: string)
     {
         console.log('##[command]' + text);

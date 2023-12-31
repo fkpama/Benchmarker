@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "gulp build --prod",
+    "build": "gulp build",
     "build:tasks": "gulp build:tasks",
     "test": "gulp tests",
     "serve": "npm run build && webpack serve",
-    "publish": "gulp publish --prod",
+    "publish": "gulp publish",
     "clean": "gulp clean"
   },
   "type": "commonjs",
@@ -21,11 +21,11 @@
     "moment": "^2.29.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.10",
+    "@babel/core": "^7.20.5",
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.22.10",
-    "@sw/benchmarker-buildtools": "file:../Common",
-    "@sw/benchmarker-core": "file:../Package",
+    "@fkpama/benchmarker-common": "file:../Common",
+    "@fkpama/benchmarker-core": "file:../Package",
     "@types/chai": "^4.3.5",
     "@types/chai-as-promised": "^7.1.5",
     "@types/fancy-log": "^2.0.0",
@@ -38,6 +38,7 @@
     "azure-pipelines-task-lib": "^5.0.1-preview.0",
     "babel-loader": "^9.1.3",
     "babel-plugin-transform-globalthis": "^1.0.0",
+    "babel-plugin-transform-import-paths": "^1.0.3",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "chalk": "^4",

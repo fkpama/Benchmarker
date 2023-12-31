@@ -1,5 +1,4 @@
 import { Logger } from '../_generated/models';
-
 export { Logger } from '../_generated/models';
 
 export class NullLogger implements Logger

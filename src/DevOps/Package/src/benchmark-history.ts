@@ -1,4 +1,4 @@
-import { _ } from '@sodiware/benchmarker-common';
+import { _ } from '@fkpama/benchmarker-common';
 import { NullLogger } from './logging/logging';
 import { BenchmarkDetail, BenchmarkHistory as BenchmarkHistoryModel, BenchmarkRecord, BenchmarkRunModel, Logger } from './_generated/models';
 

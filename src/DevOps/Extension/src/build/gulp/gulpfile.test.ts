@@ -1,10 +1,7 @@
-import {
-    copyFileAsync, execAsync, execSync,
-    existsAsync, readFileAsync, logInfo, logError, logWarn, webpackAsync
-} from '@sw/benchmarker-buildtools'
-import { MochaTestInfo, TestSession } from '@sw/benchmarker-buildtools/dist/test-tools'
-import { formatDiagnostic  } from '@sw/benchmarker-buildtools/dist/ts'
-import { gulpThrow as gThrow , gulpThrow } from '@sw/benchmarker-buildtools/dist/gulp'
+import { copyFileAsync, execAsync, execSync, existsAsync, readFileAsync } from '@fkpama/benchmarker-common/dist/node'
+import { logInfo, logError, logWarn } from '@fkpama/benchmarker-common/dist/logging'
+import { MochaTestInfo, TestSession } from '@fkpama/benchmarker-common/dist/test-tools'
+import { gulpThrow as gThrow, webpackAsync, formatDiagnostic } from '@fkpama/benchmarker-common/dist/build'
 import { basename, dirname, join, relative, resolve } from 'path';
 import { glob } from 'fast-glob';
 import { existsSync, readFileSync, rmSync } from 'fs';
@@ -145,7 +142,7 @@ export async function runTaskTypescript(taskDir: string,
     if (parsed.errors && parsed.errors.length > 0)
     {
         let str = parsed.errors.map(x => formatDiagnostic(x)).join('\n');
-        gulpThrow(str);
+        gThrow(str);
     }
 
     compilerOptions.outDir = join(outDir, relPath);

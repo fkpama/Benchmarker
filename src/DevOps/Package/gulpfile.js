@@ -4,7 +4,7 @@ const { resolve, join } = require('path');
 const { spawn } = require('child_process');
 const log = require('fancy-log');
 const { logInfo } = require('../Common')
-const { getArguments, buildDotNetProject, vsCodeReporter, tsCompileAsync } = require('../Common/dist/gulp')
+const { getArguments, buildDotNetProject, tsCompileAsync } = require('../Common/dist/build')
 const { TypingsProjects } = require('./build/config');
 const { runTestsAsync } = require('../Common/dist/test-tools');
 const { env } = require('process');
@@ -18,6 +18,8 @@ function mkErr(msg)
 
 function buildShared(cb)
 {
+   cb();
+    /*
     const npx = spawn('npm', ['run', 'build'],
     {
         cwd: resolve(__dirname, '..', 'Common'),
@@ -39,6 +41,7 @@ function buildShared(cb)
             cb(mkErr(`Process exited with code ${code}`))
         cb();
     });
+    */
 }
 buildShared.displayName = "Build Shared module"
 
@@ -46,7 +49,7 @@ async function makeDeclarations()
 {
     const tsconfig = require('./tsconfig.json');
     let opts = tsconfig.compilerOptions;
-    opts.outDir = resolve(__dirname, 'dist/typings');
+    opts.outDir = resolve(__dirname, 'dist');
     opts.emitDeclarationOnly = true;
     opts.declaration = true;
     opts.rootDir = resolve(__dirname, 'src')

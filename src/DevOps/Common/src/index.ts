@@ -3,7 +3,7 @@
 //export * from './utils/node-utils';
 //export * from './utils/dotnet-utils';
 export * from './logging';
-export * from './underscore';
+export * from './utils/underscore';
 
 import { CompilerOptions } from 'typescript';
 

@@ -1,13 +1,13 @@
 import { readFileSync, rmSync } from "fs";
 import { dirname, relative } from "path";
-import { execAsync, execSync, existsAsync, readFileAsync } from "./utils/node-utils";
+import { execAsync, execSync, existsAsync, readFileAsync } from "./node/node-utils";
 import * as glob from 'fast-glob';
 import { cwd, env } from "process";
 import * as chalk from 'chalk';
 import { RootDir } from './config'
 import { SourceMapper } from './testtools/source-mapper';
 import { logDebug, logError, logInfo } from "./logging";
-import { gulpThrow } from "./gulp";
+import { gulpThrow } from "./build";
 
 export * from './testtools/source-mapper';
 

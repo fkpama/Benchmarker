@@ -2,7 +2,7 @@ import moment from "moment";
 import { HttpClient } from "../../lib/common/http-client";
 import { HttpClientImpl } from '../../lib/node/http-client-impl';
 import { ExtensionVersion, ServerManifest, TaskManifest, TaskVersion } from "./manifest-utils";
-import { ConsoleLogger } from "../../lib/node/console-logger";
+import { ConsoleLogger } from '@fkpama/benchmarker-core';
 
 export class ServerExtension
 {

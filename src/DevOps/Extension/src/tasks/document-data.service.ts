@@ -1,6 +1,6 @@
 import { getCollectionName, getExtensionId, getExtensionManagementHostUri, getPublisherName } from '../lib/node/task-utilities';
 import { HttpClient, HttpErrors, HttpResponseError } from '../lib/common/http-client';
-import { NullLogger, Logger } from '@sw/benchmarker-core';
+import { NullLogger, Logger } from '@fkpama/benchmarker-core';
 import { isNullOrWhitespace } from '../lib/common/utilities';
 
 const API_VERSION = '7.1-preview.1';

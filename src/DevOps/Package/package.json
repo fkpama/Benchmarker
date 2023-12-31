@@ -1,5 +1,5 @@
 {
-  "name": "@sw/benchmarker-core",
+  "name": "@fkpama/benchmarker-core",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",

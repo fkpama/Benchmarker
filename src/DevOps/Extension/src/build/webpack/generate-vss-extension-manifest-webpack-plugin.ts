@@ -6,13 +6,13 @@ import {
     getManifestInfos, ManifestInfo, findPATToken,
     getServerManifestInfosAsync, ServerManifest, parseAndIncrementVersion, normalizePath
 } from '../lib/manifest-utils';
-import * as benchmarkerBuildtools from '@sw/benchmarker-buildtools'
+import * as chalk from 'chalk';
+import { logTrace, logInfo, logError, logWarn, logDebug, logVerbose } from '@fkpama/benchmarker-common/logging'
+import { rmdirAsync, readFileAsync, execAsync } from '@fkpama/benchmarker-common/node'
+import { webpackThrow } from '@fkpama/benchmarker-common/build'
 import { tmpdir } from 'os';
 import { getLastVersion } from '../lib/server-extension';
-import log from 'fancy-log';
-import chalk from 'chalk';
 import { WaitToken } from './wait-plugin';
-import {  } from '@sw/benchmarker-buildtools';
 import { VsixCompilationImpl as VsixCompilation } from './vsix-compilation';
 import { isPromise } from 'util/types';
 
@@ -84,7 +84,7 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         if(!this.options.objDir)
         {
             this.options.objDir = tmpdir();
-            log.info(`Using ${this.options.objDir} as temp dir`)
+            logInfo(`Using ${this.options.objDir} as temp dir`)
         }
         return this.options.objDir;
     }
@@ -97,7 +97,7 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
     }
     private async _process(compilation: Compilation): Promise<void>
     {
-        benchmarkerBuildtools.logTrace(`VSIX generation plugin BEGIN`)
+        logTrace(`VSIX generation plugin BEGIN`)
         const compiler = compilation.compiler;
         let manifest = this.options.manifest;
         let outputPath: string | undefined;
@@ -105,7 +105,7 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
             outputPath = this.options.outputPath;
             if (!outputPath)
                 outputPath = join(compiler.outputPath, 'vss-extension.json');
-            log.info('Writing vss-extension to', dirname(outputPath));
+            logInfo('Writing vss-extension to', dirname(outputPath));
             if (!existsSync(dirname(outputPath)))
                 mkdirSync(dirname(outputPath), { recursive: true });
             writeFileSync(outputPath, JSON.stringify(manifest, undefined, '  '));
@@ -115,7 +115,7 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
             globs.push(outputPath!);
 
         if (globs.length == 0) {
-            log.warn('No vss-extension inputs');
+            logWarn('No vss-extension inputs');
             return Promise.resolve();
         }
         let pat: string | undefined = this.options.updateDisabled ? undefined : findPATToken();
@@ -131,19 +131,19 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         if (pat) {
             try
             {
-                benchmarkerBuildtools.logTrace(`Trying to get server extension version`)
+                logTrace(`Trying to get server extension version`)
                 serverManifest = await getServerManifestInfosAsync(pat, manifestInfo.id, publisher);
                 let lastVer = getLastVersion(serverManifest);
                 serverVersion = lastVer.version;
                 if (this.options.incrementVersion)
                 {
                     serverVersion = parseAndIncrementVersion(serverVersion);
-                    benchmarkerBuildtools.logInfo(`Incremented version from server: ${chalk.greenBright(serverVersion)}`);
+                    logInfo(`Incremented version from server: ${chalk.greenBright(serverVersion)}`);
                 }
             }
             catch(ex)
             {
-                benchmarkerBuildtools.logError(`Failed to obtain server version: ${ex}`);
+                logError(`Failed to obtain server version: ${ex}`);
                 if (ex instanceof Error)
                 {
                     let error : WebpackError = new WebpackError(ex.message);
@@ -165,31 +165,31 @@ export class GenerateManifestWebpackPlugin implements WebpackPluginInstance {
         {
             gl = [...gl, ...addFiles];
         }
-        benchmarkerBuildtools.logVerbose(`Generating extension manifest: ${vsixOutputPath}`)
+        logVerbose(`Generating extension manifest: ${vsixOutputPath}`)
         let overrideFile = this.options.overridesFile;
         if (serverVersion) {
             overrideFile = this._writeOverridesFile(manifestInfo, serverVersion);
         }
         cmdLine += generateManifestGlobs(gl, overrideFile);
-        benchmarkerBuildtools.logDebug('Increment version:', this.options.incrementVersion);
+        logDebug('Increment version:', this.options.incrementVersion);
         if (!serverVersion && this.options.incrementVersion) {
             cmdLine += " --rev-version";
         }
 
-        benchmarkerBuildtools.logDebug('Executing command ' + cmdLine);
-        let result = await benchmarkerBuildtools.execAsync(`npx tfx-cli extension create --no-prompt ${cmdLine}`, {
+        logDebug('Executing command ' + cmdLine);
+        let result = await execAsync(`npx tfx-cli extension create --no-prompt ${cmdLine}`, {
             sharedIo: true
         });
         if (result.exitCode) {
-            benchmarkerBuildtools.webpackThrow(result.stderr);
+            webpackThrow(result.stderr);
         }
 
-        let size = await benchmarkerBuildtools.readFileAsync(vsixOutputPath, 'binary');
+        let size = await readFileAsync(vsixOutputPath, 'binary');
         const buffer = Buffer.from(size, 'binary');
         /*
         await copyFileAsync(vsixOutputPath, `${changeExt(vsixOutputPath, '.bak.zip')}`);
         //*/
-        await benchmarkerBuildtools.rmdirAsync(vsixOutputPath, true);
+        await rmdirAsync(vsixOutputPath, true);
         let src = new sources.RawSource(buffer, false);
 
 

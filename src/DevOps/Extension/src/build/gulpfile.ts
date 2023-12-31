@@ -1,16 +1,12 @@
 import { glob } from 'fast-glob';
 import { info as logInfo } from 'fancy-log';
-import { RootDir, BinDir, ObjDir, TaskDirName, DistDir, TokenFilename } from './config';
+import { RootDir, BinDir, ObjDir, TaskDirName, DistDir } from './config';
 import * as gulp from 'gulp';
-import { statSync, existsSync, readFileSync, rmSync } from 'fs';
 import { cwd } from 'process';
-import {
-    join,
-    dirname, relative, resolve
-} from 'path';
+import { join, relative } from 'path';
 import { runTaskTests } from './gulp/gulpfile.test';
-import { rmdirAsync } from '@sw/benchmarker-buildtools';
-import { TestSession, SourceMapper } from '@sw/benchmarker-buildtools/dist/test-tools';
+import { rmdirAsync } from '@fkpama/benchmarker-common/node';
+import { TestSession, SourceMapper } from '@fkpama/benchmarker-common/test-tools';
 import chalk from 'chalk';
 import { ConfigMode } from './declarations';
 import { findPATToken } from './lib/manifest-utils';
@@ -163,6 +159,7 @@ async function buildTasksTask()
 }
 async function buildTask()
 {
+    console.log('HERE 1');
     await (await import('./webpack.config.base')).Run();
 }
 
@@ -176,7 +173,7 @@ export const publish = gulp.series(mk('publish', publishTask));
 export const tests = gulp.parallel(
     mk('tests:unit-tests', testUnitTestsTask),
     mk('tests:tasks', testTasksTask))
-export const build = gulp.series(mk('build:core', buildTask));
+export const build = series(mk('build:core', buildTask));
 //export const buildExtension = gulp.series(cleanDist, cleanOutputs, mk('build:core', buildExtensionTask));
 export const buildExtension = series(mk('build:core', buildExtensionTask));
 export const buildTasks = series(mk('build:tasks', buildTasksTask));

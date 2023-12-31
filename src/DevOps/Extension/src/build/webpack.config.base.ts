@@ -2,7 +2,7 @@
 /// <reference types="copy-webpack-plugin" />
 /// <reference types="../lib/manifest.d.ts" />
 import { Configuration, DefinePlugin, EntryObject, IgnorePlugin, MultiStats, ProgressPlugin, Stats, WebpackPluginInstance } from 'webpack';
-import { readdirSync, writeFile, writeFileSync } from 'fs';
+import { readdirSync } from 'fs';
 const JsonMinimizerPlugin = require("json-minimizer-webpack-plugin");
 import { join, relative, resolve } from 'path';
 import { cwd } from 'process';
@@ -15,11 +15,11 @@ import path from 'path';
 import { VssTaskGenerationWebpackPlugin } from './webpack/task-generation-webpack-plugin';
 import { BinDir, DistDir, ObjDir, RootDir, SrcDir } from './config';
 import { ConfigMode, GetConfigFn, GetDefaultBuildConfigFn, WebpackEnv } from './declarations';
-import { TaskCompilationContext } from './webpack/internal';
-import { TaskComponent as VsixTask, VsixCompilation } from './webpack/vsix-compilation';
+import { VsixCompilation } from './webpack/vsix-compilation';
 import { DEFAULT_EXTENSION_FILENAME } from '../lib/node/task-initialization';
-import { WebpackOptions, webpackAsync } from '@sw/benchmarker-buildtools/dist/webpack';
-import { logDebug, logWarn, writeFileAsync } from '@sw/benchmarker-buildtools';
+import { WebpackOptions, webpackAsync } from '@fkpama/benchmarker-common/build';
+import { logDebug, logWarn, logInfo } from '@fkpama/benchmarker-common/logging';
+import { writeFileAsync } from '@fkpama/benchmarker-common/node';
 
 export const CommandLineArgs = {
     VsixOutputDir: 'vsix-output-dir'
@@ -31,7 +31,8 @@ export const Constants = {
     VsixUpdateDisabled: 'update-disabled',
     VsixUpdateDisabled2: 'update-disabled',
     IncrementManifestsSourceVersions: 'increment_version',
-    CorePackageDir: path.join(RootDir, '..', 'Packages')
+    CorePackageDir: path.join(RootDir, '..', 'Packages'),
+    CommonPackageDir: path.join(RootDir, '..', 'Common')
 }
 
 const inspect = require('util').inspect.styles;
@@ -347,7 +348,8 @@ function GetConfigImpl(...args: any[]): Configuration
             alias: {
                 //"azure-devops-extension-sdk": path.join(buildRootDir, "node_modules/azure-devops-extension-sdk"),
                 //'fs/promises': 'fs.promises'
-                '@sw/benchmarker-core': Constants.CorePackageDir
+                '@fkpama/benchmarker-core': Constants.CorePackageDir,
+                '@fkpama/benchmarker-common': Constants.CommonPackageDir
             }
         },
         module: {
@@ -414,6 +416,8 @@ export async function Run(mode: ConfigMode) : Promise<Stats>;
 export async function Run(options: WebpackOptions) : Promise<MultiStats>;
 export async function Run(...args: any[]) : Promise<any>
 {
+    console.log('OK');
+    logInfo("Starting webpack")
     let opts: WebpackOptions | undefined;
     let cfgMode : ConfigMode | undefined;
 

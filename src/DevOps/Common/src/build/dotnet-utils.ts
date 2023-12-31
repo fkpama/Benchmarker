@@ -1,5 +1,5 @@
 import { logInfo } from "../logging";
-import { execAsync } from "./node-utils";
+import { execAsync } from "../node/node-utils";
 
 export async function buildDotNetProject(path: string)
 {

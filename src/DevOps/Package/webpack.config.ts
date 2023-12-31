@@ -27,7 +27,7 @@ const configurator: (env: WebpackEnv) => Configuration = (env) => {
         resolve: {
             extensions: ['.ts', '.js'],
             alias: {
-                '@sodiware/benchmarker-common': path.resolve(process.cwd(), '../Common/')
+                '@fkpama/benchmarker-common': path.resolve(process.cwd(), '../Common/'),
             }
         },
         module: {

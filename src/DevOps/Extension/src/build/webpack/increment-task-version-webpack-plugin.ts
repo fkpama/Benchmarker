@@ -3,7 +3,7 @@ import log from 'fancy-log';
 import { existsSync, readFileSync, stat, statSync, writeFileSync } from "fs";
 import { dirname, extname, join, relative, resolve } from "path";
 import { Chunk, Compilation, Compiler, WebpackPluginInstance } from "webpack";
-import { changeExt } from '@sw/benchmarker-buildtools';
+import { changeExt } from '@fkpama/benchmarker-common/node';
 import {
     TaskManifest, TaskVersion, findPATToken,
     getManifestInfos, getServerManifestInfosAsync,

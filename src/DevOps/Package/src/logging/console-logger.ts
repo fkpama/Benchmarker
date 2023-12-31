@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { Logger } from './logging';
-import { logInfo, logError, logWarn, logDebug, logVerbose, logTrace } from '@sodiware/benchmarker-common/dist/logging';
+import { logInfo, logError, logWarn, logDebug, logVerbose, logTrace } from '@fkpama/benchmarker-common/dist/logging';
 
 export class ConsoleLogger implements Logger {
     constructor()

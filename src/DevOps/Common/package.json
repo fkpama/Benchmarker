@@ -1,18 +1,30 @@
 {
-  "name": "@sw/benchmarker-buildtools",
+  "name": "@fkpama/benchmarker-common",
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
     "build": "webpack"
   },
+  "exports": {
+    "logging": "./dist/logging.js",
+    "node": "./dist/node.js",
+    "build": "./dist/build.js",
+    "test-tools": "./dist/test-tools.js"
+  },
   "devDependencies": {
+    "@babel/core": "7.20",
+    "@babel/types": "^7.23.6",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__traverse": "^7.20.5",
     "@types/fancy-log": "^2.0.2",
     "@types/node": "^20.10.6",
+    "@types/vinyl": "^2.0.11",
     "@types/yargs": "^17.0.32",
     "chalk": "^4",
     "fancy-log": "^2.0.0",
     "fast-glob": "^3.3.2",
     "gulp-typescript": "^6.0.0-alpha.1",
+    "minimatch": "^9.0.3",
     "source-map": "^0.7.4",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",

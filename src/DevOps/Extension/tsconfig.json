@@ -21,13 +21,14 @@
       "ES2015.Promise"
     ],
       "paths": {
-        "@sw/benchmarker-core": [
+        "@fkpama/benchmarker-core": [
           "../Package/"
         ],
-        "@sw/benchmarker-buildtools":[
+        "@fkpama/benchmarker-common":[
           "../Common/"
         ],
-        "@sw/benchmarker-buildtools/*": [
+        "@fkpama/benchmarker-common/*": [
+          "../Common/dist/*",
           "../Common/*"
         ]
       }
@@ -51,13 +52,14 @@
         "ES2015"
       ],
       "paths": {
-        "@sw/benchmarker-core": [
+        "@fkpama/benchmarker-core": [
           "../Package/"
         ],
-        "@sw/benchmarker-buildtools": [
+        "@fkpama/benchmarker-common": [
           "../Common/"
         ],
-        "@sw/benchmarker-buildtools/*": [
+        "@fkpama/benchmarker-common/*": [
+          "../Common/dist/*",
           "../Common/*"
         ]
       },
@@ -79,8 +81,8 @@
      "src/lib/node/console-logger.ts"
   ],
   "exclude": [
-    "bin",
-    "obj",
-    "node_modules"
+    "./bin/**/*",
+    "./obj/**/*",
+    "./node_modules/**/*"
   ]
 }

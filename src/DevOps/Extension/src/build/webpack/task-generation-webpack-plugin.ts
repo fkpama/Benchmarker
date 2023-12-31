@@ -5,8 +5,9 @@ import {
 import {
     changeExt,
     ensureParentDirectory, filePathWithoutExtension, readFileAsync,
-    writeFileAsync, logInfo, logWarn, logDebug, logError
-} from '@sw/benchmarker-buildtools'
+    writeFileAsync,
+} from '@fkpama/benchmarker-common/node'
+import { logInfo, logWarn, logDebug, logError } from '@fkpama/benchmarker-common/logging'
 import { TaskManifest, normalizePath } from "../lib/manifest-utils";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "path";
 import {  existsSync } from "fs";

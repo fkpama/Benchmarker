@@ -13,10 +13,11 @@
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "paths": {
-            "@sodiware/benchmarker-common": [
+            "@fkpama/benchmarker-common": [
                 "../Common"
             ],
-            "@sodiware/benchmarker-common/*": [
+            "@fkpama/benchmarker-common/*": [
+                "../Common/dist/*",
                 "../Common/*"
             ]
         }

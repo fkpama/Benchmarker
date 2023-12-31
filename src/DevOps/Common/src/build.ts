@@ -1,8 +1,13 @@
 import * as yargs from 'yargs'
 const { hideBin } = require('yargs/helpers')
-export * from './utils/dotnet-utils';
-export * from './vs-code-reporter';
-export * from './ts';
+export * from './build/dotnet-utils';
+export * from './build/vs-code-reporter';
+export * from './build/ts';
+export * from './build/webpack';
+
+export const isInPipeline = !!process.env['TF_BUILD']
+
+export { expandPath } from './build/expand-path-plugin';
 
 export function gulpThrow(str: string) : never
 {

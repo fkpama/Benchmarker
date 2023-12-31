@@ -14,9 +14,8 @@ const configurator: (env: WebpackEnv) => Configuration = (env) => {
             'index': path.join(__dirname, 'src', 'index'),
             'test-tools': path.join(__dirname, 'src', 'test-tools.ts'),
             'logging': path.join(__dirname, 'src', 'logging.ts'),
-            'webpack': path.join(__dirname, 'src', 'webpack.ts'),
-            'ts': path.join(__dirname, 'src', 'ts.ts'),
-            'gulp': path.join(__dirname, 'src', 'gulp.ts'),
+            'build': path.join(__dirname, 'src', 'build.ts'),
+            'node': path.join(__dirname, 'src', 'node.ts'),
         },
         mode: 'development',
         target: 'node',
@@ -34,6 +33,7 @@ const configurator: (env: WebpackEnv) => Configuration = (env) => {
         resolve: {
             extensions: ['.ts', '.js']
         },
+        devtool: 'inline-source-map',
         module: {
             rules: [
                 {

@@ -4,7 +4,7 @@ import { webpack, Configuration, Stats, MultiStats  } from 'webpack';
 import { isAbsolute, relative, resolve } from 'path';
 import * as path from 'path';
 import { cwd } from 'process';
-import { isPathUnder } from './fs';
+import { isPathUnder } from '../node/fs';
 
 //export const logInfo =  log.info;
 //export const logError =  log.error;

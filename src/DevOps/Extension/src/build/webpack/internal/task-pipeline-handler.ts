@@ -1,6 +1,6 @@
 import { Compilation, Compiler, sources } from "webpack";
 import { Constants, TaskCompilationContext, TaskData } from ".";
-import { readFileAsync } from '@sw/benchmarker-buildtools';
+import { readFileAsync } from '@fkpama/benchmarker-common/node';
 
 const PluginName = Constants.TaskGenerationPluginName;
 

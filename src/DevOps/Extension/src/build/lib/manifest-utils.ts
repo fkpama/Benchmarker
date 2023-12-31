@@ -2,7 +2,8 @@
 import log from 'fancy-log';
 import { existsSync, readFileSync } from "fs";
 import { dirname, join } from 'path';
-import { changeExt, execAsync, readFileAsync, logDebug, logTrace } from '@sw/benchmarker-buildtools';
+import { logDebug, logTrace } from '@fkpama/benchmarker-common';
+import { changeExt, execAsync, readFileAsync } from '@fkpama/benchmarker-common/node';
 
 const extensionCache =new Map<string, ServerManifest>();
 

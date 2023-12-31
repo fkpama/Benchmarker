@@ -1,6 +1,6 @@
 //import * as log from 'fancy-log';
 import * as chalk from 'chalk';
-import { _ } from './underscore';
+import { _ } from './utils/underscore';
 
 function format(msg: string, args: any[])
 {

@@ -1,5 +1,7 @@
 ﻿/// <reference path="src/build/gulp/chain.d.ts" />
 
+const { Transform } = require('stream');
+
 require('source-map-support').install();
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
@@ -18,7 +20,7 @@ const gulpFilePath = './bin/build/gulpfile';
 const config = require('./src/build/config');
 const { glob } = require('fast-glob');
 
-const { vsCodeReporter } = require('../Common');
+const { vsCodeReporter, isInPipeline, expandPath } = require('../Common/dist/build');
 const { spawn } = require('child_process');
 
 log.verbose = msg => {
@@ -196,13 +198,17 @@ function compile()
 {
     const binDir = config.BinDir;
 
-    const _conf = require('./tsconfig.json')['ts-node'];
+    let configJsonPath = './tsconfig.json'
+    const _conf = require(configJsonPath)['ts-node'];
     let opts = _conf.compilerOptions;
     const tsProject = ts.createProject(opts);
     const base = path.relative(__dirname, path.join(config.RootDir, config.SrcDir));
 
     log.verbose(`Bin Dir: ${binDir}`)
-    log.verbose(`TS Config: ${JSON.stringify(opts, null, ' ')}`)
+    if (isInPipeline)
+    {
+        log.verbose(`TS Config: ${JSON.stringify(opts, null, ' ')}`)
+    }
 
     const tsResult = gulp.src([
         mk('src/build/**/*.ts'),
@@ -225,7 +231,9 @@ function compile()
         //*/
         .pipe(sourcemaps.write('.', {
             sourceRoot: srcRoot
-        })).pipe(gulp.dest(binDir))
+        }))
+        .pipe(expandPath(configJsonPath))
+        .pipe(gulp.dest(binDir))
     ]);
     function mk(pattern)
     {
@@ -234,6 +242,7 @@ function compile()
 }
 compile.description = 'Builds the build system files';
 gulp.task('build:compile', mkFn('', gulp.series(mkFn('clean:bindir', cleanBinDir), 'build:deps', mkFn('build:compile:core', compile)), 'Build necessary build files'));
+gulp.task('build:compile:core', mkFn('', gulp.series(mkFn('clean:bindir', cleanBinDir), mkFn('build:compile:core', compile)), 'Build necessary build files'));
 
 
 function makeTask(name, description, flags)

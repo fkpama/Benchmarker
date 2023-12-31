@@ -4,11 +4,15 @@
         "module": "CommonJS",
         "target": "ES2015",
         "moduleResolution": "node",
+        "sourceMap": true,
         "strict": true,
         "declaration": true,
         "allowJs": true,
         "types": [
-            "node"
+            "node",
+            "@babel/traverse",
+            "@babel/core",
+            "vinyl"
         ]
     },
     "ts-node": {
