@@ -38,7 +38,6 @@
     "azure-pipelines-task-lib": "^5.0.1-preview.0",
     "babel-loader": "^9.1.3",
     "babel-plugin-transform-globalthis": "^1.0.0",
-    "babel-plugin-transform-import-paths": "^1.0.3",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "chalk": "^4",

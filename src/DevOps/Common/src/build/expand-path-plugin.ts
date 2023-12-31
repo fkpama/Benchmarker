@@ -1,3 +1,4 @@
+// see: https://github.com/anthonynichols/babel-plugin-transform-import-paths/blob/master/src/transform-import-paths.ts
 import { Transform, TransformCallback } from 'stream';
 import { CallExpression, ImportDeclaration, Program, StringLiteral, isBinaryExpression, isStringLiteral } from '@babel/types';
 import { NodePath } from '@babel/traverse';
