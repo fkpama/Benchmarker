@@ -4,7 +4,7 @@ import { HttpClientImpl as HttpClient } from '../lib/node/http-client-impl';
 import { describe } from "mocha";
 import { setupPatToken } from './test-utils';
 import { getAccessToken } from '../tasks/azure-sdk-utils';
-import { ConsoleLogger } from '../lib/node/console-logger';
+import { ConsoleLogger } from '@fkpama/benchmarker-core'
 import chai, { expect } from 'chai';
 import { HttpResponseError } from '../lib/common//http-client';
 const chaiAsPromised = require('chai-as-promised');
