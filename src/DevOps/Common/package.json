@@ -25,7 +25,6 @@
     "fast-glob": "^3.3.2",
     "gulp-typescript": "^6.0.0-alpha.1",
     "minimatch": "^9.0.3",
-    "mocha": "^10.2.0",
     "mocha-trx-reporter": "^3.3.1",
     "source-map": "^0.7.4",
     "ts-loader": "^9.5.1",
@@ -35,5 +34,8 @@
     "webpack-cli": "^5.1.4",
     "webpack-node-externals": "^3.0.0",
     "yargs": "^17.7.2"
+  },
+  "peerDependencies": {
+    "mocha": "^10.2.0"
   }
 }
