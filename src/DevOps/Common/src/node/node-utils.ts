@@ -48,6 +48,7 @@ export function execSync(cmd: string, ...args: string[]): ExecResult
         let bufs : any = spawnSync(cmd, {
             shell: true
         });
+        const { status, stdout, stderr } = bufs;
         if (bufs.error)
         {
             return {
