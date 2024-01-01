@@ -5,7 +5,7 @@ export * from './build/vs-code-reporter';
 export * from './build/ts';
 export * from './build/webpack';
 
-export const isInPipeline = !!process.env['TF_BUILD']
+export const isInPipeline = !!process.env['TF_BUILD'] || !!process.env['BUILD_BUILDID']
 
 export { expandPath } from './build/expand-path-plugin';
 

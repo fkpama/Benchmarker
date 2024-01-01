@@ -4,18 +4,18 @@ import { execAsync, execSync, existsAsync, readFileAsync } from "../node/node-ut
 import * as glob from 'fast-glob';
 import { cwd, env } from "process";
 import * as chalk from 'chalk';
-import { RootDir } from '../config'
 import { SourceMapper } from './source-mapper';
 import { logDebug, logError, logInfo } from "../logging";
-import { gulpThrow } from "../build";
-import { strict } from "yargs";
+import { gulpThrow, isInPipeline } from "../build";
 
 type ProcessEnv = { [key: string]: string | undefined};
+
+//const isInPipeline = !!env['TF_BUILD'] || !!env['BUILD_BUILDID']
 
 function getMochaCmd(target: string): string
 {
     let mochaCmd = 'npx mocha'
-    if (process.platform === 'linux' && process.env['BUILD_BUILDID'])
+    if (process.platform === 'linux' && isInPipeline)
     {
         let nodeExe = 'node'
         // mocha has an issue on build agents.
@@ -69,8 +69,6 @@ function getMochaCmd(target: string): string
     }
     return mochaCmd;
 }
-
-const isInPipeline = !!env['TF_BUILD']
 
 export interface TestSession {
     failed: string[];

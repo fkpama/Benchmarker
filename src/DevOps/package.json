@@ -1,10 +1,22 @@
 {
   "devDependencies": {
+    "mocha": "^10.2.0",
+    "mocha-trx-reporter": "^3.3.1",
     "tsconfig-paths": "^4.2.0",
     "yargs": "^17.7.2"
   },
   "dependencies": {
     "@sw/benchmarker-buildtools": "file:Common",
     "@sw/benchmarker-core": "file:Package"
-  }
+  },
+  "name": "devops",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

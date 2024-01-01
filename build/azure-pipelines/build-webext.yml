@@ -76,6 +76,12 @@ steps:
       Import-Module $(BuildToolsDirectory)Pipelines/Utils.ps1
 
       $loc = Get-Location
+      if (Test-Path package.json)
+      {
+        Log-Info "Restoring root module"
+        npm install -y -f
+      }
+      
       foreach($dir in (Get-ChildItem -Directory))
       {
         $pkgJsonPath = Join-Path $dir "package.json"
@@ -85,7 +91,7 @@ steps:
           try
           {
             cd $dir
-            npm install
+            npm install -f -y
           }
           finally
           {

@@ -65,9 +65,12 @@ async function runTests()
         cwd: join(__dirname, 'tests'),
     };
     if (args.trx) {
-        let trx = resolve(args.trx);
-        logInfo(`Test result report file: ${trx}`)
-        options.trxReportPath = trx
+        let trx = typeof args.trx === 'string' ? resolve(args.trx) : (!!args.trx ? "TestResults.trx" : null);
+        if (trx)
+        {
+            logInfo(`Test result report file: ${trx}`)
+            options.trxReportPath = trx
+        }
     }
     await runTestsAsync('**/*.suite.ts', options);
 }
