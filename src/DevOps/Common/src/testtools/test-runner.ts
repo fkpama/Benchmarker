@@ -1,5 +1,5 @@
-import { readFileSync, rmSync } from "fs";
-import { dirname, relative } from "path";
+import { existsSync, readFileSync, rmSync } from "fs";
+import { dirname, join, relative } from "path";
 import { execAsync, execSync, existsAsync, readFileAsync } from "../node/node-utils";
 import * as glob from 'fast-glob';
 import { cwd, env } from "process";
@@ -8,6 +8,7 @@ import { RootDir } from '../config'
 import { SourceMapper } from './source-mapper';
 import { logDebug, logError, logInfo } from "../logging";
 import { gulpThrow } from "../build";
+import { strict } from "yargs";
 
 type ProcessEnv = { [key: string]: string | undefined};
 
@@ -23,9 +24,48 @@ function getMochaCmd(target: string): string
         let { exitCode: rc } = execSync('node -v');
         if (rc !== 0)
         {
+            console.log(rc);
             nodeExe = 'nodejs'
         }
-        mochaCmd = `${nodeExe} "${RootDir}/node_modules/.bin/mocha"`
+        
+        let scriptPath : string | undefined = undefined;
+        for(let cur = dirname(target), parent; !!cur && cur != (parent = dirname(cur)); cur = parent)
+        {
+            let candidate = join(cur, "/node_modules/mocha/bin/mocha.js")
+            if (existsSync(candidate))
+            {
+                scriptPath = candidate;
+                break;
+            }
+        }
+
+        if (!scriptPath)
+        {
+            let res = execSync("npx mocha --version");
+            if (res.exitCode != 0)
+            {
+                gulpThrow(`Could not find mocha for script: ${target}`);
+            }
+
+            mochaCmd = "npx mocha"
+        }
+        else
+        {
+            mochaCmd = `${nodeExe} "${scriptPath}"`;
+        }
+    }
+    let version = execSync(`${mochaCmd} --version`);
+    if (version.exitCode != 0)
+    {
+        if (version.error)
+        {
+            logError(version.error.message);
+        }
+        gulpThrow(`Error finding mocha (${version.exitCode}): ${version.stderr}`);
+    }
+    else
+    {
+        logDebug(`Using mocha version 1: ${version.stdout}`);
     }
     return mochaCmd;
 }

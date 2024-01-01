@@ -32,6 +32,7 @@ export function ensureDirectory(path: string)
 interface ExecResult {
     exitCode: number;
     stdout: string;
+    error?: Error;
     stderr: string;
 }
 interface ExecOptions2 extends ExecOptions {
@@ -41,22 +42,36 @@ interface ExecOptions2 extends ExecOptions {
     sharedIo?: boolean;
     noThrowOnError?: boolean
 }
-export function execSync(cmd: string): ExecResult
+export function execSync(cmd: string, ...args: string[]): ExecResult
 {
     try {
-        let bufs = spawnSync(cmd).toString();
+        let bufs : any = spawnSync(cmd, {
+            shell: true
+        });
+        if (bufs.error)
+        {
+            return {
+                exitCode: bufs.error.errno,
+                stderr: '',
+                stdout: '',
+                error: bufs.error
+
+            }
+        }
         return {
-            exitCode: 0,
-            stderr: '',
-            stdout: bufs
+            exitCode: status,
+            stderr,
+            stdout
         }
     }
     catch (err: any)
     {
+        console.log('Spawn error',  err)
         return {
             exitCode: err.status,
-            stdout: err.stdout,
-            stderr: err.stdout
+            stdout: '',
+            error: err.error ?? err,
+            stderr: err.stderr
         }
     }
 }
