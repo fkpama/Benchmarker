@@ -11,19 +11,23 @@ import { gulpThrow } from "../build";
 
 type ProcessEnv = { [key: string]: string | undefined};
 
-let mochaCmd = 'npx mocha'
-if (process.platform === 'linux' && process.env['BUILD_BUILDID'])
+function getMochaCmd(target: string): string
 {
-    let nodeExe = 'node'
-    // mocha has an issue on build agents.
-    // it tries to run `node', which is the
-    // legacy exe
-    let { exitCode: rc } = execSync('node -v');
-    if (rc !== 0)
+    let mochaCmd = 'npx mocha'
+    if (process.platform === 'linux' && process.env['BUILD_BUILDID'])
     {
-        nodeExe = 'nodejs'
+        let nodeExe = 'node'
+        // mocha has an issue on build agents.
+        // it tries to run `node', which is the
+        // legacy exe
+        let { exitCode: rc } = execSync('node -v');
+        if (rc !== 0)
+        {
+            nodeExe = 'nodejs'
+        }
+        mochaCmd = `${nodeExe} "${RootDir}/node_modules/.bin/mocha"`
     }
-    mochaCmd = `${nodeExe} "${RootDir}/node_modules/mocha/bin/mocha.js"`
+    return mochaCmd;
 }
 
 const isInPipeline = !!env['TF_BUILD']
@@ -70,7 +74,7 @@ async function cleanupTestSuite(suiteFpath: string)
 
 async function runAllTestsAsync(suiteFpath: string, env: ProcessEnv, session?: TestSession | null, options?: TestRunOptions)
 {
-    let cmd = `${mochaCmd}`
+    let cmd = getMochaCmd(suiteFpath);
     if (isInPipeline)
     {
         //cmd += `--reporter mocha-trx-reporter`
@@ -97,7 +101,7 @@ async function runSuiteAsync(suiteFpath: string, testName?: string, session?: Te
     logInfo(`Listing tests in ${relative(cwd(), suiteFpath)}`);
     let testEnv = getTestEnv();
     let fname = `${suiteFpath}.testlist`;
-    let output = await execAsync(`${mochaCmd} --require mocha-suppress-logs --reporter-options output="${fname}" --reporter json --dry-run "${suiteFpath}"`);
+    let output = await execAsync(`${getMochaCmd(suiteFpath)} --require mocha-suppress-logs --reporter-options output="${fname}" --reporter json --dry-run "${suiteFpath}"`);
     if (!await existsAsync(fname))
     {
         throw new Error(`Could not find the reporter output '${fname}'`)
@@ -109,7 +113,7 @@ async function runSuiteAsync(suiteFpath: string, testName?: string, session?: Te
     for (let test of testList)
     {
         logInfo(`Executing test ${chalk.greenBright(test.fullTitle)}`);
-        output = await execAsync(`${mochaCmd} --register source-map-support/register --grep "${test.fullTitle}" -c "${suiteFpath}"`, {
+        output = await execAsync(`${getMochaCmd(suiteFpath)} --register source-map-support/register --grep "${test.fullTitle}" -c "${suiteFpath}"`, {
             sharedIo: true,
             noThrowOnError: true,
             env: testEnv
