@@ -1,5 +1,4 @@
-import { getEndpointAuthorizationParameter } from "azure-pipelines-task-lib/task";
-import * as tl from 'azure-pipelines-task-lib';
+import * as tl from 'azure-pipelines-task-lib/task';
 import * as path from 'path';
 import { env } from "process";
 

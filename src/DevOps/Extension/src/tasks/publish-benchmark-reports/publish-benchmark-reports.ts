@@ -1,10 +1,7 @@
 import tl = require('azure-pipelines-task-lib/task');
-import tr = require("azure-pipelines-task-lib/toolrunner");
+import tr from "azure-pipelines-task-lib/toolrunner";
 import * as utils from '../azure-sdk-utils';
-import { TaskLogger } from '../task-logger';
-import { DocumentDataService } from '../document-data.service';
-import { HttpClientImpl } from '../../lib/node/http-client-impl';
-import { glob } from 'fast-glob';
+import { join } from 'path';
 export class DotNetExe
 {
   private command?: string;
@@ -24,6 +21,7 @@ export class DotNetExe
 
   public async execute(): Promise<void>
   {
+    tl.setResourcePath(join(__dirname, 'task.json'));
     switch (this.command)
     {
       case "test":
@@ -43,6 +41,7 @@ export class DotNetExe
     const dotnetPath = tl.which('dotnet', true);
 
     const projectFiles = utils.getProjectFiles(this._projects)
+    //const projectFiles: string[] = tl.findMatch(tl.getVariable("System.DefaultWorkingDirectory") || process.cwd(), this._projects!);
     if (projectFiles.length == 0) {
       tl.warning(tl.loc('noProjectFilesFound'));
     }

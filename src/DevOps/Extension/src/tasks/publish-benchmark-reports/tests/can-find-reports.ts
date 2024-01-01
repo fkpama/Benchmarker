@@ -31,7 +31,7 @@ tmr.setInput('command', 'test')
 let cmd = "/dummy/dotnet";
 let chp :{ [key: string]: boolean; } = {}
 chp[cmd] = true;
-const args = 'test';
+const args = 'test answer';
 const str = `${cmd} ${args}`
 var answers: ma.TaskLibAnswers = <ma.TaskLibAnswers>{
     which: {
@@ -39,6 +39,11 @@ var answers: ma.TaskLibAnswers = <ma.TaskLibAnswers>{
     },
     checkPath: {
         [cmd]: true
+    },
+    findMatch: {
+        "some": [
+            "answer"
+        ]
     },
     exec: {
         [str]: {
